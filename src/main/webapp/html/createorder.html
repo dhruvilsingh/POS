@@ -1,0 +1,119 @@
+<!doctype html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+
+    <h3>Create Order</h3>
+
+    <!-- Top row with form-->
+    <div class="row">
+        <div class="col-12">
+            <form class="form-inline" id="create-order-form" name="inputOrder">
+                <div class="form-group">
+                    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="productBarcode" id="inputBarcode" placeholder="Enter barcode">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" name="productQuantity" id="inputQuantity" placeholder="Enter quantity">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputProductSP" class="col-sm-2 col-form-label">Selling Price</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" name="productSP" id="inputProductSP" placeholder="Enter selling price">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" id="add-product">Add</button>
+                &nbsp;
+                <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>
+                &nbsp;
+                <button type="button" class="btn btn-primary" id="confirm-order">Confirm</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Blank Row -->
+    <div class="row">
+        &nbsp;
+    </div>
+    <div class="row">
+        <!-- Table -->
+        <div class="col-12">
+            <table class="table table-striped" id="order-item-table">
+                <thead>
+                <tr>
+                    <th scope="col">Barcode</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Selling price</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Product Edit Modal -->
+    <div class="modal" tabindex="-1" role="dialog" id="edit-order-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="form-inline" id="order-edit-form">
+                        <div class="form-group">
+                            <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="productBarcode" id="editBarcode" placeholder="Enter Barcode" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="productQuantity" id="editQuantity" placeholder="Enter quantity">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputProductSP" class="col-sm-2 col-form-label">Selling price</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="productSP" id="editProductSP" placeholder="Enter selling price">
+                            </div>
+                        </div>
+                        <input type="hidden" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="update-order">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- Container end-->
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script th:src="@{/static/createorder.js}"/></script>
+
+</body>
+
+</html>
+
+
