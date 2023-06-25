@@ -29,18 +29,15 @@ function addProduct(event){
 
 function confirmOrder(event) {
   var baseUrl = $("meta[name=baseUrl]").attr("content");
-  var url = baseUrl + "/api/orderItem";
-
+  var url = baseUrl + "/api/orderitem";
   $.ajax({
     url: url,
     type: 'POST',
     success: function(response) {
-        console.log("clearingtable")
         getProductList();
     },
     error: handleAjaxError
   });
-
   return false;
 }
 
@@ -50,7 +47,6 @@ function updateProduct(event){
 	var id = $("#order-edit-form input[name=id]").val();
 	var url = getCreateOrderUrl() + "/" + id;
 	console.log(url);
-
 	//Set the values to update
 	var $form = $("#order-edit-form");
 	var json = toJson($form);

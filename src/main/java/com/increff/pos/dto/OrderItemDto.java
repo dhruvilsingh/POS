@@ -1,10 +1,9 @@
 package com.increff.pos.dto;
 
+import com.increff.pos.dao.OrderItemDao;
+import com.increff.pos.model.BrandData;
 import com.increff.pos.model.OrderItemData;
-import com.increff.pos.model.OrderItemForm;
-import com.increff.pos.pojo.CartPojo;
-import com.increff.pos.pojo.OrderItemPojo;
-import com.increff.pos.pojo.OrderPojo;
+import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +31,26 @@ public class OrderItemDto {
             orderItemService.add(convert(cartPojo,orderId));
             cartService.delete(cartPojo.getItemNo());
         }
+    }
+
+    public List<OrderItemData> getAll(int orderId) throws ApiException {
+        List<OrderItemPojo> list = orderItemService.getAll(orderId);
+        List<OrderItemData> list2 = new ArrayList<OrderItemData>();
+        for (OrderItemPojo orderItemPojo : list) {
+            list2.add(convert(orderItemPojo));
+        }
+        return list2;
+    }
+
+    private OrderItemData convert(OrderItemPojo orderItemPojo) throws ApiException {
+        OrderItemData orderItemData = new OrderItemData();
+        ProductPojo productPojo = productService.get(orderItemPojo.getProductId());
+        orderItemData.setProductBarcode(productPojo.getProductBarcode());
+        orderItemData.setProductName(productPojo.getProductName());
+        orderItemData.setProductQuantity(orderItemPojo.getProductQuantity());
+        orderItemData.setProductMrp(productPojo.getProductMrp());
+        orderItemData.setProductSP(orderItemPojo.getSellingPrice());
+        return orderItemData;
     }
 
     private OrderItemPojo convert(CartPojo cartPojo, int orderId){

@@ -26,6 +26,7 @@ public class BrandDto {
         BrandPojo brandPojo = brandService.get(id);
         return convert(brandPojo);
     }
+
     public List<BrandData> getAll() {
         List<BrandPojo> list = brandService.getAll();
         List<BrandData> list2 = new ArrayList<BrandData>();

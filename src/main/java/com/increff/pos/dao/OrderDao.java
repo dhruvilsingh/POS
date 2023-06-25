@@ -20,9 +20,7 @@ public class OrderDao extends AbstractDao{
 
     @Transactional
     public int insert(OrderPojo orderPojo) {
-        System.out.println("order pojo id =  " + orderPojo.getOrderId());
         entityManager.persist(orderPojo);
-        System.out.println("   persisted  ");
         return orderPojo.getOrderId();
     }
 

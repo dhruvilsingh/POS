@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -19,4 +20,24 @@ public class OrderService {
     public int add(OrderPojo orderPojo) throws ApiException {
         return orderDao.insert(orderPojo);
     }
+
+    @Transactional(rollbackOn = ApiException.class)
+    public OrderPojo get(int orderId) throws ApiException {
+        return getCheck(orderId);
+    }
+
+    @Transactional
+    public List<OrderPojo> getAll() {
+        return orderDao.selectAll();
+    }
+
+    @Transactional
+    public OrderPojo getCheck(int orderId) throws ApiException {
+        OrderPojo orderPojo = orderDao.select(orderId);
+        if (orderPojo == null) {
+            throw new ApiException("Brand with given ID does not exit, id: " + orderId);
+        }
+        return orderPojo;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.increff.pos.service;
 
 import com.increff.pos.dao.OrderItemDao;
 import com.increff.pos.dao.OrderItemDao;
+import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.util.StringUtil;
@@ -22,5 +23,8 @@ public class OrderItemService {
         orderItemDao.insert(orderItemPojo);
     }
 
-
+    @Transactional
+    public List<OrderItemPojo> getAll(int orderId) {
+        return orderItemDao.selectAll(orderId);
+    }
 }

@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+
+  <h3>Order Item</h3>
+
+  <!-- Blank Row -->
+  <div class="row">
+    &nbsp;
+  </div>
+  <div class="row">
+    <!-- Table -->
+    <div class="col-12">
+      <table class="table table-striped" id="order-item-table">
+        <thead>
+        <tr>
+          <th scope="col">Barcode</th>
+          <th scope="col">Name</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Selling price</th>
+          <th scope="col">Mrp</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div> <!-- Container end-->
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script th:src="@{/static/orderitem.js}"/></script>
+<script th:src="@{/static/loaddata.js}"/></script>
+
+</body>
+
+</html>
+
+

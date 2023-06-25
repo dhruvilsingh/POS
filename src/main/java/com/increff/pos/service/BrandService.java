@@ -49,6 +49,7 @@ public class BrandService {
         brandDao.update(exBrandPojo);
     }
 
+    @Transactional
     public int getBrandCategory(String brandName, String category){
         return brandDao.selectBrandCategory(brandName,category);
     }

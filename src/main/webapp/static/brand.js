@@ -49,10 +49,8 @@ function updateBrand(event){
 	   },
 	   error: handleAjaxError
 	});
-
 	return false;
 }
-
 
 function getBrandList(){
 	var url = getBrandUrl();
