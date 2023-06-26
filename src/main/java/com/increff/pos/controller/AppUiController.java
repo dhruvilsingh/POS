@@ -28,9 +28,9 @@ public class AppUiController extends AbstractUiDto {
 		return mav("inventory.html");
 	}
 
-	@RequestMapping(value = "/ui/createorder")
-	public ModelAndView createOrder() {
-		return mav("createorder.html");
+	@RequestMapping(value = "/ui/cart")
+	public ModelAndView cart() {
+		return mav("cart.html");
 	}
 
 	@RequestMapping(value = "/ui/orderitem")

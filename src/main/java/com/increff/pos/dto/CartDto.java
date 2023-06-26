@@ -6,6 +6,8 @@ import com.increff.pos.model.CartForm;
 import com.increff.pos.pojo.CartPojo;
 import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.service.*;
+import com.increff.pos.util.SecurityUtil;
+import com.increff.pos.util.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
@@ -23,12 +25,17 @@ public class CartDto {
     private UserService userService;
 
     public void add(CartForm cartForm) throws ApiException {
-        CartPojo cartPojo = cartService.get(cartForm.getProductBarcode(), LoginDto.userEmail);
+        CartPojo cartPojo = cartService.get(cartForm.getProductBarcode(), getUser());
         if(cartPojo != null){
-            throw new ApiException("Product already exist in the cart!!");
+            int updatedQuantity = cartPojo.getProductQuantity() + cartForm.getProductQuantity();
+            cartPojo.setProductQuantity(updatedQuantity);
+            cartPojo.setProductSP(cartForm.getProductSP());
+            checkInput(cartPojo);
+            cartService.update(cartPojo.getItemNo(),cartPojo);
+            return;
         }
-        check(cartForm);
         cartPojo = convert(cartForm);
+        checkInput(cartPojo);
         cartService.add(cartPojo);
     }
 
@@ -37,7 +44,7 @@ public class CartDto {
         return convert(cartPojo);
     }
     public List<CartData> getAll() {
-        List<CartPojo> list = cartService.getAll(LoginDto.userEmail);
+        List<CartPojo> list = cartService.getAll(getUser());
         List<CartData> list2 = new ArrayList<CartData>();
         for (CartPojo cartPojo : list) {
             list2.add(convert(cartPojo));
@@ -45,31 +52,37 @@ public class CartDto {
         return list2;
     }
 
+
     public void delete(int id){
         cartService.delete(id);
     }
 
     public void update(int id, CartForm cartForm) throws ApiException {
-        check(cartForm);
         CartPojo cartPojo = convert(cartForm);
+        checkInput(cartPojo);
         cartService.update(id, cartPojo);
     }
 
-    private void check(CartForm cartForm) throws ApiException {
-        int productId = productService.getId(cartForm.getProductBarcode());
+    private void checkInput(CartPojo cartPojo) throws ApiException {
+        int productId = productService.getId(cartPojo.getProductBarcode());
         if (productId == -1) {
             throw new ApiException("Invalid Barcode");
         }
         InventoryPojo inventoryPojo = inventoryService.get(productId);
         int productQuantity = inventoryPojo.getProductQuantity();
-        int inputQuantity = cartForm.getProductQuantity();
+        int inputQuantity = cartPojo.getProductQuantity();
         double productMrp = productService.get(productId).getProductMrp();
         if (productQuantity < inputQuantity) {
-            throw new ApiException("Inventory only has " + productQuantity + " items");
+            throw new ApiException("Inventory has " + productQuantity + " items");
         }
-        if (productMrp < cartForm.getProductSP()) {
+        if (productMrp < cartPojo.getProductSP()) {
             throw new ApiException("Selling price cannot be more than MRP!!  (MRP = " + productMrp + " )");
         }
+    }
+
+    private String getUser(){
+        UserPrincipal principal = SecurityUtil.getPrincipal();
+        return principal.getEmail();
     }
 
     private static CartData convert(CartPojo cartPojo) {
@@ -83,7 +96,7 @@ public class CartDto {
 
     private CartPojo convert(CartForm cartForm) {
         CartPojo cartPojo = new CartPojo();
-        cartPojo.setUserEmail(LoginDto.userEmail);
+        cartPojo.setUserEmail(getUser());
         cartPojo.setProductBarcode(cartForm.getProductBarcode());
         cartPojo.setProductQuantity(cartForm.getProductQuantity());
         cartPojo.setProductSP(cartForm.getProductSP());

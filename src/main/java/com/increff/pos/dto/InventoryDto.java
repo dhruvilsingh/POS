@@ -18,6 +18,11 @@ public class InventoryDto {
     @Autowired
     private ProductService productService;
 
+    public void add(InventoryForm inventoryForm) throws ApiException {
+        String productBarcode = inventoryForm.getProductBarcode();
+        update(productService.getId(productBarcode),inventoryForm);
+    }
+
     public InventoryData get(int id) throws ApiException {
         InventoryPojo inventoryPojo = inventoryService.get(id);
         return convert(inventoryPojo);

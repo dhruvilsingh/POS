@@ -5,8 +5,12 @@ import com.increff.pos.model.BrandData;
 import com.increff.pos.model.OrderItemData;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
+import com.increff.pos.util.SecurityUtil;
+import com.increff.pos.util.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +25,33 @@ public class OrderItemDto {
     private ProductService productService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private InventoryService inventoryService;
 
+    @Transactional(rollbackOn = ApiException.class)
     public void add() throws ApiException {
+        List<CartPojo> list = cartService.getAll(getUser());
+        if(list.isEmpty()){
+            throw new ApiException("Empty list cannot be pushed");
+        }
         OrderPojo orderPojo = new OrderPojo();
         orderPojo.setOrderTime(LocalDateTime.now());
         int orderId = orderService.add(orderPojo);
-        List<CartPojo> list = cartService.getAll(LoginDto.userEmail);
         for(CartPojo cartPojo : list){
-            orderItemService.add(convert(cartPojo,orderId));
+            int productId = productService.getId(cartPojo.getProductBarcode());
+            InventoryPojo inventoryPojo = new InventoryPojo();
+            inventoryPojo.setProductId(productId);
+            int productQuantity = inventoryService.get(productId).getProductQuantity();
+            if(cartPojo.getProductQuantity() > productQuantity){
+                throw new ApiException(productQuantity + " items are left for " + cartPojo.getProductBarcode());
+            }
+            if(cartPojo.getProductSP() > productService.get(productId).getProductMrp()){
+                throw new ApiException("Selling price for " + cartPojo.getProductBarcode() + " is greater than Mrp");
+            }
+            int updatedQuantity = productQuantity - cartPojo.getProductQuantity();
+            inventoryPojo.setProductQuantity(updatedQuantity);
+            inventoryService.update(productId,inventoryPojo);
+            orderItemService.add(convert(cartPojo,orderId,productId));
             cartService.delete(cartPojo.getItemNo());
         }
     }
@@ -53,12 +76,17 @@ public class OrderItemDto {
         return orderItemData;
     }
 
-    private OrderItemPojo convert(CartPojo cartPojo, int orderId){
+    private String getUser(){
+        UserPrincipal principal = SecurityUtil.getPrincipal();
+        return principal.getEmail();
+    }
+
+    private OrderItemPojo convert(CartPojo cartPojo, int orderId, int productId){
         OrderItemPojo orderItemPojo = new OrderItemPojo();
         orderItemPojo.setOrderId(orderId);
         orderItemPojo.setProductQuantity(cartPojo.getProductQuantity());
         orderItemPojo.setSellingPrice(cartPojo.getProductSP());
-        orderItemPojo.setProductId(productService.getId(cartPojo.getProductBarcode()));
+        orderItemPojo.setProductId(productId);
         return  orderItemPojo;
     }
 

@@ -32,8 +32,6 @@ public class LoginDto {
     @Autowired
     private InfoData info;
 
-    static String userEmail;
-
     public ModelAndView login(HttpServletRequest req, LoginForm f) throws ApiException {
         UserPojo p = service.get(f.getEmail());
         boolean authenticated = (p != null && Objects.equals(p.getPassword(), f.getPassword()));
@@ -49,7 +47,6 @@ public class LoginDto {
         SecurityUtil.createContext(session);
         // Attach Authentication object to the Security Context
         SecurityUtil.setAuthentication(authentication);
-        userEmail = f.getEmail();
         return new ModelAndView("redirect:/ui/home");
     }
 

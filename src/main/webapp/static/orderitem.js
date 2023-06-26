@@ -11,7 +11,7 @@ function displayOrderItem(id){
        	   url: url,
        	   type: 'GET',
        	   success: function(data) {
-       	   		 localStorage.setItem('data', JSON.stringify(data));
+       	   		 sessionStorage.setItem('data', JSON.stringify(data));
        	   		 window.location.href = getOrderItemUrl() + "/ui/orderitem";
        	   },
        	   error: handleAjaxError

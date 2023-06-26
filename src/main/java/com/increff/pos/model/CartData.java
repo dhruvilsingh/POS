@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CartData extends OrderItemForm{
+public class CartData extends CartForm{
     private int itemNo;
 }

@@ -1,5 +1,5 @@
 
-var data = JSON.parse(localStorage.getItem('data'));
+var data = JSON.parse(sessionStorage.getItem('data'));
 displayOrderItemList(data);
 
 //UI DISPLAY METHODS

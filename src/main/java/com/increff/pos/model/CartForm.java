@@ -1,4 +1,12 @@
 package com.increff.pos.model;
 
-public class CartForm extends OrderItemForm{
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class CartForm{
+    String productBarcode;
+    int productQuantity;
+    double productSP;
 }
