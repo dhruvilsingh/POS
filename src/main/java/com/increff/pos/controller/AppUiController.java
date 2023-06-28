@@ -43,6 +43,21 @@ public class AppUiController extends AbstractUiDto {
 		return mav("orders.html");
 	}
 
+	@RequestMapping(value = "/ui/dailysales")
+	public ModelAndView dailySales() {
+		return mav("dailysales.html");
+	}
+
+	@RequestMapping(value = "/ui/brandreport")
+	public ModelAndView brandReport() {
+		return mav("brandreport.html");
+	}
+
+	@RequestMapping(value = "/ui/inventoryreport")
+	public ModelAndView inventoryReport() {
+		return mav("inventoryreport.html");
+	}
+
 	@RequestMapping(value = "/ui/admin")
 	public ModelAndView admin() {
 		return mav("user.html");

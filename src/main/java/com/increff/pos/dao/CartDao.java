@@ -42,7 +42,7 @@ public class CartDao extends  AbstractDao{
         query.setParameter("email",userEmail);
         return query.getResultList();
     }
-
+    @Transactional
     public int deleteId(int itemNo) {
         Query query = entityManager.createQuery(delete_id);
         query.setParameter("id", itemNo);

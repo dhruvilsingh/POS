@@ -1,6 +1,7 @@
 package com.increff.pos.service;
 
 import com.increff.pos.dao.InventoryDao;
+import com.increff.pos.model.InventoryReportData;
 import com.increff.pos.pojo.InventoryPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,11 @@ public class InventoryService {
     @Transactional
     public List<InventoryPojo> getAll() {
         return inventoryDao.selectAll();
+    }
+
+    @Transactional
+    public List<InventoryReportData> getReport() {
+        return inventoryDao.selectReport();
     }
 
     @Transactional(rollbackOn  = ApiException.class)

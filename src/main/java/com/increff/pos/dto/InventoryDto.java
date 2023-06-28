@@ -2,6 +2,7 @@ package com.increff.pos.dto;
 
 import com.increff.pos.model.InventoryData;
 import com.increff.pos.model.InventoryForm;
+import com.increff.pos.model.InventoryReportData;
 import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.InventoryService;
@@ -35,6 +36,10 @@ public class InventoryDto {
             list2.add(convert(inventoryPojo));
         }
         return list2;
+    }
+
+    public List<InventoryReportData> getReport(){
+        return inventoryService.getReport();
     }
 
     public void update(int id, InventoryForm inventoryForm) throws ApiException {
