@@ -6,6 +6,7 @@ function getProductUrl(){
 
 //BUTTON ACTIONS
 function addProduct(event){
+    $('#add-product-modal').modal('toggle');
 	//Set the values to update
 	var $form = $("#product-form");
 	var json = toJson($form);
@@ -131,9 +132,8 @@ function displayProductList(data){
 	for(var i in data){
 		var p = data[i];
 		console.log(p);
-		var buttonHtml = '<button onclick="displayEditProduct(' + p.productId + ')">edit</button>'
+		var buttonHtml = '<button class="btn btn-warning" onclick="displayEditProduct(' + p.productId + ')">Edit</button>'
 		var row = '<tr>'
-		+ '<td>' + p.productId + '</td>'
 		+ '<td>' + p.productBarcode + '</td>'
 		+ '<td>'  + p.productName + '</td>'
 		+ '<td>'  + p.productBrand + '</td>'
@@ -197,10 +197,15 @@ function displayProduct(data){
 	$('#edit-product-modal').modal('toggle');
 }
 
+function openModal(){
+	$('#add-product-modal').modal('toggle');
+}
+
 
 //INITIALIZATION CODE
 function init(){
 	$('#add-product').click(addProduct);
+	$('#open-modal').click(openModal);
 	$('#update-product').click(updateProduct);
 	$('#refresh-data').click(getProductList);
 	$('#upload-data').click(displayUploadData);

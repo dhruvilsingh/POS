@@ -21,7 +21,7 @@ public class DailySalesApiController {
     @Autowired
     DailySalesDto dailySalesDto;
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets report of sales on each day")
     @RequestMapping(path = "/api/dailysales", method = RequestMethod.GET)
     public List<DailySalesData> getAll() {
         return dailySalesDto.getAll();

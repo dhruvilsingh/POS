@@ -103,8 +103,8 @@ function displayProductList(data){
 	for(var i in data){
 		var p = data[i];
 		console.log("itemno" + p.itemNo);
-		var buttonHtml = '<button onclick="displayEditProduct(' + p.itemNo + ')">edit</button>'
-		buttonHtml += '<button onclick="deleteItem(' + p.itemNo + ')">delete</button>'
+		var buttonHtml = '<button class="btn btn-warning mr-1" onclick="displayEditProduct(' + p.itemNo + ')">Edit</button>'
+		buttonHtml += '<button class="btn btn-danger" onclick="deleteItem(' + p.itemNo + ')">Delete</button>'
 		var row = '<tr>'
 		+ '<td>' + p.productBarcode + '</td>'
 		+ '<td>'  + p.productQuantity + '</td>'
@@ -145,5 +145,4 @@ function init(){
 }
 
 $(document).ready(init);
-$(document).ready(getProductList);
 

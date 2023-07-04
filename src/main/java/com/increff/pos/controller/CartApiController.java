@@ -18,31 +18,31 @@ public class CartApiController {
     @Autowired
     private CartDto cartDto;
 
-    @ApiOperation(value = "Adds an brand")
+    @ApiOperation(value = "Adds an item to cart")
     @RequestMapping(path = "/api/cart", method = RequestMethod.POST)
     public void add(@RequestBody CartForm cartForm) throws ApiException {
         cartDto.add(cartForm);
     }
 
-    @ApiOperation(value = "Gets a product by ID")
+    @ApiOperation(value = "Gets a cart item by ID")
     @RequestMapping(path = "/api/cart/{id}", method = RequestMethod.GET)
     public CartData get(@PathVariable int id) throws ApiException {
         return cartDto.get(id);
     }
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets list of all items in cart")
     @RequestMapping(path = "/api/cart", method = RequestMethod.GET)
     public List<CartData> getAll() throws ApiException{
         return cartDto.getAll();
     }
 
-    @ApiOperation(value = "Deletes an item")
+    @ApiOperation(value = "Deletes an item from cart")
     @RequestMapping(path = "/api/cart/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable int id) {
         cartDto.delete(id);
     }
 
-    @ApiOperation(value = "Updates a brand")
+    @ApiOperation(value = "Updates an item in the cart")
     @RequestMapping(path = "/api/cart/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable int id, @RequestBody CartForm cartForm) throws ApiException {
         cartDto.update(id, cartForm);

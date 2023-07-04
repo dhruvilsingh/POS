@@ -20,13 +20,13 @@ public class OrderApiController {
     @Autowired
     OrderDto orderDto;
 
-    @ApiOperation(value = "Gets a brand by ID")
+    @ApiOperation(value = "Gets an order by ID")
     @RequestMapping(path = "/api/order/{id}", method = RequestMethod.GET)
     public OrderData get(@PathVariable int id) throws ApiException {
         return  orderDto.get(id);
     }
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets list of all orders")
     @RequestMapping(path = "/api/order", method = RequestMethod.GET)
     public List<OrderData> getAll() {
         return orderDto.getAll();

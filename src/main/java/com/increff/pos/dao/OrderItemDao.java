@@ -1,6 +1,7 @@
 package com.increff.pos.dao;
 
 import com.increff.pos.pojo.BrandPojo;
+import com.increff.pos.pojo.CartPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
@@ -18,17 +19,22 @@ public class OrderItemDao extends AbstractDao{
 
     private static String select_all = "select orderItemPojo from OrderItemPojo orderItemPojo where orderId=:id";
 
-    private static String select_item_count = "SELECT COUNT(orderItemPojo.orderItemId) " +
-                                                    "FROM OrderPojo orderPojo " +
-                                                    "INNER JOIN OrderItemPojo orderItemPojo on " +
-                                                    "orderPojo.orderId = orderItemPojo.orderId "+
-                                                    "WHERE DATE(orderPojo.orderTime) = :date";
+    private static String select_id = "select orderItemPojo from OrderItemPojo orderItemPojo where orderItemId = :id";
 
-    private static String select_revenue = "SELECT SUM(orderItemPojo.sellingPrice * orderItemPojo.productQuantity) " +
-                                                "FROM OrderPojo orderPojo " +
-                                                "INNER JOIN OrderItemPojo orderItemPojo on " +
-                                                "orderPojo.orderId = orderItemPojo.orderId "+
-                                                "WHERE DATE(orderPojo.orderTime) = :date";
+    private static String delete_id = "delete from OrderItemPojo orderItemPojo where orderItemId=:id";
+
+
+    private static String select_item_count = "SELECT COUNT(ip.orderItemId) " +
+                                                    "FROM OrderPojo op " +
+                                                    "INNER JOIN OrderItemPojo ip on " +
+                                                    "op.orderId = ip.orderId "+
+                                                    "WHERE DATE(op.orderTime) = :date";
+
+    private static String select_revenue = "SELECT SUM(ip.sellingPrice * ip.productQuantity) " +
+                                                "FROM OrderPojo op " +
+                                                "INNER JOIN OrderItemPojo ip on " +
+                                                "op.orderId = ip.orderId "+
+                                                "WHERE DATE(op.orderTime) = :date";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -37,6 +43,28 @@ public class OrderItemDao extends AbstractDao{
     public void insert(OrderItemPojo orderItemPojo) {
         System.out.println("  HELLO  " + orderItemPojo.getOrderItemId() + "  " + orderItemPojo.getOrderId() + "   " + orderItemPojo.getProductQuantity()+"   "+orderItemPojo.getProductId()+ "   "+orderItemPojo.getSellingPrice());
         entityManager.persist(orderItemPojo);
+    }
+
+    public OrderItemPojo selectId(int itemId){
+        TypedQuery<OrderItemPojo> query = getQuery(select_id, OrderItemPojo.class);
+        query.setParameter("id", itemId);
+        return query.getSingleResult();
+    }
+
+    public List<OrderItemPojo> selectAll(int orderId){
+        TypedQuery<OrderItemPojo> query = getQuery(select_all, OrderItemPojo.class);
+        query.setParameter("id", orderId);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public int deleteId(int itemNo) {
+        Query query = entityManager.createQuery(delete_id);
+        query.setParameter("id", itemNo);
+        return query.executeUpdate();
+    }
+
+    public void update(OrderItemPojo orderItemPojo) {
     }
 
     public int selectItemCount(LocalDate date) {
@@ -51,12 +79,6 @@ public class OrderItemDao extends AbstractDao{
         TypedQuery<Double> query = getQuery(select_revenue, Double.class);
         query.setParameter("date", convertedDate);
         return query.getSingleResult().doubleValue();
-    }
-
-    public List<OrderItemPojo> selectAll(int orderId){
-        TypedQuery<OrderItemPojo> query = getQuery(select_all, OrderItemPojo.class);
-        query.setParameter("id", orderId);
-        return query.getResultList();
     }
 
 }

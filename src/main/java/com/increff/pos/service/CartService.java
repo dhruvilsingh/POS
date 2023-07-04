@@ -4,6 +4,7 @@ import com.increff.pos.dao.BrandDao;
 import com.increff.pos.dao.CartDao;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.CartPojo;
+import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.util.StringUtil;
 import com.sun.javafx.binding.StringFormatter;
 import lombok.Setter;

@@ -10,23 +10,33 @@
 
 <nav th:replace="snippets.html :: name_site_navbar"></nav>
 
-<div class="container">
-<div class="row">
-<div class="col-6">
- 
-<div class="jumbotron">
-  <h1 class="display-4">Hello, world!</h1>
-  <p class="lead">Welcome to Increff Spring Tutorial</p>
-  <hr class="my-4">
-  <p>This application teaches you Spring concepts and creating awesome web applications</p>
-  <a class="btn btn-primary btn-lg" th:href="@{/site/login}" role="button">Get Started</a>
-</div>
 
-</div>
-</div>
-</div> <!--Container-->
 
-<footer th:replace="snippets.html :: name_footer"></footer>
+<div class="container mt-5">
+    <div class="center">
+    <!-- Blank Row -->
+    <div class="row px-3">
+      &nbsp;
+      &nbsp;
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div style="width:50%;background-color:white">
+          <img th:src="@{/static/home.png}" style="width:680px; height:500px"  alt="Image">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div  class="jumbotron" style="margin-left:100px;height:500px">
+          <h2 class="display-4">POINT OF SALE</h2>
+          <hr class="my-4">
+          <p> Introducing the <b>POINT OF SALE APP</b> to manage your orders, products and inventory, generate invoices
+            along with the ability to track your sales by variety of reports all in one app. </p>
+          <a class="btn btn-success get-started" th:href="@{/site/login}" role="button">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!--Container-->
 
 </body>
 

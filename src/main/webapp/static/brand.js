@@ -6,6 +6,7 @@ function getBrandUrl(){
 
 //BUTTON ACTIONS
 function addBrand(event){
+	$('#add-brand-modal').modal('toggle');
 	//Set the values to update
 	var $form = $("#brand-form");
 	var json = toJson($form);
@@ -127,9 +128,8 @@ function displayBrandList(data){
 	for(var i in data){
 		var b = data[i];
 		console.log(b.brandId + b.brandName + b.category);
-		var buttonHtml = '<button onclick="displayEditBrand(' + b.brandId + ')">edit</button>'
+		var buttonHtml = '<button class="btn btn-warning" onclick="displayEditBrand(' + b.brandId + ')">Edit</button>'
 		var row = '<tr>'
-		+ '<td>' + b.brandId + '</td>'
 		+ '<td>' + b.brandName + '</td>'
 		+ '<td>'  + b.category + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
@@ -180,6 +180,10 @@ function displayUploadData(){
 	$('#upload-brand-modal').modal('toggle');
 }
 
+function openModal(){
+    $('#add-brand-modal').modal('toggle');
+}
+
 function displayBrand(data){
 	$("#brand-edit-form input[name=brandName]").val(data.brandName);
 	$("#brand-edit-form input[name=category]").val(data.category);
@@ -191,12 +195,13 @@ function displayBrand(data){
 //INITIALIZATION CODE
 function init(){
 	$('#add-brand').click(addBrand);
+	$('#open-modal').click(openModal);
 	$('#update-brand').click(updateBrand);
 	$('#refresh-data').click(getBrandList);
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#brandFile').on('change', updateFileName)
+    $('#brandFile').on('change', updateFileName);
 }
 
 $(document).ready(init);

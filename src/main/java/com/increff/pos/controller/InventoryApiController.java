@@ -17,31 +17,25 @@ public class InventoryApiController {
     @Autowired
     private InventoryDto inventoryDto;
 
-    @ApiOperation(value = "Updates a brand")
-    @RequestMapping(path = "/api/inventory", method = RequestMethod.POST)
-    public void add(@RequestBody InventoryForm inventoryForm) throws ApiException {
-        inventoryDto.add(inventoryForm);
-    }
-
-    @ApiOperation(value = "Gets a product by ID")
+    @ApiOperation(value = "Gets inventory of a product by ID")
     @RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.GET)
     public InventoryData get(@PathVariable int id) throws ApiException {
         return inventoryDto.get(id);
     }
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets list of all product inventory")
     @RequestMapping(path = "/api/inventory", method = RequestMethod.GET)
     public List<InventoryData> getAll() throws ApiException{
         return inventoryDto.getAll();
     }
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets inventory report")
     @RequestMapping(path = "/api/inventoryreport", method = RequestMethod.GET)
     public List<InventoryReportData> getReport() throws ApiException{
         return inventoryDto.getReport();
     }
 
-    @ApiOperation(value = "Updates a brand")
+    @ApiOperation(value = "Updates inventory of product by ID")
     @RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable int id, @RequestBody InventoryForm inventoryForm) throws ApiException {
         inventoryDto.update(id, inventoryForm);

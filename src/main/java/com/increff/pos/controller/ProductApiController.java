@@ -30,13 +30,13 @@ public class ProductApiController {
         return productDto.get(id);
     }
 
-    @ApiOperation(value = "Gets list of all brands")
+    @ApiOperation(value = "Gets list of all products")
     @RequestMapping(path = "/api/product", method = RequestMethod.GET)
     public List<ProductData> getAll() throws ApiException{
         return productDto.getAll();
     }
 
-    @ApiOperation(value = "Updates a brand")
+    @ApiOperation(value = "Updates a product")
     @RequestMapping(path = "/api/product/{id}", method = RequestMethod.PUT)
     public void update(@PathVariable int id, @RequestBody ProductForm productForm) throws ApiException {
         productDto.update(id, productForm);

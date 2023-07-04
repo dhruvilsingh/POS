@@ -2,7 +2,9 @@
 
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
-<head th:replace="snippets.html :: name_head"></head>
+
+<head th:replace="snippets.html :: name_head">
+</head>
 
 <body>
 
@@ -10,30 +12,39 @@
 
 <div class="container">
 
-  <h3>Brand Master</h3>
+          <button type="button" class="btn btn-success" id="open-modal">Add</button>
+          &nbsp;
+          <button type="button" class="btn btn-secondary" id="refresh-data">Refresh</button>
+          &nbsp;
+          <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
 
   <!-- Top row with form-->
-  <div class="row">
-    <div class="col-12">
-      <form class="form-inline" id="brand-form">
-        <div class="form-group">
-          <label for="inputBrandName" class="col-sm-2 col-form-label">Brand Name</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" name="brandName" id="inputBrandName" placeholder="Enter brand name">
-          </div>
+  <div class="modal" tabindex="-1" role="dialog" id="add-brand-modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add brand</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-        <div class="form-group">
-          <label for="inputCategory" class="col-sm-2 col-form-label">Category</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" name="category" id="inputCategory" placeholder="Enter category">
-          </div>
+        <div class="modal-body">
+          <form class="form" id="brand-form">
+            <div class="form-group">
+              <label for="inputBrandName">Brand Name</label>
+                <input type="text" class="form-control" name="brandName" id="inputBrandName" placeholder="Enter brand name">
+            </div>
+            <div class="form-group">
+              <label for="inputCategory">Category</label>
+                <input type="text" class="form-control" name="category" id="inputCategory" placeholder="Enter category">
+            </div>
+          </form>
         </div>
-        <button type="button" class="btn btn-primary" id="add-brand">Add</button>
-        &nbsp;
-        <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>
-        &nbsp;
-        <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
-      </form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="add-brand">Add</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -46,10 +57,9 @@
 
     <!-- Table -->
     <div class="col-12">
-      <table class="table table-striped" id="brand-table">
-        <thead>
+      <table class="table text-center table-striped" id="brand-table">
+        <thead class="thead-dark">
         <tr>
-          <th scope="col">ID</th>
           <th scope="col">Brand</th>
           <th scope="col">Category</th>
           <th scope="col">Actions</th>
@@ -72,29 +82,27 @@
           </button>
         </div>
         <div class="modal-body">
-          <form class="form-inline" id="brand-edit-form">
+          <form class="form" id="brand-edit-form">
             <div class="form-group">
-              <label for="inputBrandName" class="col-sm-2 col-form-label">Brand Name</label>
-              <div class="col-sm-10">
+              <label for="inputBrandName">Brand Name</label>
                 <input type="text" class="form-control" name="brandName" placeholder="Enter brand name">
-              </div>
             </div>
             <div class="form-group">
-              <label for="inputCategory" class="col-sm-2 col-form-label">Category</label>
-              <div class="col-sm-10">
+              <label for="inputCategory">Category</label>
                 <input type="text" class="form-control" name="category" placeholder="Enter category">
-              </div>
             </div>
             <input type="hidden" name="id" >
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="update-brand">Update</button>
+          <button type="button" class="btn btn-success" id="update-brand">Update</button>
         </div>
       </div>
     </div>
   </div>
+
+
 
 
   <!-- Brand upload Modal -->
@@ -134,8 +142,13 @@
 
 <footer th:replace="snippets.html :: name_footer"></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/static/brand.js}"/></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" th:href="@{/static/app.css}">
 
 </body>
 
 </html>
+

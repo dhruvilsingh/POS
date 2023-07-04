@@ -46,7 +46,7 @@ public class InventoryService {
     public InventoryPojo getCheck(int productId) throws ApiException {
         InventoryPojo inventoryPojo = inventoryDao.select(productId);
         if (inventoryPojo == null) {
-            throw new ApiException("Product with given ID does not exit, id: " + productId);
+            throw new ApiException("Inventory for product with given ID does not exit, id: " + productId);
         }
         return inventoryPojo;
     }

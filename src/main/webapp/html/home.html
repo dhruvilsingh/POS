@@ -4,38 +4,57 @@
 
 <html lang="en">
 
-<head th:replace="snippets.html :: name_head"></head>
+<head th:replace="snippets.html :: name_head">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" th:href="@{/static/app.css}">
+</head>
 
 <body>
 
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
 
 <div class="container">
-
-<h3>Home</h3>
-
- <!-- Top row with form-->
-<div class="row">
-	 <div class="col-2">
-	 	<a th:href="@{/ui/brand}" title="Brand"> <i class="fas fa-users"></i> </a>
-	 </div>
-	<div class="col-2">
-		<a th:href="@{/ui/product}" title="Product"> <i class="fas fa-users"></i> </a>
+	<div class="container" style="padding: 80px 16px">
+		<h2 class="text-center">Key features of the app</h2>
+		<div class="card-deck mt-5 pt-4">
+			<div class="card card0">
+				<h3 class="card-header mt-0 py-3 text-center">Brands</h3>
+				<div class="card-body pt-0 d-flex flex-column">
+					<p class="card-text"> <br>Add brands with category</br>
+						<br>Edit existing brands and categories</br>
+						<br>Upload brand and category list from tsv</br></p>
+					<a th:href="@{/ui/brand}" class="btn btn-primary mt-auto">Go to Brands</a>
+				</div>
+			</div>
+			<div class="card card0">
+				<h3 class="card-header mt-0 py-3 text-center">Products</h3>
+				<div class="card-body pt-0 d-flex flex-column">
+					<p class="card-text"> <br>Add new product</br>
+						<br>Edit product details</br></p>
+					<a th:href="@{/ui/product}"  class="btn btn-primary mt-auto">Go to products</a>
+				</div>
+			</div>
+			<div class="card card0">
+				<h3 class="card-header mt-0 py-3 text-center">Inventory</h3>
+				<div class="card-body pt-0 d-flex flex-column">
+					<p class="card-text"><br>Add inventory for products</br>
+						<br>Upload inventory list from tsv</br></p>
+					<a th:href="@{/ui/inventory}" class="btn btn-primary mt-auto">Go to Inventory</a>
+				</div>
+			</div>
+			<div class="card card0">
+				<h3 class="card-header mt-0 py-3 text-center">Orders</h3>
+				<div class="card-body d-flex pt-0 flex-column">
+					<p><br>Create a new order</br>
+						<br>Edit existing orders</br>
+						<br>View orders and generate invoices</br></p>
+					<a th:href="@{/ui/order}" class="btn btn-primary mt-auto">Go to Orders</a>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="col-2">
-		<a th:href="@{/ui/inventory}" title="Inventory"> <i class="fas fa-users"></i> </a>
-	</div>
-	<div class="col-2">
-		<a th:href="@{/ui/cart}" title="Create Order"> <i class="fas fa-users"></i> </a>
-	</div>
-	<div class="col-2">
-		<a th:href="@{/ui/order}" title="Orders"> <i class="fas fa-users"></i> </a>
-	</div>
-	<div class="col-2">
-	 	<a th:href="@{/ui/admin}" title="Admin"> <i class="fas fa-cog"></i> </a>
-	 </div>	
-</div> 
-
 
 
 </div> <!-- Container end-->
@@ -43,6 +62,6 @@
 <footer th:replace="snippets.html :: name_footer"></footer>
 
 
-</body>	
+</body>
 
 </html>
