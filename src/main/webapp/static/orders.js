@@ -233,6 +233,13 @@ function init(){
 }
 
 $(document).ready(init);
-
+$(document).ready(function(){
+    const navbarContainer = document.getElementById('navbarContainer');
+    const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+    navItems.forEach(item => {
+       item.classList.remove('active')});
+    const navItem = document.getElementById('orders-nav');
+    navItem.classList.add('active');
+});
 
 

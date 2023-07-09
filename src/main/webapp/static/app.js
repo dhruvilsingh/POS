@@ -1,4 +1,3 @@
-
 //HELPER METHOD
 function toJson($form){
     var serialized = $form.serializeArray();
@@ -14,7 +13,7 @@ function toJson($form){
 
 function handleAjaxError(response){
 	var response = JSON.parse(response.responseText);
-	alert(response.message);
+    $.notify(response.message);
 }
 
 function readFileData(file, callback){
@@ -28,7 +27,6 @@ function readFileData(file, callback){
 	}
 	Papa.parse(file, config);
 }
-
 
 function writeFileData(arr){
 	var config = {
@@ -51,3 +49,12 @@ function writeFileData(arr){
     tempLink.setAttribute('download', 'download.tsv');
     tempLink.click(); 
 }
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+
+
+
+

@@ -1,0 +1,78 @@
+<!doctype html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+    <!-- Blank Row -->
+    <div class="row">
+        &nbsp;
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <form class="form" id="sale-report-form" name="saleReportForm">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="inputStartDate">Start date</label>
+                        <input type="date" class="form-control" name="startDate" id="inputStartDate" placeholder="Enter start date">
+                    </div>
+                    <div class="form-group col">
+                        <label for="inputEndDate">End date</label>
+                        <input type="date" class="form-control" name="endDate" id="inputEndDate" placeholder="Enter end date">
+                    </div>
+                    <div class="form-group col">
+                        <label for="inputBrand">Brand</label>
+                        <select class="dropdown custom-dropdown" name="brandName" id="inputBrand">
+                            <option value="" selected="selected">Select brand</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="inputCategory">Category</label>
+                        <select class="dropdown custom-dropdown" name="category" id="inputCategory">
+                            <option value="" selected="selected">Please select brand first</option>
+                        </select>
+                        <div class="row-flex mt-2 text-right"s>
+                            <button class="btn btn-success"  id="get-report" role="button">Get report</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Table -->
+        <div class="col-12">
+            <table class="table text-center table-striped" id="sale-report-table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Revenue</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div> <!-- Container end-->
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script th:src="@{/static/salereport.js}"/></script>
+
+</body>
+
+</html>
+
+

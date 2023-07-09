@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public class ProductDao extends AbstractDao{
     private static String select_id = "select productPojo from ProductPojo productPojo where productId=:id";
-    private static String select_all = "select productPojo from ProductPojo productPojo";
+    private static String select_all = "select productPojo from ProductPojo productPojo order by productPojo.productId desc";
     private static String select_barcode = "select productPojo from ProductPojo productPojo where productBarcode=:productBarcode";
 
     @PersistenceContext

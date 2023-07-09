@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api
 @RestController
@@ -22,6 +23,12 @@ public class ProductApiController {
     @RequestMapping(path = "/api/product", method = RequestMethod.POST)
     public void add(@RequestBody ProductForm productForm) throws ApiException {
         productDto.add(productForm);
+    }
+
+    @ApiOperation(value = "Uploads products from TSV")
+    @RequestMapping(path = "/api/product-list", method = RequestMethod.POST)
+    public List<Map<String, Object>> processData(@RequestBody List<Map<String, Object>> fileData){
+        return productDto.upload(fileData);
     }
 
     @ApiOperation(value = "Gets a product by ID")

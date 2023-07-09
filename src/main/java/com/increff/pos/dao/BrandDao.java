@@ -12,8 +12,10 @@ import java.util.List;
 public class BrandDao extends AbstractDao{
 
     private static String select_id = "select brandPojo from BrandPojo brandPojo where brandId=:id";
-    private static String select_all = "select brandPojo from BrandPojo brandPojo";
+    private static String select_all = "select brandPojo from BrandPojo brandPojo order by brandPojo.brandId desc";
     private static String check_category = "select brandPojo from BrandPojo brandPojo where brandName=:brandName and category=:category";
+    private static String select_brands = "select distinct brandPojo.brandName from BrandPojo brandPojo";
+    private static String select_cat = "select brandPojo.category from BrandPojo brandPojo where brandName=:brandName";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -41,8 +43,7 @@ public class BrandDao extends AbstractDao{
         TypedQuery<BrandPojo> query = getQuery(check_category,BrandPojo.class);
         query.setParameter("brandName",brandName );
         query.setParameter("category",category);
-        BrandPojo brandPojo = new BrandPojo();
-        brandPojo = getSingle(query);
+        BrandPojo brandPojo = getSingle(query);
         if(brandPojo == null){
             return -1;
         }

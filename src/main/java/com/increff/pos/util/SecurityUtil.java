@@ -20,7 +20,7 @@ public class SecurityUtil {
 		SecurityContextHolder.getContext().setAuthentication(token);
 	}
 
-	public static Authentication getAuthentication() {
+	public static Authentication getAuthentication(){
 		return SecurityContextHolder.getContext().getAuthentication();
 	}
 

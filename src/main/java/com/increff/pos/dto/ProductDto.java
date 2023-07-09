@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ProductDto {
@@ -21,11 +22,28 @@ public class ProductDto {
     private BrandService brandService;
 
     public void add(ProductForm productForm) throws ApiException {
-        if(checkBrandCategory(productForm) == -1){
+        if(checkBrandCategory(productForm.getProductBrand(), productForm.getProductCategory()) == -1){
             throw new ApiException("Entered brand or category does not exist");
         }
         ProductPojo productPojo = convert(productForm);
         productService.add(productPojo);
+    }
+
+    public List<Map<String, Object>>  upload(List<Map<String, Object>> fileData) {
+        List<Map<String, Object>> errorData = new ArrayList<>();
+        for(Map<String,Object> row : fileData){
+            ProductPojo productPojo = convert(row);
+            try {
+                if(productPojo.getProductBrandCategory()==-1){
+                    throw new ApiException("Entered brand or category does not exist");
+                }
+                productService.add(productPojo);
+            } catch (ApiException e) {
+                row.put("error", e.getMessage());
+                errorData.add(row);
+            }
+        }
+        return errorData;
     }
 
     public ProductData get(int id) throws ApiException {
@@ -43,7 +61,7 @@ public class ProductDto {
     }
 
     public void update(int id, ProductForm productForm) throws ApiException {
-        if(checkBrandCategory(productForm) == -1){
+        if(checkBrandCategory(productForm.getProductBrand(), productForm.getProductCategory()) == -1){
             throw new ApiException("Entered brand or category does not exist");
         }
         ProductPojo productPojo= convert(productForm);
@@ -52,6 +70,15 @@ public class ProductDto {
 
     private BrandPojo getBrandCategory(ProductPojo productPojo) throws ApiException{
         return brandService.get(productPojo.getProductBrandCategory());
+    }
+
+    private ProductPojo convert(Map<String,Object> row){
+        ProductPojo productPojo = new ProductPojo();
+        productPojo.setProductName(row.get("productName").toString());
+        productPojo.setProductBarcode(row.get("productBarcode").toString());
+        productPojo.setProductBrandCategory(checkBrandCategory(row.get("productBrand").toString(), row.get("productCategory").toString()));
+        productPojo.setProductMrp(Double.valueOf(row.get("productMrp").toString()).doubleValue());
+        return productPojo;
     }
 
     private ProductData convert(ProductPojo productPojo) throws ApiException {
@@ -69,8 +96,8 @@ public class ProductDto {
         return productData;
     }
 
-    private int checkBrandCategory(ProductForm productForm){
-        return brandService.getBrandCategory(productForm.getProductBrand(), productForm.getProductCategory());
+    private int checkBrandCategory(String productBrand, String productCategory){
+        return brandService.getBrandCategory(productBrand, productCategory);
     }
 
     private ProductPojo convert(ProductForm productForm){
@@ -78,7 +105,7 @@ public class ProductDto {
         productPojo.setProductBarcode(productForm.getProductBarcode());
         productPojo.setProductName(productForm.getProductName());
         productPojo.setProductMrp(productForm.getProductMrp());
-        productPojo.setProductBrandCategory(checkBrandCategory(productForm));
+        productPojo.setProductBrandCategory(checkBrandCategory(productForm.getProductBrand(), productForm.getProductCategory()));
         return productPojo;
     }
 }

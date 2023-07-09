@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public class DailySalesDao extends AbstractDao{
-    private static String select_all = "select dailySalesPojo from DailySalesPojo dailySalesPojo";
+    private static String select_all = "select dailySalesPojo from DailySalesPojo dailySalesPojo order by dailySalesPojo.id desc";
 
     @PersistenceContext
     private EntityManager entityManager;

@@ -30,7 +30,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public List<InventoryReportData> getReport() {
+    public List<Object[]> getReport() {
         return inventoryDao.selectReport();
     }
 
@@ -46,7 +46,7 @@ public class InventoryService {
     public InventoryPojo getCheck(int productId) throws ApiException {
         InventoryPojo inventoryPojo = inventoryDao.select(productId);
         if (inventoryPojo == null) {
-            throw new ApiException("Inventory for product with given ID does not exit, id: " + productId);
+            throw new ApiException("Barcode does not exist");
         }
         return inventoryPojo;
     }

@@ -38,7 +38,7 @@ public class AppUiController extends AbstractUiDto {
 		return mav("orderitem.html");
 	}
 
-	@RequestMapping(value = "/ui/order")
+	@RequestMapping(value = "/ui/orders")
 	public ModelAndView order() {
 		return mav("orders.html");
 	}
@@ -58,7 +58,12 @@ public class AppUiController extends AbstractUiDto {
 		return mav("inventoryreport.html");
 	}
 
-	@RequestMapping(value = "/ui/admin")
+	@RequestMapping(value = "/ui/salereport")
+	public ModelAndView saleReport() {
+		return mav("salereport.html");
+	}
+
+	@RequestMapping(value = "/ui/user")
 	public ModelAndView admin() {
 		return mav("user.html");
 	}

@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public class InventoryDao extends AbstractDao{
     private static String select_id = "select inventoryPojo from InventoryPojo inventoryPojo where productId=:id";
-    private static String select_all = "select inventoryPojo from InventoryPojo inventoryPojo";
+    private static String select_all = "select inventoryPojo from InventoryPojo inventoryPojo order by inventoryPojo.productId desc";
     private static String select_report = "SELECT bp.brandName, bp.category, SUM(ip.productQuantity)" +
                                             "FROM InventoryPojo ip " +
                                             "INNER JOIN ProductPojo pp ON ip.productId = pp.productId " +
@@ -42,18 +42,9 @@ public class InventoryDao extends AbstractDao{
         return query.getResultList();
     }
 
-    public List<InventoryReportData> selectReport(){
+    public List<Object[]> selectReport(){
         TypedQuery<Object[]> query = getQuery(select_report, Object[].class);
-        List<Object[]> resultList = query.getResultList();
-        List<InventoryReportData> reportDataList = new ArrayList<>();
-        for (Object[] result : resultList) {
-            InventoryReportData inventoryReportData = new InventoryReportData();
-            inventoryReportData.setBrand((String) result[0]);
-            inventoryReportData.setCategory((String) result[1]);
-            inventoryReportData.setQuantity(((Long) result[2]).intValue());
-            reportDataList.add(inventoryReportData);
-        }
-        return reportDataList;
+        return query.getResultList();
     }
 
     public void update(InventoryPojo inventoryPojo) {

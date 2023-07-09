@@ -41,6 +41,12 @@ public class LoginController {
 		return loginDto.login(req, f);
 	}
 
+//	@ApiOperation(value = "Sign up a user")
+//	@RequestMapping(path = "/session/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//	public ModelAndView signUp(HttpServletRequest req, LoginForm f) throws ApiException {
+//		return loginDto.signUp(req, f);
+//	}
+
 	@RequestMapping(path = "/session/logout", method = RequestMethod.GET)
 	public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
 		return loginDto.logout(request, response);

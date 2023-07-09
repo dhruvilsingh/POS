@@ -10,12 +10,19 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Api
 public class InventoryApiController {
     @Autowired
     private InventoryDto inventoryDto;
+
+    @ApiOperation(value = "Uploads inventory from TSV")
+    @RequestMapping(path = "/api/inventory-list", method = RequestMethod.POST)
+    public List<Map<String, Object>> processData(@RequestBody List<Map<String, Object>> fileData) throws ApiException {
+        return inventoryDto.upload(fileData);
+    }
 
     @ApiOperation(value = "Gets inventory of a product by ID")
     @RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.GET)

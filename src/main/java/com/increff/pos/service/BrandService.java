@@ -21,6 +21,10 @@ public class BrandService {
         if(StringUtil.isEmpty(brandPojo.getBrandName()) || StringUtil.isEmpty(brandPojo.getCategory())) {
             throw new ApiException("Fields cannot be empty");
         }
+        if(brandPojo.getBrandName() == null || brandPojo.getCategory() == null)
+        {
+            throw new ApiException("TSV format is not correct");
+        }
         if(getBrandCategory(brandPojo.getBrandName(), brandPojo.getCategory()) != -1){
             throw new ApiException("Category already exist in this brand");
         }

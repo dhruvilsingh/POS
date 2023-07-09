@@ -26,7 +26,8 @@ public class DailySalesService {
 
     @Autowired
     private OrderItemDao orderItemDao;
-//(cron = "0 0 0 * * *")
+
+    //(cron = "0 0 0 * * *")
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional(rollbackOn = ApiException.class)
     public void add() throws ApiException {
@@ -34,7 +35,7 @@ public class DailySalesService {
         System.out.println(currentDate);
         DailySalesPojo dailySalesPojo = new DailySalesPojo();
         dailySalesPojo.setDate(currentDate);
-        dailySalesPojo.setOrderCount((int)orderDao.selectcount(currentDate));
+        dailySalesPojo.setOrderCount(orderDao.selectcount(currentDate));
         dailySalesPojo.setOrderItemCount(orderItemDao.selectItemCount(currentDate));
         dailySalesPojo.setRevenue(orderItemDao.selectRevenue(currentDate));
         dailySalesDao.insert(dailySalesPojo);

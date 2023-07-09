@@ -1,10 +1,12 @@
 package com.increff.pos.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.increff.pos.dao.UserDao;
@@ -16,6 +18,9 @@ public class UserService {
 	@Autowired
 	private UserDao dao;
 
+	@Value("${supervisor.email}")
+	private String supervisorEmail;
+
 	@Transactional
 	public void add(UserPojo p) throws ApiException {
 		normalize(p);
@@ -23,6 +28,7 @@ public class UserService {
 		if (existing != null) {
 			throw new ApiException("User with given email already exists");
 		}
+		p = assignRole(p);
 		dao.insert(p);
 	}
 
@@ -45,4 +51,16 @@ public class UserService {
 		p.setEmail(p.getEmail().toLowerCase().trim());
 		p.setRole(p.getRole().toLowerCase().trim());
 	}
+
+	private UserPojo assignRole(UserPojo userPojo){
+		List<String> supervisorEmailList = Arrays.asList(supervisorEmail.split("\\s*,\\s*"));
+		for(String email : supervisorEmailList){
+			if(userPojo.getEmail().equals(email)){
+				userPojo.setRole("admin");
+				break;
+			}
+		}
+		return userPojo;
+	}
+
 }

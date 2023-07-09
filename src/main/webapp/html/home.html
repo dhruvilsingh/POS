@@ -5,63 +5,75 @@
 <html lang="en">
 
 <head th:replace="snippets.html :: name_head">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link rel="stylesheet" th:href="@{/static/app.css}">
 </head>
 
 <body>
 
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
 
-<div class="container">
-	<div class="container" style="padding: 80px 16px">
-		<h2 class="text-center">Key features of the app</h2>
-		<div class="card-deck mt-5 pt-4">
-			<div class="card card0">
-				<h3 class="card-header mt-0 py-3 text-center">Brands</h3>
-				<div class="card-body pt-0 d-flex flex-column">
-					<p class="card-text"> <br>Add brands with category</br>
-						<br>Edit existing brands and categories</br>
-						<br>Upload brand and category list from tsv</br></p>
-					<a th:href="@{/ui/brand}" class="btn btn-primary mt-auto">Go to Brands</a>
-				</div>
+<div class="container-fluid container-home">
+	<div class="row mt-5 pt-5">
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a  th:href="@{/ui/brand}"><img data-toggle="tooltip" data-placement="bottom" title="Brands" class="col-img" th:src="@{/static/brand.png}"></a>
 			</div>
-			<div class="card card0">
-				<h3 class="card-header mt-0 py-3 text-center">Products</h3>
-				<div class="card-body pt-0 d-flex flex-column">
-					<p class="card-text"> <br>Add new product</br>
-						<br>Edit product details</br></p>
-					<a th:href="@{/ui/product}"  class="btn btn-primary mt-auto">Go to products</a>
-				</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 my-3 pb-5">
+			<a th:href="@{/ui/inventory}"><img data-toggle="tooltip" data-placement="bottom" title="Inventory" class="col-img" th:src="@{/static/inventory.png}"></a>
 			</div>
-			<div class="card card0">
-				<h3 class="card-header mt-0 py-3 text-center">Inventory</h3>
-				<div class="card-body pt-0 d-flex flex-column">
-					<p class="card-text"><br>Add inventory for products</br>
-						<br>Upload inventory list from tsv</br></p>
-					<a th:href="@{/ui/inventory}" class="btn btn-primary mt-auto">Go to Inventory</a>
-				</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/product}"><img data-toggle="tooltip" data-placement="bottom" title="Products" class="col-img" th:src="@{/static/product.webp}"></a>
 			</div>
-			<div class="card card0">
-				<h3 class="card-header mt-0 py-3 text-center">Orders</h3>
-				<div class="card-body d-flex pt-0 flex-column">
-					<p><br>Create a new order</br>
-						<br>Edit existing orders</br>
-						<br>View orders and generate invoices</br></p>
-					<a th:href="@{/ui/order}" class="btn btn-primary mt-auto">Go to Orders</a>
-				</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/orders}"><img data-toggle="tooltip" data-placement="bottom" title="Orders" class="col-img" th:src="@{/static/orders.png}"></a>
 			</div>
 		</div>
 	</div>
+	<div class="row mb-5 pb-5">
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/brandreport}"><img data-toggle="tooltip" data-placement="bottom" title="Brand report" class="col-img" th:src="@{/static/brand-report.png}"></a>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/inventoryreport}"><img data-toggle="tooltip" data-placement="bottom" title="Inventory report" class="col-img" th:src="@{/static/inventory-report.webp}"></a>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/dailysales}"><img data-toggle="tooltip" data-placement="bottom" title="Daily sales report" class="col-img" th:src="@{/static/daily-sales.png}"></a>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-home">
+			<div class="card1 mx-5 pb-5">
+			<a th:href="@{/ui/salereport}"><img data-toggle="tooltip" data-placement="bottom" title="Sales report" class="col-img" th:src="@{/static/sales-report.webp}"></a>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 </div> <!-- Container end-->
 
+</body>
+
 <footer th:replace="snippets.html :: name_footer"></footer>
 
-
-</body>
+<script>
+$(document).ready(function(){
+const navbarContainer = document.getElementById('navbarContainer');
+const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+navItems.forEach(item => {
+item.classList.remove('active')});
+const navItem = document.getElementById('home-nav');
+navItem.classList.add('active');
+});
+</script>
 
 </html>

@@ -30,3 +30,11 @@ function displayDailySalesList(data){
 }
 
 $(document).ready(displayDailySales);
+$(document).ready(function(){
+    const navbarContainer = document.getElementById('navbarContainer');
+    const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+    navItems.forEach(item => {
+       item.classList.remove('active')});
+    const navItem = document.getElementById('reports-nav');
+    navItem.classList.add('active');
+});

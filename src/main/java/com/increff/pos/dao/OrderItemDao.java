@@ -17,7 +17,7 @@ import java.util.List;
 @Repository
 public class OrderItemDao extends AbstractDao{
 
-    private static String select_all = "select orderItemPojo from OrderItemPojo orderItemPojo where orderId=:id";
+    private static String select_all = "select orderItemPojo from OrderItemPojo orderItemPojo where orderId=:id order by orderItemPojo.orderItemId desc";
 
     private static String select_id = "select orderItemPojo from OrderItemPojo orderItemPojo where orderItemId = :id";
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class BrandDto {
@@ -21,6 +22,21 @@ public class BrandDto {
         BrandPojo brandPojo = convert(brandForm);
         brandService.add(brandPojo);
     }
+
+    public List<Map<String, Object>>  upload(List<Map<String, Object>> fileData) {
+        List<Map<String, Object>> errorData = new ArrayList<>();
+        for(Map<String,Object> row : fileData){
+            BrandPojo brandPojo = convert(row);
+            try {
+                brandService.add(brandPojo);
+            } catch (ApiException e) {
+                row.put("error", e.getMessage());
+                errorData.add(row);
+            }
+        }
+        return errorData;
+    }
+
 
     public BrandData get(int id) throws ApiException {
         BrandPojo brandPojo = brandService.get(id);
@@ -48,6 +64,13 @@ public class BrandDto {
         brandData.setCategory(brandPojo.getCategory());
         brandData.setBrandId(brandPojo.getBrandId());
         return brandData;
+    }
+
+    private static BrandPojo convert(Map<String,Object> row){
+        BrandPojo brandPojo = new BrandPojo();
+        brandPojo.setBrandName(row.get("brandName").toString());
+        brandPojo.setCategory(row.get("category").toString());
+        return brandPojo;
     }
 
     private static BrandPojo convert(BrandForm brandForm) {

@@ -1,7 +1,9 @@
 package com.increff.pos.service;
 
-public class ApiException extends Exception {
+import com.increff.pos.model.InfoData;
+import org.springframework.beans.factory.annotation.Autowired;
 
+public class ApiException extends Exception {
 	private static final long serialVersionUID = 1L;
 	
 	public ApiException(String string) {

@@ -25,6 +25,9 @@ public class ProductService {
         if(StringUtil.isEmpty(productPojo.getProductName()) || StringUtil.isEmpty(productPojo.getProductBarcode())) {
             throw new ApiException("Fields cannot be empty");
         }
+        if(getId(productPojo.getProductBarcode())!=-1){
+            throw new ApiException("Barcode already exists") ;
+        }
         productDao.insert(productPojo);
         InventoryPojo inventoryPojo = new InventoryPojo();
         inventoryPojo.setProductId(productPojo.getProductId());

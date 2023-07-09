@@ -17,8 +17,7 @@ import java.util.List;
 @Repository
 public class OrderDao extends AbstractDao{
     private static String select_id = "select orderPojo from OrderPojo orderPojo where orderId=:id";
-    private static String select_all = "select orderPojo from OrderPojo orderPojo";
-
+    private static String select_all = "select orderPojo from OrderPojo orderPojo order by orderPojo.orderId desc";
     private static String select_order_count = "select count(op.orderId) from OrderPojo op where date(orderTime) = :date";
 
     @PersistenceContext

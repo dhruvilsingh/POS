@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public class CartDao extends  AbstractDao{
     private static String select_id = "select cartPojo from CartPojo cartPojo where itemNo=:id";
-    private static String select_all = "select cartPojo from CartPojo cartPojo where userEmail=:email";
+    private static String select_all = "select cartPojo from CartPojo cartPojo where userEmail=:email order by cartPojo.itemNo desc";
     private static String delete_id = "delete from CartPojo cartPojo where itemNo=:id";
     private static String select_barcode = "select cartPojo from CartPojo cartPojo where productBarcode=:barcode and userEmail=:email";
 

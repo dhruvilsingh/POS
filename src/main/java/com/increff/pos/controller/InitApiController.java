@@ -18,37 +18,29 @@ import io.swagger.annotations.ApiOperation;
 public class InitApiController extends AbstractUiDto {
 
 	@Autowired
-	private UserService service;
+	private UserService userService;
 	@Autowired
 	private InfoData info;
 
 	@ApiOperation(value = "Initializes application")
-	@RequestMapping(path = "/site/init", method = RequestMethod.GET)
-	public ModelAndView showPage(UserForm form) throws ApiException {
-		info.setMessage("");
-		return mav("init.html");
-	}
-
-	@ApiOperation(value = "Initializes application")
 	@RequestMapping(path = "/site/init", method = RequestMethod.POST)
 	public ModelAndView initSite(UserForm form) throws ApiException {
-		List<UserPojo> list = service.getAll();
+		List<UserPojo> list = userService.getAll();
 		if (list.size() > 0) {
-			info.setMessage("Application already initialized. Please use existing credentials");
+			info.setMessage("Application already initialized. Please login using existing credentials");
 		} else {
-			form.setRole("admin");
 			UserPojo p = convert(form);
-			service.add(p);
-			info.setMessage("Application initialized");
+			userService.add(p);
+			info.setMessage("Application initialized! Please login");
+			return mav("login.html");
 		}
 		return mav("init.html");
-
 	}
 
 	private static UserPojo convert(UserForm f) {
 		UserPojo p = new UserPojo();
 		p.setEmail(f.getEmail());
-		p.setRole(f.getRole());
+		p.setRole("admin");
 		p.setPassword(f.getPassword());
 		return p;
 	}

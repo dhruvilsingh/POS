@@ -19,6 +19,7 @@ function addUser(event){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
+	        $.notify("User added", "success");
 	   		getUserList();    
 	   },
 	   error: handleAjaxError
@@ -46,6 +47,7 @@ function deleteUser(id){
 	   url: url,
 	   type: 'DELETE',
 	   success: function(data) {
+	        $.notify("User deleted", "success");
 	   		getUserList();    
 	   },
 	   error: handleAjaxError
@@ -63,8 +65,8 @@ function displayUserList(data){
 		var buttonHtml = '<button onclick="deleteUser(' + e.id + ')">delete</button>'
 		buttonHtml += ' <button onclick="displayEditUser(' + e.id + ')">edit</button>'
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.email + '</td>'
+		+ '<td>' + e.role + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
@@ -75,9 +77,17 @@ function displayUserList(data){
 //INITIALIZATION CODE
 function init(){
 	$('#add-user').click(addUser);
-	$('#refresh-data').click(getUserList);
 }
 
 $(document).ready(init);
 $(document).ready(getUserList);
+
+$(document).ready(function(){
+    const navbarContainer = document.getElementById('navbarContainer');
+    const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+    navItems.forEach(item => {
+       item.classList.remove('active')});
+    const navItem = document.getElementById('user-nav');
+    navItem.classList.add('active');
+});
 

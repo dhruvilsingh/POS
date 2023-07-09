@@ -1,20 +1,21 @@
+<!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" th:href="@{/static/app.css}">
 
+<head th:replace="snippets.html :: name_head">
+</head>
+
+
+<body>
+
+<nav th:replace="snippets.html :: name_site_navbar"></nav>
 
 <div class="container-fluid px-1 px-md-5 px-lg-1 px-xl-5 py-5 mx-auto">
-	<div class="card card0 border-0">
+	<div class="card card0 mt-5 border-0">
 		<div class="row d-flex">
 			<div class="col-lg-6">
 				<div class="card1 pb-5">
-					<div class="row" >
-						<img th:src="@{/static/increfflogo.png}" class="logo" alt="Company Logo">
-					</div>
-					<div class="row px-3 justify-content-center mt-4 mb-5 border-line">
+					<div class="row ml-4 justify-content-center my-4 border-line">
 						<img th:src="@{/static/login.png}" class="image">
 					</div>
 				</div>
@@ -41,7 +42,7 @@
 						<button type="submit" class="btn btn-blue text-center" id="login" method="POST" th:action="@{/session/login}">Login</button>
 					</div>
 					<div class="row mb-4 px-3">
-						<small class="font-weight-bold">Don't have an account? <a class="text-danger">Sign Up</a></small>
+						<small class="font-weight-bold">Don't have an account? <a class="text-danger" th:href="@{/site/signup}">Sign Up</a></small>
 					</div>
 					</form>
 				</div>
@@ -55,6 +56,11 @@
 	</div>
 </div>
 
+</body>
+
+<script>
+	$(document).ready([[${info.setMessage("")}]])
+</script>
 
 </html>
 

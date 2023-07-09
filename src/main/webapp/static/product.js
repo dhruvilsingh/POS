@@ -75,54 +75,61 @@ var fileData = [];
 var errorData = [];
 var processCount = 0;
 
-
-function processData(){
-	var file = $('#productFile')[0].files[0];
-	readFileData(file, readFileDataCallback);
+function processData() {
+  processCount = 0;
+  fileData = [];
+  errorData = [];
+  var file = $('#productFile')[0].files[0];
+  readFileData(file, readFileDataCallback);
 }
 
-function readFileDataCallback(results){
-	fileData = results.data;
-	uploadRows();
+function readFileDataCallback(results) {
+  fileData = results.data;
+  uploadRows();
 }
 
-function uploadRows(){
-	//Update progress
-	updateUploadDialog();
-	//If everything processed then return
-	if(processCount==fileData.length){
-		return;
-	}
+function uploadRows() {
+  var jsonData = [];
 
-	//Process next row
-	var row = fileData[processCount];
-	processCount++;
+  for ( processCount = 0; processCount < fileData.length; processCount++) {
+    var row = fileData[processCount];
+        console.log("row = " + row);
+    var json = JSON.stringify(row);
+        console.log("json = "+ json);
+        jsonData.push(json);
+        console.log("json data = "+ jsonData)
+  }
 
-	var json = JSON.stringify(row);
-	var url = getProductUrl();
+  var url = getProductUrl() + "-list";
+  console.log("url = "+url);
 
-	//Make ajax call
-	$.ajax({
-	   url: url,
-	   type: 'POST',
-	   data: json,
-	   headers: {
-       	'Content-Type': 'application/json'
-       },
-	   success: function(response) {
-	   		uploadRows();
-	   },
-	   error: function(response){
-	   		row.error=response.responseText
-	   		errorData.push(row);
-	   		uploadRows();
-	   }
-	});
-
+  // Make ajax call
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: '[' + jsonData.join(',') + ']',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    success: function(data) {
+        for(var i = 0; i < data.length; i++){
+            var row = data[i];
+            console.log(row);
+            console.log(row.error);
+            if(row.error != null)
+                errorData.push(row);
+        }
+        getProductList();
+        updateUploadDialog();
+        if(errorData.length !=0)
+            downloadErrors();
+    },
+    error: handleAjaxError
+  });
 }
 
-function downloadErrors(){
-	writeFileData(errorData);
+function downloadErrors() {
+  writeFileData(errorData);
 }
 
 //UI DISPLAY METHODS
@@ -211,9 +218,19 @@ function init(){
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#productFile').on('change', updateFileName)
+    $('#productFile').on('change', updateFileName);
 }
+
 
 $(document).ready(init);
 $(document).ready(getProductList);
+
+$(document).ready(function(){
+    const navbarContainer = document.getElementById('navbarContainer');
+    const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+    navItems.forEach(item => {
+       item.classList.remove('active')});
+    const navItem = document.getElementById('products-nav');
+    navItem.classList.add('active');
+});
 
