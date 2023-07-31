@@ -8,18 +8,18 @@
 
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
 
-<div class="container">
+<div class="container-fluid px-5">
 
   <div class="row">
     &nbsp;
   </div>
 
-  <button type="button" class="btn btn-success" id="open-modal">Add</button>
+  <button th:if = "${info.getRole()=='ADMIN'}" type="button" class="btn btn-success" id="open-modal">Add</button>
   &nbsp;&nbsp;
-  <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
+  <button th:if = "${info.getRole()=='ADMIN'}" type="button" class="btn btn-primary" id="upload-data">Upload</button>
 
-  <div class="modal" tabindex="-1" role="dialog" id="add-product-modal">
-    <div class="modal-dialog" role="document">
+  <div th:if = "${info.getRole()=='ADMIN'}" class="modal" data-backdrop="static" tabindex="-1" role="dialog" id="add-product-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add Product</h5>
@@ -31,23 +31,27 @@
           <form class="form" id="product-form">
             <div class="form-group">
               <label for="inputBarcode">Barcode</label>
-                <input type="text" class="form-control" name="productBarcode" id="inputBarcode" placeholder="Enter Barcode">
+                <input type="text" class="form-control" maxlength="255" name="barcode" id="inputBarcode" placeholder="Enter Barcode" required>
             </div>
             <div class="form-group">
               <label for="inputProductBrand">Product Brand</label>
-                <input type="text" class="form-control" name="productBrand" id="inputProductBrand" placeholder="Enter product brand">
+              <select class="dropdown custom-dropdown" name="brand" id="inputProductBrand" required>
+                <option value="" selected="selected">Select brand</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="inputProductCategory">Product Category</label>
-                <input type="text" class="form-control" name="productCategory" id="inputProductCategory" placeholder="Enter product Category">
-            </div>
-            <div class="form-group">
-              <label for="inputProductMrp">Mrp</label>
-                <input type="number" class="form-control" name="productMrp" id="inputProductMrp" placeholder="Enter product Mrp">
+              <select class="dropdown custom-dropdown" name="category" id="inputProductCategory" required>
+                <option value="" selected="selected">Please select brand first</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="inputProductName">Product Name</label>
-                <input type="text" class="form-control" name="productName" id="inputProductName" placeholder="Enter product name">
+                <input type="text" class="form-control" name="name" maxlength="255" id="inputProductName" placeholder="Enter Product Name" required>
+            </div>
+            <div class="form-group">
+              <label for="inputProductMrp">MRP</label>
+              <input type="number" class="form-control" step="any" min="0.01" name="mrp" id="inputProductMrp" placeholder="Enter MRP" required>
             </div>
           </form>
         </div>
@@ -67,7 +71,7 @@
   <div class="row">
 
     <!-- Table -->
-    <div class="col-12">
+    <div class="col-12 table-responsive">
       <table class="table text-center table-striped" id="product-table">
         <thead class="thead-dark">
         <tr>
@@ -75,19 +79,20 @@
           <th scope="col">Name</th>
           <th scope="col">Brand</th>
           <th scope="col">Category</th>
-          <th scope="col">Mrp</th>
-          <th scope="col">Actions</th>
+          <th scope="col">MRP</th>
+          <th th:if = "${info.getRole()=='ADMIN'}" scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
+
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- Product Edit Modal -->
-  <div class="modal" tabindex="-1" role="dialog" id="edit-product-modal">
-    <div class="modal-dialog" role="document">
+  <div th:if = "${info.getRole()=='ADMIN'}" class="modal" data-backdrop="static" tabindex="-1" role="dialog" id="edit-product-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Edit Product</h5>
@@ -99,23 +104,23 @@
           <form class="form" id="product-edit-form">
             <div class="form-group">
               <label for="inputBarcode">Barcode</label>
-                <input type="text" class="form-control" name="productBarcode" placeholder="Enter Barcode">
+                <input type="text" class="form-control" name="barcode" placeholder="Enter Barcode" readonly>
             </div>
             <div class="form-group">
               <label for="inputProductBrand">Brand</label>
-                <input type="text" class="form-control" name="productBrand" placeholder="Enter product brand">
+                <input type="text" class="form-control" name="brand" placeholder="Enter Brand" readonly>
             </div>
             <div class="form-group">
               <label for="inputProductCategory">Category</label>
-                <input type="text" class="form-control" name="productCategory" placeholder="Enter product Category">
-            </div>
-            <div class="form-group">
-              <label for="inputProductMrp">Mrp</label>
-                <input type="number" class="form-control" name="productMrp" placeholder="Enter product Mrp">
+                <input type="text" class="form-control" name="category" placeholder="Enter Category" readonly>
             </div>
             <div class="form-group">
               <label for="inputProductName">Product Name</label>
-                <input type="text" class="form-control" name="productName" placeholder="Enter Product name">
+              <input type="text" class="form-control" maxlength="255" name="name" placeholder="Enter Product Name" required>
+            </div>
+            <div class="form-group">
+              <label for="inputProductMrp">MRP</label>
+                <input type="number" step="any" min="0.01" class="form-control" name="mrp" placeholder="Enter MRP" required>
             </div>
             <input type="hidden" name="id" >
           </form>
@@ -130,8 +135,8 @@
 
 
   <!-- Product upload Modal -->
-  <div class="modal" tabindex="-1" role="dialog" id="upload-product-modal">
-    <div class="modal-dialog" role="document">
+  <div th:if = "${info.getRole()=='ADMIN'}" class="modal" data-backdrop="static" tabindex="-1" role="dialog" id="upload-product-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
 
         <div class="modal-header">
@@ -143,13 +148,11 @@
 
         <div class="modal-body">
           <div class="product-file">
-            <input type="file" class="custom-file-input" id="productFile">
+            <input type="file" class="custom-file-input" id="productFile" required>
             <label class="custom-file-label" for="productFile" id="productFileName">Choose file</label>
           </div>
           <a th:href="@{/sample/pos.tsv}" target="_blank">Download Sample</a>
           <br>
-          Rows: <span id="rowCount">0</span>,
-          Processed: <span id="processCount">0</span>,
           Errors: <span id="errorCount">0</span>
         </div>
 

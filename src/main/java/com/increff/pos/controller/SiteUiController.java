@@ -24,11 +24,6 @@ public class SiteUiController extends AbstractUiDto {
 		return mav("login.html");
 	}
 
-	@RequestMapping(value = "/site/logout")
-	public ModelAndView logout() {
-		return mav("logout.html");
-	}
-
 	@RequestMapping(value = "/site/signup")
 	public ModelAndView signUp() {
 		return mav("init.html");

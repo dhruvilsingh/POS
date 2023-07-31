@@ -1,13 +1,21 @@
-
 function getProductUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/product";
+	return baseUrl + "/api/products";
 }
 
 //BUTTON ACTIONS
 function addProduct(event){
-    $('#add-product-modal').modal('toggle');
-	//Set the values to update
+	//Set the values to add
+    var isValid = $("#product-form")[0].checkValidity();
+                if(!isValid){
+                  $("#product-form")[0].reportValidity();
+                     return;
+                }
+	var sellingPrice = $("#product-form input[name=mrp]").val();
+        if(sellingPrice==""){
+            $.notify("MRP cannot be empty!");
+            return;
+        }
 	var $form = $("#product-form");
 	var json = toJson($form);
 	var url = getProductUrl();
@@ -21,6 +29,9 @@ function addProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	        $('#add-product-modal').modal('toggle');
+            document.getElementById("product-form").reset();
+	        $.notify("Product added!", "success");
 	   		getProductList();
 	   },
 	   error: handleAjaxError
@@ -30,7 +41,16 @@ function addProduct(event){
 }
 
 function updateProduct(event){
-	$('#edit-product-modal').modal('toggle');
+ var isValid = $("#product-edit-form")[0].checkValidity();
+                if(!isValid){
+                  $("#product-edit-form")[0].reportValidity();
+                     return;
+                }
+    var sellingPrice = $("#product-edit-form input[name=mrp]").val();
+        if(sellingPrice==""){
+            $.notify("MRP cannot be empty!");
+            return;
+        }
 	//Get the ID
 	var id = $("#product-edit-form input[name=id]").val();
 	var url = getProductUrl() + "/" + id;
@@ -48,6 +68,8 @@ function updateProduct(event){
        	'Content-Type': 'application/json'
        },
 	   success: function(response) {
+	   	    $('#edit-product-modal').modal('toggle');
+	        $.notify("Product updated!", "success");
 	   		getProductList();
 	   },
 	   error: handleAjaxError
@@ -56,18 +78,62 @@ function updateProduct(event){
 	return false;
 }
 
-
-function getProductList(){
-	var url = getProductUrl();
+function getBrandList(){
+	var baseUrl = $("meta[name=baseUrl]").attr("content")
+    var url = baseUrl + "/api/brands";
 	console.log(url);
 	$.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   		displayProductList(data);
+	   		dropdown(data);
 	   },
 	   error: handleAjaxError
 	});
+}
+
+function dropdown(data){
+    var brandData = {};
+    for (var i in data){
+        var b = data[i];
+        if (brandData.hasOwnProperty(b.brand)) {
+                brandData[b.brand].push(b.category);
+        } else {
+                brandData[b.brand] = [b.category];
+        }
+    }
+      var brandSel = document.getElementById("inputProductBrand");
+      var catSel = document.getElementById("inputProductCategory");
+      brandSel.length=1;
+      for (var brand in brandData) {
+        brandSel.options[brandSel.options.length] = new Option(brand, brand);
+      }
+      brandSel.onchange = function() {
+          var selectedBrand = this.value;
+          catSel.length = 1; // Reset category dropdown
+          var categories = brandData[selectedBrand];
+          console.log(categories);
+          for (var i = 0; i < categories.length; i++) {
+                  catSel.options[catSel.options.length] = new Option(categories[i], categories[i]);
+          }
+      }
+}
+
+function getProductList(){
+	var url = getProductUrl();
+	table.clear().draw();
+    table.row.add(["","","<i class='fa fa-refresh fa-spin'></i>","","",""]).draw();
+        console.log(url);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                displayProductList(data);
+            },
+            error: function(error) {
+                handleAjaxError(error);
+            }
+        });
 }
 
 // FILE UPLOAD METHODS
@@ -76,6 +142,11 @@ var errorData = [];
 var processCount = 0;
 
 function processData() {
+ var isValid = $("#productFile")[0].checkValidity();
+            if(!isValid){
+              $("#productFile")[0].reportValidity();
+                 return;
+            }
   processCount = 0;
   fileData = [];
   errorData = [];
@@ -90,17 +161,24 @@ function readFileDataCallback(results) {
 
 function uploadRows() {
   var jsonData = [];
-
   for ( processCount = 0; processCount < fileData.length; processCount++) {
     var row = fileData[processCount];
-        console.log("row = " + row);
+    if (row.hasOwnProperty("")) {
+                  delete row[""];
+                }
+            const desiredOrder = ["barcode","brand","category","mrp","name"];
+            row = trimLowerCase(row, desiredOrder);
+            if(row==null){
+                    $.notify("Incorrect TSV format!");
+                    return;
+             }
     var json = JSON.stringify(row);
         console.log("json = "+ json);
         jsonData.push(json);
         console.log("json data = "+ jsonData)
   }
 
-  var url = getProductUrl() + "-list";
+  var url = getProductUrl() + "/upload";
   console.log("url = "+url);
 
   // Make ajax call
@@ -112,44 +190,48 @@ function uploadRows() {
       'Content-Type': 'application/json'
     },
     success: function(data) {
-        for(var i = 0; i < data.length; i++){
-            var row = data[i];
-            console.log(row);
-            console.log(row.error);
-            if(row.error != null)
-                errorData.push(row);
-        }
         getProductList();
-        updateUploadDialog();
-        if(errorData.length !=0)
-            downloadErrors();
+        $.notify("Products uploaded", "success");
+        $('#upload-product-modal').modal('toggle');
     },
-    error: handleAjaxError
+    error: function(xhr, textStatus, errorThrown) {
+                   var errorList = xhr.responseJSON.errors;
+                   for (var i = 0; i < errorList.length; i++) {
+                        var errorRow = errorList[i];
+                        errorData.push(errorRow);
+                   }
+                   updateUploadDialog();
+                   $.notify(xhr.responseJSON.message);
+          }
   });
 }
 
 function downloadErrors() {
-  writeFileData(errorData);
+ var isValid = $("#productFile")[0].checkValidity();
+            if(!isValid){
+              $("#productFile")[0].reportValidity();
+                 return;
+            }
+ if(errorData.length == 0){
+       $.notify("No errors to download!");
+       return;
+   }
+   writeFileData(errorData, 'Product_Upload_Errors.tsv');
+   $.notify("Error list downloaded!", "success");
 }
 
 //UI DISPLAY METHODS
 function displayProductList(data){
-	var $tbody = $('#product-table').find('tbody');
-	$tbody.empty();
+    table.clear().draw();
+    var dataRows = [];
 	for(var i in data){
+	console.log(i);
 		var p = data[i];
-		console.log(p);
-		var buttonHtml = '<button class="btn btn-warning" onclick="displayEditProduct(' + p.productId + ')">Edit</button>'
-		var row = '<tr>'
-		+ '<td>' + p.productBarcode + '</td>'
-		+ '<td>'  + p.productName + '</td>'
-		+ '<td>'  + p.productBrand + '</td>'
-		+ '<td>' + p.productCategory + '</td>'
-		+ '<td>' + p.productMrp + '</td>'
-		+ '<td>' + buttonHtml + '</td>'
-		+ '</tr>';
-        $tbody.append(row);
+		var buttonHtml = '<button class="btn btn-primary" onclick="displayEditProduct(' + p.id + ')"> <i class="fas fa-edit white-icon mr-1"></i>Edit</button>';
+        row = [p.barcode, p.name, p.brand, p.category, p.mrp, buttonHtml];
+        dataRows.push(row);
 	}
+		table.rows.add(dataRows).draw();
 }
 
 function displayEditProduct(id){
@@ -177,16 +259,19 @@ function resetUploadDialog(){
 	updateUploadDialog();
 }
 
-function updateUploadDialog(){
-	$('#rowCount').html("" + fileData.length);
-	$('#processCount').html("" + processCount);
-	$('#errorCount').html("" + errorData.length);
-}
+$(document).ready(function(){
+    $('#productFile').on('change', function() {
+        var fileInput = this;
+        resetUploadDialog();
+        if (fileInput.files && fileInput.files[0]) {
+            var fileName = fileInput.files[0].name;
+            $('#productFileName').html(fileName);
+        }
+    });
+});
 
-function updateFileName(){
-	var $file = $('#productFile');
-	var fileName = $file.val();
-	$('#productFileName').html(fileName);
+function updateUploadDialog(){
+	$('#errorCount').html("" + errorData.length);
 }
 
 function displayUploadData(){
@@ -195,16 +280,17 @@ function displayUploadData(){
 }
 
 function displayProduct(data){
-	$("#product-edit-form input[name=productName]").val(data.productName);
-	$("#product-edit-form input[name=productBarcode]").val(data.productBarcode);
-	$("#product-edit-form input[name=id]").val(data.productId);
-    $("#product-edit-form input[name=productMrp]").val(data.productMrp);
-    $("#product-edit-form input[name=productBrand]").val(data.productBrand);
-    $("#product-edit-form input[name=productCategory]").val(data.productCategory);
+	$("#product-edit-form input[name=name]").val(data.name);
+	$("#product-edit-form input[name=barcode]").val(data.barcode);
+	$("#product-edit-form input[name=id]").val(data.id);
+    $("#product-edit-form input[name=mrp]").val(data.mrp);
+    $("#product-edit-form input[name=brand]").val(data.brand);
+    $("#product-edit-form input[name=category]").val(data.category);
 	$('#edit-product-modal').modal('toggle');
 }
 
-function openModal(){
+function openAddModal(){
+    document.getElementById("product-form").reset();
 	$('#add-product-modal').modal('toggle');
 }
 
@@ -212,17 +298,76 @@ function openModal(){
 //INITIALIZATION CODE
 function init(){
 	$('#add-product').click(addProduct);
-	$('#open-modal').click(openModal);
+	$('#open-modal').click(openAddModal);
 	$('#update-product').click(updateProduct);
 	$('#refresh-data').click(getProductList);
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#productFile').on('change', updateFileName);
+    getBrandList();
 }
 
-
 $(document).ready(init);
+
+var table;
+$(document).ready(function() {
+    if($("meta[name=role]").attr("content") == "OPERATOR"){
+        table = $('#product-table').DataTable({
+        order: [],
+        scrollCollapse: true,
+        "columns": [
+                          { "searchable": true, "orderable": true },
+                          { "searchable": true, "orderable": true },
+                          { "searchable": true, "orderable": true },
+                          { "searchable": true, "orderable": true },
+                          { "searchable": false, "orderable": true },
+                        ],
+        columnDefs:[
+                        {
+                        targets: '_all',
+                                 render:function(data,type,row,meta){
+                                    return '<div>'+data+'</div>';
+                                 }
+                        },
+                         { width: '20%', targets: 0 },
+                          { width: '20%', targets: 1 },
+                          { width: '20%', targets: 2 },
+                          { width: '20%', targets: 3 },
+                          { width: '20%', targets: 4 },
+                        ]
+    });
+    }
+    else if($("meta[name=role]").attr("content") == "ADMIN"){
+       table = $('#product-table').DataTable({
+               order: [],
+               scrollCollapse: true,
+               "columns": [
+                                 { "searchable": true, "orderable": true },
+                                 { "searchable": true, "orderable": true },
+                                 { "searchable": true, "orderable": true },
+                                 { "searchable": true, "orderable": true },
+                                 { "searchable": false, "orderable": true },
+                                 { "searchable": false, "orderable": false },
+                               ],
+               columnDefs:[
+                               {
+                               targets: '_all',
+                                        render:function(data,type,row,meta){
+                                           return '<div>'+data+'</div>';
+                                        }
+                               },
+                                { width: '20%', targets: 0 },
+                                 { width: '20%', targets: 1 },
+                                 { width: '17%', targets: 2 },
+                                 { width: '17%', targets: 3 },
+                                 { width: '17%', targets: 4 },
+                                 { width: '9%', targets: 5 },
+                               ]
+           });
+}
+});
+
+
 $(document).ready(getProductList);
 
 $(document).ready(function(){

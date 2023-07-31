@@ -11,10 +11,12 @@ import java.util.List;
 
 @Repository
 public class CartDao extends  AbstractDao{
-    private static String select_id = "select cartPojo from CartPojo cartPojo where itemNo=:id";
-    private static String select_all = "select cartPojo from CartPojo cartPojo where userEmail=:email order by cartPojo.itemNo desc";
-    private static String delete_id = "delete from CartPojo cartPojo where itemNo=:id";
-    private static String select_barcode = "select cartPojo from CartPojo cartPojo where productBarcode=:barcode and userEmail=:email";
+    private static String SELECT_BY_ID = "select cartPojo from CartPojo cartPojo where id=:id";
+    private static String SELECT_ALL = "select cartPojo from CartPojo cartPojo where userEmail=:email order by cartPojo.id desc";
+    private static String DELETE_BY_ID = "delete from CartPojo cartPojo where id=:id";
+    private static String DELETE_ALL = "delete from CartPojo cartPojo where userEmail=:email";
+    private static String SELECT_BY_PRODUCT_ID = "select cartPojo from CartPojo cartPojo where productId=:productId " +
+                                            "and userEmail=:email";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -24,31 +26,37 @@ public class CartDao extends  AbstractDao{
         entityManager.persist(cartPojo);
     }
 
-    public CartPojo select(int itemNo) {
-        TypedQuery<CartPojo> query = getQuery(select_id, CartPojo.class);
+    public CartPojo selectId(int itemNo) {
+        TypedQuery<CartPojo> query = getQuery(SELECT_BY_ID, CartPojo.class);
         query.setParameter("id", itemNo);
         return getSingle(query);
     }
 
-    public CartPojo select(String barcode, String userEmail) {
-        TypedQuery<CartPojo> query = getQuery(select_barcode, CartPojo.class);
-        query.setParameter("barcode", barcode);
+    public CartPojo selectProduct(int productId, String userEmail) {
+        TypedQuery<CartPojo> query = getQuery(SELECT_BY_PRODUCT_ID, CartPojo.class);
+        query.setParameter("productId", productId);
         query.setParameter("email",userEmail);
         return getSingle(query);
     }
 
     public List<CartPojo> selectAll(String userEmail) {
-        TypedQuery<CartPojo> query = getQuery(select_all, CartPojo.class);
+        TypedQuery<CartPojo> query = getQuery(SELECT_ALL, CartPojo.class);
         query.setParameter("email",userEmail);
         return query.getResultList();
     }
     @Transactional
-    public int deleteId(int itemNo) {
-        Query query = entityManager.createQuery(delete_id);
+    public void deleteId(int itemNo) {
+        Query query = entityManager.createQuery(DELETE_BY_ID);
         query.setParameter("id", itemNo);
-        return query.executeUpdate();
+        query.executeUpdate();
     }
 
-    public void update(CartPojo cartPojo) {
+    public void deleteAll(String userEmail){
+        Query query = entityManager.createQuery(DELETE_ALL);
+        query.setParameter("email",userEmail);
+        query.executeUpdate();
     }
+
 }
+
+

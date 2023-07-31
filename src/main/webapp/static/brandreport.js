@@ -1,10 +1,10 @@
-function getBrandUrl(){
+function getBrandReportUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/brand";
+	return baseUrl + "/api/reports/brand";
 }
 
 function getBrandList(){
-	var url = getBrandUrl();
+	var url = getBrandReportUrl();
 	console.log(url);
 	$.ajax({
 	   url: url,
@@ -16,20 +16,48 @@ function getBrandList(){
 	});
 }
 
+var button = document.getElementById("download-report");
+button.addEventListener("click", function() {
+    var url = getBrandReportUrl();
+    $.ajax({
+       url: url,
+       type: 'GET',
+       success: function(data) {
+            downloadReport(data, 'Brand_Report.tsv');
+       },
+       error: handleAjaxError
+    });
+});
+
 function displayBrandList(data){
-	var $tbody = $('#brand-table').find('tbody');
-	$tbody.empty();
+	table.clear().draw();
+		var dataRows=[];
 	for(var i in data){
 		var b = data[i];
-		var row = '<tr>'
-		+ '<td>' + b.brandName + '</td>'
-		+ '<td>'  + b.category + '</td>'
-		+ '</tr>';
-        $tbody.append(row);
+		     row = [b.brand, b.category];
+                    dataRows.push(row);
 	}
+		table.rows.add(dataRows).draw();
 }
 
 $(document).ready(getBrandList);
+
+var table;
+$(document).ready(function() {
+    table = $('#brand-table').DataTable({
+        order: [],
+        columnDefs:[
+                { width: '50%', targets: 0 },
+                { width: '50%', targets: 1 },
+                {
+                targets: '_all',
+                         render:function(data,type,row,meta){
+                            return '<div>'+data+'</div>';
+                         }
+                }
+                ]
+    });
+});
 
 $(document).ready(function(){
     const navbarContainer = document.getElementById('navbarContainer');

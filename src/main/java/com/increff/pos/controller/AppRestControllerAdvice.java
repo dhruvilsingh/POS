@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.increff.pos.model.MessageData;
+import com.increff.pos.model.data.MessageData;
 import com.increff.pos.service.ApiException;
 
 @RestControllerAdvice
@@ -15,6 +15,7 @@ public class AppRestControllerAdvice {
 	public MessageData handle(ApiException e) {
 		MessageData data = new MessageData();
 		data.setMessage(e.getMessage());
+		data.setErrors(e.getErrorList());
 		return data;
 	}
 

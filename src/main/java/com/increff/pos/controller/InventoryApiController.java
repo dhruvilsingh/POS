@@ -1,9 +1,8 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.InventoryDto;
-import com.increff.pos.model.InventoryData;
-import com.increff.pos.model.InventoryForm;
-import com.increff.pos.model.InventoryReportData;
+import com.increff.pos.model.data.InventoryData;
+import com.increff.pos.model.forms.InventoryForm;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,9 +18,15 @@ public class InventoryApiController {
     private InventoryDto inventoryDto;
 
     @ApiOperation(value = "Uploads inventory from TSV")
-    @RequestMapping(path = "/api/inventory-list", method = RequestMethod.POST)
-    public List<Map<String, Object>> processData(@RequestBody List<Map<String, Object>> fileData) throws ApiException {
-        return inventoryDto.upload(fileData);
+    @RequestMapping(path = "/api/inventory", method = RequestMethod.PUT)
+    public void addInventory(@RequestBody InventoryForm inventoryForm) throws ApiException {
+        inventoryDto.addInventory(inventoryForm);
+    }
+
+    @ApiOperation(value = "Adds inventory for multiple products")
+    @RequestMapping(path = "/api/inventory/upload", method = RequestMethod.POST)
+    public void processData(@RequestBody List<InventoryForm> fileData) throws ApiException {
+        inventoryDto.upload(fileData);
     }
 
     @ApiOperation(value = "Gets inventory of a product by ID")
@@ -34,12 +39,6 @@ public class InventoryApiController {
     @RequestMapping(path = "/api/inventory", method = RequestMethod.GET)
     public List<InventoryData> getAll() throws ApiException{
         return inventoryDto.getAll();
-    }
-
-    @ApiOperation(value = "Gets inventory report")
-    @RequestMapping(path = "/api/inventoryreport", method = RequestMethod.GET)
-    public List<InventoryReportData> getReport() throws ApiException{
-        return inventoryDto.getReport();
     }
 
     @ApiOperation(value = "Updates inventory of product by ID")

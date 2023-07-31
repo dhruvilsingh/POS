@@ -1,14 +1,23 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.model.BrandData;
-import com.increff.pos.model.BrandForm;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.increff.pos.model.data.BrandData;
+import com.increff.pos.model.forms.BrandForm;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.BrandService;
+import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,30 +28,38 @@ public class BrandDto {
     private BrandService brandService;
 
     public void add(BrandForm brandForm) throws ApiException {
-        BrandPojo brandPojo = convert(brandForm);
+        normalize(brandForm);
+        ValidationUtil.checkValid(brandForm);
+        BrandPojo brandPojo = convert(brandForm); //TODO : to use copy bean and create a generic function
         brandService.add(brandPojo);
     }
 
-    public List<Map<String, Object>>  upload(List<Map<String, Object>> fileData) {
-        List<Map<String, Object>> errorData = new ArrayList<>();
-        for(Map<String,Object> row : fileData){
-            BrandPojo brandPojo = convert(row);
+    @Transactional(rollbackOn = ApiException.class) //TODO : validate the form in DTO and avoid @transac
+    //TODO: to send whole form list with error in the response
+    public void upload(List<BrandForm> fileData) throws ApiException{
+        List<Map<String,String>> errorList = new ArrayList<>();
+        for(BrandForm brandForm : fileData){
             try {
-                brandService.add(brandPojo);
-            } catch (ApiException e) {
-                row.put("error", e.getMessage());
-                errorData.add(row);
+                add(brandForm);
+            } catch (Exception e) {
+                Map<String,String> row = new HashMap<>();
+                row.put("Brand", brandForm.getBrand());
+                row.put("Category", brandForm.getCategory());
+                row.put("Error", e.getMessage());
+                errorList.add(row);
             }
         }
-        return errorData;
+        if (!errorList.isEmpty()) {
+            throw new ApiException("One or more errors occurred while processing the data!\nDownload error list to view errors", errorList);
+        }
     }
-
 
     public BrandData get(int id) throws ApiException {
         BrandPojo brandPojo = brandService.get(id);
         return convert(brandPojo);
     }
 
+    //TODO : to implement pagination.
     public List<BrandData> getAll() {
         List<BrandPojo> list = brandService.getAll();
         List<BrandData> list2 = new ArrayList<BrandData>();
@@ -53,31 +70,33 @@ public class BrandDto {
     }
 
     public void update(int id, BrandForm brandForm) throws ApiException {
+        normalize(brandForm);
+        ValidationUtil.checkValid(brandForm);
         BrandPojo brandPojo = convert(brandForm);
         brandService.update(id, brandPojo);
     }
 
 
+    //convert functions
+
     private static BrandData convert(BrandPojo brandPojo) {
         BrandData brandData = new BrandData();
-        brandData.setBrandName(brandPojo.getBrandName());
+        brandData.setBrand(brandPojo.getBrand());
         brandData.setCategory(brandPojo.getCategory());
-        brandData.setBrandId(brandPojo.getBrandId());
+        brandData.setId(brandPojo.getId());
         return brandData;
-    }
-
-    private static BrandPojo convert(Map<String,Object> row){
-        BrandPojo brandPojo = new BrandPojo();
-        brandPojo.setBrandName(row.get("brandName").toString());
-        brandPojo.setCategory(row.get("category").toString());
-        return brandPojo;
     }
 
     private static BrandPojo convert(BrandForm brandForm) {
         BrandPojo brandPojo = new BrandPojo();
         brandPojo.setCategory(brandForm.getCategory());
-        brandPojo.setBrandName(brandForm.getBrandName());
+        brandPojo.setBrand(brandForm.getBrand());
         return brandPojo;
+    }
+
+    protected static void normalize(BrandForm brandForm) {
+        brandForm.setBrand(StringUtil.toLowerCase(brandForm.getBrand()));
+        brandForm.setCategory(StringUtil.toLowerCase(brandForm.getCategory().trim().toLowerCase()));
     }
 
 }

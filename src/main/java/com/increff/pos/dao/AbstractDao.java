@@ -1,10 +1,12 @@
 package com.increff.pos.dao;
 
+
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-public abstract class AbstractDao {
+public abstract class AbstractDao{
 	
 	@PersistenceContext
 	private EntityManager em;

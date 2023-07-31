@@ -1,17 +1,17 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.dao.OrderItemDao;
-import com.increff.pos.model.*;
+import com.increff.pos.model.data.OrderItemData;
+import com.increff.pos.model.forms.CartForm;
+import com.increff.pos.model.forms.OrderItemForm;
 import com.increff.pos.pojo.*;
 import com.increff.pos.service.*;
 import com.increff.pos.util.SecurityUtil;
-import com.increff.pos.util.UserPrincipal;
+import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.RollbackException;
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,133 +28,101 @@ public class OrderItemDto {
     @Autowired
     private InventoryService inventoryService;
 
-    @Transactional(rollbackOn = ApiException.class)
-    public void add() throws ApiException {
-        List<CartPojo> list = cartService.getAll(getUser());
-        if(list.isEmpty()){
-            throw new ApiException("Empty list cannot be pushed");
+    @Transactional
+    public void add(OrderItemForm orderItemForm, int orderId) throws ApiException {
+        normalize(orderItemForm);
+        ValidationUtil.checkValid(orderItemForm);
+        ProductPojo productPojo = productService.getCheckBarcode(orderItemForm.getBarcode());
+        double productMrp = productPojo.getMrp();
+        int productId = productPojo.getId();
+        checkSellingPrice(orderItemForm.getSellingPrice(), productMrp, productService.get(productId).getBarcode());
+        OrderItemPojo orderItemPojo = orderItemService.getCheckOrderItem(productId,orderId);
+        if(orderItemPojo != null){
+            int updatedQuantity = orderItemPojo.getQuantity() + orderItemForm.getQuantity();
+            inventoryService.updateInventory(productId, orderItemPojo.getQuantity(), updatedQuantity);
+            orderItemPojo.setQuantity(updatedQuantity);
+            orderItemPojo.setSellingPrice(orderItemForm.getSellingPrice());
+            return;
         }
-        OrderPojo orderPojo = new OrderPojo();
-        orderPojo.setOrderTime(LocalDateTime.now());
-        int orderId = orderService.add(orderPojo);
-        for(CartPojo cartPojo : list){
-            int productId = productService.getId(cartPojo.getProductBarcode());
-            InventoryPojo inventoryPojo = new InventoryPojo();
-            inventoryPojo.setProductId(productId);
-            int productQuantity = inventoryService.get(productId).getProductQuantity();
-            if(cartPojo.getProductQuantity() > productQuantity){
-                throw new ApiException(productQuantity + " items are left for " + cartPojo.getProductBarcode());
-            }
-            if(cartPojo.getProductSP() > productService.get(productId).getProductMrp()){
-                throw new ApiException("Selling price for " + cartPojo.getProductBarcode() + " is greater than Mrp");
-            }
-            int updatedQuantity = productQuantity - cartPojo.getProductQuantity();
-            inventoryPojo.setProductQuantity(updatedQuantity);
-            inventoryService.update(productId,inventoryPojo);
-            orderItemService.add(convert(cartPojo,orderId,productId));
-            cartService.delete(cartPojo.getItemNo());
-        }
+        inventoryService.checkInputQuantity(productId, orderItemForm.getQuantity(), productService.get(productId).getBarcode());
+        orderItemService.add(convert(orderItemForm, orderId, productId));
     }
 
     @Transactional(rollbackOn = ApiException.class)
     public void delete(int id) throws ApiException {
         OrderItemPojo orderItemPojo = orderItemService.get(id);
-        if(orderItemService.getAll(orderItemPojo.getOrderId()).size() == 1){
-            throw new ApiException("Sorry! order cannot be empty");
-        }
+        orderService.getCheckInvoicedStatus(orderItemPojo.getOrderId()); //TODO : to fetch order and validate the status.
+        orderService.getCheckCancelledStatus(orderItemPojo.getOrderId());
+        orderItemService.delete(id);
         int productId = orderItemPojo.getProductId();
         InventoryPojo inventoryPojo = inventoryService.get(productId);
-        inventoryPojo.setProductQuantity(inventoryPojo.getProductQuantity() + orderItemPojo.getProductQuantity());
-        orderItemService.delete(id);
+        inventoryPojo.setQuantity(inventoryPojo.getQuantity() + orderItemPojo.getQuantity());
+        inventoryService.update(productId, inventoryPojo);
     }
 
+    @Transactional(rollbackOn = ApiException.class)
     public void update(int itemId, OrderItemForm orderItemForm) throws ApiException {
-        OrderItemPojo orderItemPojo = convert(orderItemForm);
-        checkInput(orderItemPojo);
-        updateInventory(itemId, orderItemPojo);
-        orderItemService.update(itemId, orderItemPojo);
+        normalize(orderItemForm);
+        ValidationUtil.checkValid(orderItemForm);
+        orderService.getCheckInvoicedStatus(orderItemService.get(itemId).getOrderId());
+        orderService.getCheckCancelledStatus(orderItemService.get(itemId).getOrderId());
+        int productId = orderItemService.get(itemId).getProductId();
+        Double productMrp = productService.get(productId).getMrp();
+        checkSellingPrice(orderItemForm.getSellingPrice(), productMrp, productService.get(productId).getBarcode());
+        inventoryService.updateInventory(productId, orderItemService.get(itemId).getQuantity(), orderItemForm.getQuantity());
+        orderItemService.update(itemId, convert(orderItemForm, orderItemService.get(itemId).getOrderId(), productId)); //TODO : to send only the updatable fields.
     }
 
     public OrderItemData get(int id) throws ApiException {
         OrderItemPojo orderItemPojo = orderItemService.get(id);
-        return convert(orderItemPojo);
+        ProductPojo productPojo = productService.get(orderItemPojo.getProductId());
+        return convert(orderItemPojo, productPojo);
     }
 
     public List<OrderItemData> getAll(int orderId) throws ApiException {
         List<OrderItemPojo> list = orderItemService.getAll(orderId);
         List<OrderItemData> list2 = new ArrayList<OrderItemData>();
         for (OrderItemPojo orderItemPojo : list) {
-            list2.add(convert(orderItemPojo));
+            ProductPojo productPojo = productService.get(orderItemPojo.getProductId());
+            list2.add(convert(orderItemPojo, productPojo));
         }
         return list2;
     }
 
-    private void checkInput(OrderItemPojo orderItemPojo) throws ApiException {
-        int productId = orderItemPojo.getProductId();
-        double productMrp = productService.get(productId).getProductMrp();
-        if (productMrp < orderItemPojo.getSellingPrice()) {
-            throw new ApiException("Selling price cannot be more than MRP!!  (MRP = " + productMrp + " )");
+    //check function
+
+    private void checkSellingPrice(double sellingPrice, double productMrp, String barcode) throws ApiException {
+        if (productMrp < sellingPrice) {
+            throw new ApiException("Selling price for "+barcode+" cannot be more than MRP!!  (MRP = " + productMrp + ")");
         }
     }
 
-    @Transactional(rollbackOn = ApiException.class)
-    private void updateInventory(int itemId , OrderItemPojo orderItemPojo) throws ApiException {
-        int oldQuantity = orderItemService.get(itemId).getProductQuantity();
-        int newQuantity = orderItemPojo.getProductQuantity();
-        if(oldQuantity == newQuantity){
-            return;
-        }
-        int productId = orderItemPojo.getProductId();
-        InventoryPojo inventoryPojo = inventoryService.get(productId);
-        int currentInventory = inventoryPojo.getProductQuantity();
-        if(newQuantity < oldQuantity){
-            inventoryPojo.setProductQuantity(oldQuantity-newQuantity+currentInventory);
-            inventoryService.update(productId, inventoryPojo);
-        }
-        else if(newQuantity - oldQuantity < currentInventory) {
-            inventoryPojo.setProductQuantity(currentInventory - newQuantity + oldQuantity);
-            inventoryService.update(productId, inventoryPojo);
-        }
-        else
-            throw new ApiException("Sorry! Available up to: " + (oldQuantity+ currentInventory));
-    }
 
-    private OrderItemData convert(OrderItemPojo orderItemPojo) throws ApiException {
+    //convert functions
+
+    private static OrderItemData convert(OrderItemPojo orderItemPojo, ProductPojo productPojo){
         OrderItemData orderItemData = new OrderItemData();
-        ProductPojo productPojo = productService.get(orderItemPojo.getProductId());
-        orderItemData.setOrderItemId(orderItemPojo.getOrderItemId());
+        orderItemData.setId(orderItemPojo.getId());
         orderItemData.setOrderId(orderItemPojo.getOrderId());
-        orderItemData.setProductId(orderItemPojo.getProductId());
-        orderItemData.setProductBarcode(productPojo.getProductBarcode());
-        orderItemData.setProductName(productPojo.getProductName());
-        orderItemData.setProductQuantity(orderItemPojo.getProductQuantity());
-        orderItemData.setProductMrp(productPojo.getProductMrp());
-        orderItemData.setProductSP(orderItemPojo.getSellingPrice());
+        orderItemData.setProductBarcode(productPojo.getBarcode());
+        orderItemData.setProductName(productPojo.getName());
+        orderItemData.setQuantity(orderItemPojo.getQuantity());
+        orderItemData.setProductMrp(productPojo.getMrp());
+        orderItemData.setSellingPrice(orderItemPojo.getSellingPrice());
         return orderItemData;
     }
 
-    private OrderItemPojo convert(OrderItemForm orderItemForm) {
-        OrderItemPojo orderItemPojo = new OrderItemPojo();
-        orderItemPojo.setOrderItemId(orderItemForm.getOrderItemId());
-        orderItemPojo.setOrderId(orderItemForm.getOrderId());
-        orderItemPojo.setProductId(orderItemForm.getProductId());
-        orderItemPojo.setProductQuantity(orderItemForm.getProductQuantity());
-        orderItemPojo.setSellingPrice(orderItemForm.getProductSP());
-        return  orderItemPojo;
-    }
-
-    private String getUser(){
-        UserPrincipal principal = SecurityUtil.getPrincipal();
-        return principal.getEmail();
-    }
-
-    private OrderItemPojo convert(CartPojo cartPojo, int orderId, int productId){
+    private OrderItemPojo convert(OrderItemForm orderItemForm, int orderId, int productId){
         OrderItemPojo orderItemPojo = new OrderItemPojo();
         orderItemPojo.setOrderId(orderId);
-        orderItemPojo.setProductQuantity(cartPojo.getProductQuantity());
-        orderItemPojo.setSellingPrice(cartPojo.getProductSP());
         orderItemPojo.setProductId(productId);
+        orderItemPojo.setQuantity((int) orderItemForm.getQuantity());
+        orderItemPojo.setSellingPrice(orderItemForm.getSellingPrice());
         return  orderItemPojo;
+    }
+
+    private static void normalize(OrderItemForm orderItemForm){ //TODO : to create a separate utils for norm. and converts.
+        orderItemForm.setSellingPrice(StringUtil.roundOff(orderItemForm.getSellingPrice()));
     }
 
 }

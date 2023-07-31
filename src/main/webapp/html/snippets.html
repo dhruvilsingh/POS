@@ -5,11 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="baseUrl" th:attr="content=${baseUrl}">
+  <meta name="role" th:attr="content=${role}">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" th:href="@{/static/app.css}">
 
 </head>
@@ -17,7 +20,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-1" id="navbarContainer1" th:fragment="name_site_navbar">
   <a class="navbar-brand" th:href="@{/}">
-    <img th:src="@{/static/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
+    <img th:src="@{/static/images/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
   </a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +44,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-1" id="navbarContainer" th:fragment="name_app_navbar">
   <a class="navbar-brand" th:href="@{/ui/home}">
-    <img th:src="@{/static/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
+    <img th:src="@{/static/images/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
   </a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav2" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,16 +68,16 @@
       <li class="nav-item mx-3" id="orders-nav">
         <a class="nav-link" th:href="@{/ui/orders}">Orders</a>
       </li>
-      <li class="nav-item mx-3 dropdown" id="reports-nav">
+      <li th:if = "${info.getRole()=='ADMIN'}" class="nav-item mx-3 dropdown" id="reports-nav">
         <a class="nav-link dropdown-toggle" data-toggle="dropdown">Reports</a>
         <div class="dropdown-menu" >
-          <a class="dropdown-item" th:href="@{/ui/dailysales}">Daily sales</a>
-          <a class="dropdown-item" th:href="@{/ui/salereport}">Sales</a>
+          <a class="dropdown-item" th:href="@{/ui/dailysales}">Daily Sales</a>
+          <a class="dropdown-item" th:href="@{/ui/salereport}">Revenue</a>
           <a class="dropdown-item" th:href="@{/ui/brandreport}">Brand</a>
           <a class="dropdown-item" th:href="@{/ui/inventoryreport}">Inventory</a>
         </div>
       </li>
-      <li class="nav-item mx-3" id="user-nav">
+      <li th:if = "${info.getRole()=='ADMIN'}" class="nav-item mx-3" id="user-nav">
         <a class="nav-link" th:href="@{/ui/user}">Users</a>
       </li>
     </ul>
@@ -82,27 +85,25 @@
       <li class="nav-item dropdown" id="logout-nav">
         <a class="nav-link dropdown-toggle" data-toggle="dropdown">[[${info.getEmail()}]]</a>
         <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" th:href="@{/session/logout}">Logout</a>
+          <a class="dropdown-item" id="logoutButton" th:href="@{/session/logout}">Logout</a>
         </div>
       </li>
     </ul>
   </div>
 </nav>
 
-<footer class="footer  mt-1" th:fragment="name_footer">
-  Copyright Increff 2023
-  &nbsp;
+<footer th:fragment="name_footer">
+
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script src="https://kit.fontawesome.com/c30beb553f.js" crossorigin="anonymous"></script>
   <script th:src="@{/static/notify.min.js}"/></script>
   <script th:src="@{/static/app.js}"/></script>
   <script th:src="@{/static/papaparse.min.js}"/></script>
-
-
-
 
 </footer>
 

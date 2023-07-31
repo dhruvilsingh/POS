@@ -8,13 +8,21 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class OrderItemPojo {
+public class OrderItemPojo extends AbstractPojo{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_generator_1")
     @SequenceGenerator(name = "sequence_generator_1", sequenceName = "sequence_1", initialValue = 100001, allocationSize = 1)
-    private int orderItemId;
-    private int orderId;
-    private int productId;
-    private int productQuantity;
-    private double sellingPrice;
+    private Integer id;
+
+    @Column(nullable = false)
+    private Integer orderId;
+
+    @Column(nullable = false)
+    private Integer productId;
+
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(nullable = false)
+    private Double sellingPrice;
 }

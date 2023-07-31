@@ -13,7 +13,10 @@ function toJson($form){
 
 function handleAjaxError(response){
 	var response = JSON.parse(response.responseText);
-    $.notify(response.message);
+    $.notify(response.message,{
+                                 autoHide: false,
+                                 clickToHide: true
+                               });
 }
 
 function readFileData(file, callback){
@@ -23,12 +26,12 @@ function readFileData(file, callback){
 		skipEmptyLines: "greedy",
 		complete: function(results) {
 			callback(results);
-	  	}	
+	  	}
 	}
 	Papa.parse(file, config);
 }
 
-function writeFileData(arr){
+function writeFileData(arr, fileName){
 	var config = {
 		quoteChar: '',
 		escapeChar: '',
@@ -40,14 +43,47 @@ function writeFileData(arr){
     var fileUrl =  null;
 
     if (navigator.msSaveBlob) {
-        fileUrl = navigator.msSaveBlob(blob, 'download.tsv');
+        fileUrl = navigator.msSaveBlob(blob, fileName);
     } else {
         fileUrl = window.URL.createObjectURL(blob);
     }
     var tempLink = document.createElement('a');
     tempLink.href = fileUrl;
-    tempLink.setAttribute('download', 'download.tsv');
+    tempLink.setAttribute('download', fileName);
     tempLink.click(); 
+}
+
+
+function trimLowerCase(obj, desiredOrder) {
+  const updatedObject = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const trimmedKey = key.trim().toLowerCase();
+      updatedObject[trimmedKey] = obj[key];
+      console.log(updatedObject[trimmedKey]);
+    }
+  }
+
+  console.log(Object.keys(updatedObject).length);
+  console.log(Object.keys(desiredOrder).length);
+   if (!desiredOrder.every((key) => updatedObject.hasOwnProperty(key)) || Object.keys(updatedObject).length !== Object.keys(desiredOrder).length) {
+     return null;
+   }
+
+  const orderedObject = {};
+  desiredOrder.forEach((key) => {
+    if (updatedObject.hasOwnProperty(key)) {
+      orderedObject[key] = updatedObject[key];
+      console.log(orderedObject[key]);
+    }
+  });
+  return orderedObject;
+}
+
+
+function downloadReport(data, fileName){
+      writeFileData(data, fileName);
+      $.notify("Report downloaded!", "success");
 }
 
 $(document).ready(function(){

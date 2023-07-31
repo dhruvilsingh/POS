@@ -10,9 +10,9 @@ import java.util.List;
 
 @Repository
 public class ProductDao extends AbstractDao{
-    private static String select_id = "select productPojo from ProductPojo productPojo where productId=:id";
-    private static String select_all = "select productPojo from ProductPojo productPojo order by productPojo.productId desc";
-    private static String select_barcode = "select productPojo from ProductPojo productPojo where productBarcode=:productBarcode";
+    private static String SELECT_BY_ID = "select productPojo from ProductPojo productPojo where id=:id";
+    private static String SELECT_ALL = "select productPojo from ProductPojo productPojo order by productPojo.id desc";
+    private static String SELECT_BY_BARCODE = "select productPojo from ProductPojo productPojo where barcode=:productBarcode";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -23,22 +23,20 @@ public class ProductDao extends AbstractDao{
     }
 
     public ProductPojo select(int productId) {
-        TypedQuery<ProductPojo> query = getQuery(select_id, ProductPojo.class);
+        TypedQuery<ProductPojo> query = getQuery(SELECT_BY_ID, ProductPojo.class);
         query.setParameter("id", productId);
         return getSingle(query);
     }
 
     public List<ProductPojo> selectAll() {
-        TypedQuery<ProductPojo> query = getQuery(select_all, ProductPojo.class);
+        TypedQuery<ProductPojo> query = getQuery(SELECT_ALL, ProductPojo.class);
         return query.getResultList();
     }
 
     public ProductPojo select(String productBarcode) {
-        TypedQuery<ProductPojo> query = getQuery(select_barcode, ProductPojo.class);
+        TypedQuery<ProductPojo> query = getQuery(SELECT_BY_BARCODE, ProductPojo.class);
         query.setParameter("productBarcode", productBarcode);
         return getSingle(query);
     }
 
-    public void update(ProductPojo productPojo) {
-    }
 }

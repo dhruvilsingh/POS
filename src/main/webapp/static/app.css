@@ -4,7 +4,7 @@ html {
 }
 
 body {
-	margin-bottom: 60px; /* Margin bottom by footer height */
+	margin-bottom: 0px; /* Margin bottom by footer height */
 }
 
 .footer {
@@ -19,7 +19,6 @@ body {
 
 body {
     color: #000;
-    overflow-x: hidden;
     height: 100%;
     background-repeat: no-repeat;
 }
@@ -160,6 +159,14 @@ a {
             height: 100%;
         }
 
+        .card3{
+            height: 100%;
+        }
+
+        .card1:hover img {
+          transform: scale(1.2);
+        }
+
         .index-jumbotron {
             background-color: white;
         }
@@ -195,18 +202,102 @@ a {
   color: blue;
 }
 
-        .container-home {
-            display: grid;
-                        place-items: center;
-                        height: 100vh;
+.container-home {
+      display: grid;
+      place-items: center;
+      height: 100vh;
+}
+.col-home {
+      text-align: center;
+}
+.col-img {
+      width: 100%;
+      max-width: 136px;
+      height: auto;
+      object-fit: cover;
+      cursor: pointer;
+}
+
+.col-img1 {
+      width: 100%;
+      max-width: 150px;
+      height: auto;
+      object-fit: cover;
+      cursor: pointer;
+}
+
+ .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
         }
-        .col-home {
+        .pagination input[type="text"] {
+            width: 50px;
             text-align: center;
+            margin: 0 5px;
         }
-        .col-img {
-              width: 100%;
-              max-width: 160px;
-              height: auto;
-              object-fit: cover;
-              cursor: pointer;
+        .pagination button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
+        .pagination button:last-child {
+            background-color: #008CBA;
+        }
+
+.white-icon {
+  color: white;
+}
+
+table{
+    table-layout: fixed;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+}
+
+td, th{
+    white-space: pre;
+    overflow: scroll;
+    border: 1px solid #ddd;
+}
+
+.sticky-thead {
+  position: sticky;
+  top: 0;
+  background-color: #f7f7f7;
+}
+
+.scroll-table{
+    max-height: 60vh;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.scroll-table-l{
+    max-height: 75vh;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.dataTables_filter label {
+display: flex;
+align-items: center;
+margin-bottom: 0;
+}
+
+.dataTables_filter input {
+margin-left: 5px;
+}
+
+.paginate_button.previous.disabled,
+.paginate_button.next.disabled {
+    display: none;
+}
+
+.right-aligned {
+  position: absolute;
+  right: 20px;
+}

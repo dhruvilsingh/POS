@@ -1,16 +1,20 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.model.InventoryData;
-import com.increff.pos.model.InventoryForm;
-import com.increff.pos.model.InventoryReportData;
-import com.increff.pos.pojo.BrandPojo;
+import com.increff.pos.model.data.InventoryData;
+import com.increff.pos.model.forms.InventoryForm;
 import com.increff.pos.pojo.InventoryPojo;
+import com.increff.pos.pojo.ProductPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.InventoryService;
 import com.increff.pos.service.ProductService;
+import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,87 +25,88 @@ public class InventoryDto {
     @Autowired
     private ProductService productService;
 
-    public void add(InventoryForm inventoryForm) throws ApiException {
-        String productBarcode = inventoryForm.getProductBarcode();
-        update(productService.getId(productBarcode),inventoryForm);
+    public void addInventory(InventoryForm inventoryForm) throws ApiException { //TODO :  to rename the function name.
+        normalize(inventoryForm);
+        ValidationUtil.checkValid(inventoryForm);
+        String productBarcode = inventoryForm.getBarcode();
+        ProductPojo productPojo = productService.getCheckBarcode(productBarcode);
+        if(inventoryForm.getQuantity() == 0){
+            throw new ApiException("Quantity to add should be more than zero!");
+        }
+        InventoryPojo inventoryPojo =  convert(inventoryForm, productPojo.getId());
+        inventoryService.addInventory(inventoryPojo); //TODO:  to call api and fetch the inv. pojo and send the update qty to api layer.
     }
 
-    public List<Map<String, Object>>  upload(List<Map<String, Object>> fileData){
-        List<Map<String, Object>> errorData = new ArrayList<>();
-        for(Map<String,Object> row : fileData){
+    @Transactional(rollbackOn = ApiException.class)
+    public void upload(List<InventoryForm> fileData) throws ApiException {
+        List<Map<String, String>> errorList = new ArrayList<>();
+        for(InventoryForm inventoryForm: fileData){
             try {
-                InventoryPojo inventoryPojo = convert(row);
-                inventoryService.update(inventoryPojo.getProductId(), inventoryPojo);
+                addInventory(inventoryForm);
             } catch (ApiException e) {
-                row.put("error", e.getMessage());
-                errorData.add(row);
+                Map<String,String> row = new HashMap<>();
+                row.put("Barcode", inventoryForm.getBarcode());
+                row.put("Quantity", inventoryForm.getQuantity().toString());
+                row.put("Error", e.getMessage());
+                errorList.add(row);
             }
         }
-        return errorData;
+        if (!errorList.isEmpty()) {
+            throw new ApiException("One or more errors occurred while processing the data!\nDownload error list to view errors", errorList);
+        }
     }
 
     public InventoryData get(int id) throws ApiException {
         InventoryPojo inventoryPojo = inventoryService.get(id);
-        return convert(inventoryPojo);
+        String productBarcode = productService.get(inventoryPojo.getProductId()).getBarcode();
+        return convert(inventoryPojo, productBarcode);
     }
 
     public List<InventoryData> getAll() throws ApiException{
         List<InventoryPojo> list = inventoryService.getAll();
         List<InventoryData> list2 = new ArrayList<InventoryData>();
         for (InventoryPojo inventoryPojo : list) {
-            list2.add(convert(inventoryPojo));
+            String productBarcode = productService.get(inventoryPojo.getProductId()).getBarcode();
+            list2.add(convert(inventoryPojo, productBarcode));
         }
         return list2;
     }
 
-    public List<InventoryReportData> getReport(){
-        List<Object[]> resultList = inventoryService.getReport();;
-        List<InventoryReportData> reportDataList = new ArrayList<>();
-        for (Object[] result : resultList) {
-            reportDataList.add(convert(result));
-        }
-        return reportDataList;
-    }
-
     public void update(int id, InventoryForm inventoryForm) throws ApiException {
-        if(productService.getId(inventoryForm.getProductBarcode()) == -1){
-            throw new ApiException("Invalid barcode!!");
-        }
-        InventoryPojo inventoryPojo= convert(inventoryForm);
+        ValidationUtil.checkValid(inventoryForm);
+        ProductPojo productPojo = productService.getCheckBarcode(inventoryForm.getBarcode());
+        InventoryPojo inventoryPojo= convert(inventoryForm, productPojo.getId());
         inventoryService.update(id, inventoryPojo);
     }
 
-    private InventoryData convert(InventoryPojo inventoryPojo) throws ApiException {
+
+    //Convert functions
+
+    private static InventoryData convert(InventoryPojo inventoryPojo, String productBarcode){
         InventoryData inventoryData = new InventoryData();
         inventoryData.setProductId(inventoryPojo.getProductId());
-        String productBarcode = productService.get(inventoryPojo.getProductId()).getProductBarcode();
-        inventoryData.setProductBarcode(productBarcode);
-        inventoryData.setProductQuantity(inventoryPojo.getProductQuantity());
+        inventoryData.setBarcode(productBarcode);
+        inventoryData.setQuantity(inventoryPojo.getQuantity());
         return inventoryData;
     }
 
-    private InventoryPojo convert(Map<String,Object> row) throws ApiException {
-        InventoryPojo inventoryPojo = new InventoryPojo();
-        int productId = productService.getId(row.get("productBarcode").toString());
-        inventoryPojo.setProductQuantity(inventoryService.get(productId).getProductQuantity() + Integer.valueOf(row.get("productQuantity").toString()).intValue());
-        inventoryPojo.setProductId(productService.getId(row.get("productBarcode").toString()));
-        return inventoryPojo;
+    private static InventoryForm convert(Map<String,Object> row){
+        InventoryForm inventoryForm = new InventoryForm();
+        String productBarcode = row.get("barcode").toString().trim();
+        inventoryForm.setBarcode(productBarcode);
+        inventoryForm.setQuantity(Integer.valueOf(row.get("quantity").toString()).intValue());
+        return inventoryForm;
     }
 
-    private InventoryReportData convert(Object object[]){
-        InventoryReportData inventoryReportData = new InventoryReportData();
-        inventoryReportData.setBrand((String) object[0]);
-        inventoryReportData.setCategory((String) object[1]);
-        inventoryReportData.setQuantity(((Long) object[2]).intValue());
-        return inventoryReportData;
-    }
-
-    private InventoryPojo convert(InventoryForm inventoryForm){
+    private static InventoryPojo convert(InventoryForm inventoryForm, int productId){
         InventoryPojo inventoryPojo = new InventoryPojo();
-        inventoryPojo.setProductQuantity(inventoryForm.getProductQuantity());
-        int productId = productService.getId(inventoryForm.getProductBarcode());
+        inventoryPojo.setQuantity(inventoryForm.getQuantity());
         inventoryPojo.setProductId(productId);
         return inventoryPojo;
+    }
+
+    private static void normalize(InventoryForm inventoryForm){
+        inventoryForm.setBarcode(StringUtil.toLowerCase(inventoryForm.getBarcode()));
     }
 
 }

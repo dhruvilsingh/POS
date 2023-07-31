@@ -1,35 +1,39 @@
 package com.increff.pos.controller;
 
 import com.increff.pos.dto.OrderDto;
-import com.increff.pos.model.BrandData;
-import com.increff.pos.model.OrderData;
+import com.increff.pos.model.data.OrderData;
+import com.increff.pos.model.forms.OrderItemForm;
+import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.service.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @Api
-public class OrderApiController {
+public class OrderApiController { //TODO : to create a api to create order
     @Autowired
-    OrderDto orderDto;
+    private OrderDto orderDto;
 
-    @ApiOperation(value = "Gets an order by ID")
-    @RequestMapping(path = "/api/order/{id}", method = RequestMethod.GET)
-    public OrderData get(@PathVariable int id) throws ApiException {
-        return  orderDto.get(id);
+    @ApiOperation(value = "Creates an order from existing cart")
+    @RequestMapping(path = "/api/orders", method = RequestMethod.POST)
+    public void createOrder() throws ApiException {
+        orderDto.createOrder();
     }
 
     @ApiOperation(value = "Gets list of all orders")
-    @RequestMapping(path = "/api/order", method = RequestMethod.GET)
+    @RequestMapping(path = "/api/orders", method = RequestMethod.GET)
     public List<OrderData> getAll() {
         return orderDto.getAll();
+    }
+
+    @ApiOperation(value = "Cancels an order")
+    @RequestMapping(path = "/api/orders/{id}", method = RequestMethod.PUT)
+    public void cancelOrder(@PathVariable int id) throws ApiException {
+        orderDto.cancelOrder(id);
     }
 
 }

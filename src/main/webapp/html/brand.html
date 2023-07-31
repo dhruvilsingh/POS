@@ -10,22 +10,22 @@
 
 <nav th:replace="snippets.html :: name_app_navbar" id="navbarContainer"></nav>
 
-<div class="container">
+<div class="container-fluid px-5">
 
   <div class="row">
     &nbsp;
   </div>
 
-          <button type="button" class="btn btn-success" id="open-modal">Add</button>
+          <button type="button" th:if = "${info.getRole()=='ADMIN'}" class="btn btn-success" id="open-modal">Add</button>
           &nbsp;&nbsp;
-          <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
+          <button type="button" th:if = "${info.getRole()=='ADMIN'}" class="btn btn-primary" id="upload-data">Upload</button>
 
   <!-- Top row with form-->
-  <div class="modal" tabindex="-1" role="dialog" id="add-brand-modal">
-    <div class="modal-dialog" role="document">
+  <div class="modal" data-backdrop="static" th:if = "${info.getRole()=='ADMIN'}" tabindex="-1" role="dialog" id="add-brand-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Add brand</h5>
+          <h5 class="modal-title">Add Brand</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -33,12 +33,12 @@
         <div class="modal-body">
           <form class="form" id="brand-form">
             <div class="form-group">
-              <label for="inputBrandName">Brand Name</label>
-                <input type="text" class="form-control" name="brandName" id="inputBrandName" placeholder="Enter brand name">
+              <label for="inputBrandName">Brand</label>
+                <input type="text" class="form-control" maxlength="255" name="brand" id="inputBrandName" placeholder="Enter Brand" required>
             </div>
             <div class="form-group">
               <label for="inputCategory">Category</label>
-                <input type="text" class="form-control" name="category" id="inputCategory" placeholder="Enter category">
+                <input type="text" class="form-control" maxlength="255" name="category" id="inputCategory" placeholder="Enter Category" required>
             </div>
           </form>
         </div>
@@ -56,15 +56,15 @@
     &nbsp;
   </div>
   <div class="row">
-
     <!-- Table -->
-    <div class="col-12">
+    <div class="col-12 table-responsive">
+
       <table class="table text-center table-striped" id="brand-table">
         <thead class="thead-dark">
         <tr>
           <th scope="col">Brand</th>
           <th scope="col">Category</th>
-          <th scope="col">Actions</th>
+          <th th:if = "${info.getRole()=='ADMIN'}" scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -74,8 +74,8 @@
   </div>
 
   <!-- Brand Edit Modal -->
-  <div class="modal" tabindex="-1" role="dialog" id="edit-brand-modal">
-    <div class="modal-dialog" role="document">
+  <div class="modal" data-backdrop="static" th:if = "${info.getRole()=='ADMIN'}" tabindex="-1" role="dialog" id="edit-brand-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Edit Brand</h5>
@@ -86,12 +86,12 @@
         <div class="modal-body">
           <form class="form" id="brand-edit-form">
             <div class="form-group">
-              <label for="inputBrandName">Brand Name</label>
-                <input type="text" class="form-control" name="brandName" placeholder="Enter brand name">
+              <label for="inputBrandName">Brand</label>
+                <input type="text" class="form-control" maxlength="30" name="brand" placeholder="Enter Brand" required>
             </div>
             <div class="form-group">
               <label for="inputCategory">Category</label>
-                <input type="text" class="form-control" name="category" placeholder="Enter category">
+                <input type="text" class="form-control" maxlength="30" name="category" placeholder="Enter Category" required>
             </div>
             <input type="hidden" name="id" >
           </form>
@@ -108,8 +108,8 @@
 
 
   <!-- Brand upload Modal -->
-  <div class="modal" tabindex="-1" role="dialog" id="upload-brand-modal">
-    <div class="modal-dialog" role="document">
+  <div class="modal" data-backdrop="static" th:if = "${info.getRole()=='ADMIN'}" tabindex="-1" role="dialog" id="upload-brand-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
 
         <div class="modal-header">
@@ -117,17 +117,16 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
+          <hr>
         </div>
 
         <div class="modal-body">
           <div class="brand-file">
-            <input type="file" class="custom-file-input" id="brandFile">
+            <input type="file" class="custom-file-input" id="brandFile" required>
             <label class="custom-file-label" for="brandFile" id="brandFileName">Choose file</label>
           </div>
           <a th:href="@{/sample/brand.tsv}" target="_blank">Download Sample</a>
           <br>
-          Rows: <span id="rowCount">0</span>,
-          Processed: <span id="processCount">0</span>,
           Errors: <span id="errorCount">0</span>
         </div>
 

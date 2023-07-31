@@ -1,7 +1,7 @@
 
 function getUserUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/admin/user";
+	return baseUrl + "/api/users";
 }
 
 //BUTTON ACTIONS
@@ -19,7 +19,8 @@ function addUser(event){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
-	        $.notify("User added", "success");
+            document.getElementById("user-form").reset();
+            $.notify("User added", "success");
 	   		getUserList();    
 	   },
 	   error: handleAjaxError
@@ -47,7 +48,7 @@ function deleteUser(id){
 	   url: url,
 	   type: 'DELETE',
 	   success: function(data) {
-	        $.notify("User deleted", "success");
+	        $.notify("User deleted", "warn");
 	   		getUserList();    
 	   },
 	   error: handleAjaxError
@@ -62,21 +63,23 @@ function displayUserList(data){
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		var buttonHtml = '<button onclick="deleteUser(' + e.id + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditUser(' + e.id + ')">edit</button>'
+		var buttonHtml = '<button class="btn btn-danger" id="deleteButton'+  e.id  + '" onclick="deleteUser(' + e.id + ')">delete</button>';
 		var row = '<tr>'
-		+ '<td>' + e.email + '</td>'
+		+ '<td class="wrap-text">' + e.email + '</td>'
 		+ '<td>' + e.role + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
+        if(e.role=='ADMIN'){
+            document.getElementById('deleteButton'+e.id).disabled = true;
+        }
 	}
 }
-
 
 //INITIALIZATION CODE
 function init(){
 	$('#add-user').click(addUser);
+	document.getElementById("user-form").reset();
 }
 
 $(document).ready(init);

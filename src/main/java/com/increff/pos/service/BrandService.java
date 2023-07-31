@@ -2,76 +2,63 @@ package com.increff.pos.service;
 
 import com.increff.pos.dao.BrandDao;
 import com.increff.pos.pojo.BrandPojo;
-import com.increff.pos.util.StringUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
 
 @Service
+@Transactional
 public class BrandService {
 
     @Autowired
     private BrandDao brandDao;
 
-    @Transactional(rollbackOn = ApiException.class)
     public void add(BrandPojo brandPojo) throws ApiException {
-        normalize(brandPojo);
-        if(StringUtil.isEmpty(brandPojo.getBrandName()) || StringUtil.isEmpty(brandPojo.getCategory())) {
-            throw new ApiException("Fields cannot be empty");
-        }
-        if(brandPojo.getBrandName() == null || brandPojo.getCategory() == null)
-        {
-            throw new ApiException("TSV format is not correct");
-        }
-        if(getBrandCategory(brandPojo.getBrandName(), brandPojo.getCategory()) != -1){
-            throw new ApiException("Category already exist in this brand");
+        if(brandDao.selectBrandCategory(brandPojo.getBrand(), brandPojo.getCategory()) != null){
+            throw new ApiException(brandPojo.getBrand()+" and "+brandPojo.getCategory()+" pair already exist!");
         }
         brandDao.insert(brandPojo);
     }
 
-    @Transactional(rollbackOn = ApiException.class)
-    public BrandPojo get(int brandId) throws ApiException {
-        return getCheck(brandId);
+     //TODO : to remove the get method.
+    public BrandPojo get(int id) throws ApiException {
+        return getCheck(id);
     }
 
-    @Transactional
     public List<BrandPojo> getAll() {
         return brandDao.selectAll();
     }
 
-    @Transactional(rollbackOn  = ApiException.class)
-    public void update(int brandId, BrandPojo brandPojo) throws ApiException {
-        normalize(brandPojo);
-        BrandPojo exBrandPojo = getCheck(brandId);
-        if(getBrandCategory(brandPojo.getBrandName(), brandPojo.getCategory()) != -1) {
-            throw new ApiException("Category already exist in this brand");
+    public void update(int id, BrandPojo brandPojo) throws ApiException { //TODO: to send only the updatable fields in the function
+        BrandPojo exBrandPojo = getCheck(id);
+        BrandPojo brandPojo1 = brandDao.selectBrandCategory(brandPojo.getBrand(), brandPojo.getCategory());
+        if( brandPojo1 != null && brandPojo1.getId() != id) {
+            throw new ApiException(brandPojo.getBrand()+" and "+brandPojo.getCategory()+" pair already exist!");
         }
-        exBrandPojo.setBrandName(brandPojo.getBrandName());
+        exBrandPojo.setBrand(brandPojo.getBrand());
         exBrandPojo.setCategory(brandPojo.getCategory());
-        brandDao.update(exBrandPojo);
     }
 
-    @Transactional
-    public int getBrandCategory(String brandName, String category){
-        return brandDao.selectBrandCategory(brandName,category);
-    }
-
-    @Transactional
-    public BrandPojo getCheck(int brandId) throws ApiException {
-        BrandPojo brandPojo = brandDao.select(brandId);
-        if (brandPojo == null) {
-            throw new ApiException("Brand with given ID does not exit, id: " + brandId);
+    public BrandPojo getBrandCategory(String brand, String category) throws ApiException{
+        BrandPojo brandPojo = brandDao.selectBrandCategory(brand,category);
+        if(brandPojo == null){
+            throw new ApiException(brand +" and "+category+" pair does not exist!");
         }
         return brandPojo;
     }
 
-    protected static void normalize(BrandPojo brandPojo) {
-        brandPojo.setBrandName(brandPojo.getBrandName().trim());
-        brandPojo.setCategory(brandPojo.getCategory().trim());
-        brandPojo.setBrandName(StringUtil.toLowerCase(brandPojo.getBrandName()));
-        brandPojo.setCategory(StringUtil.toLowerCase(brandPojo.getCategory()));
+    public BrandPojo getCheck(int id) throws ApiException {
+        BrandPojo brandPojo = brandDao.select(id);
+        if (brandPojo == null) {
+            throw new ApiException("Brand with given ID does not exist!"); //TODO : to mention ID in error msg.
+        }
+        return brandPojo;
     }
+
+
 
 }

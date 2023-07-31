@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class DbConfig {
 
 	public static final String PACKAGE_POJO = "com.increff.pos.pojo";
-	
 	@Value("${jdbc.driverClassName}")
 	private String jdbcDriver;
 	@Value("${jdbc.url}")
@@ -34,6 +33,8 @@ public class DbConfig {
 	private String hibernateShowSql;
 	@Value("${hibernate.hbm2ddl.auto}")
 	private String hibernateHbm2ddl;
+	@Value("${hibernate.physical_naming_strategy}")
+	private String physicalNamingStrategy;
 	
 
 	@Bean(name = "dataSource")
@@ -68,6 +69,7 @@ public class DbConfig {
 		jpaProperties.put("hibernate.show_sql", hibernateShowSql);
 		jpaProperties.put("hibernate.hbm2ddl.auto", hibernateHbm2ddl);
 		jpaProperties.put("hibernate.hbm2ddl.auto", hibernateHbm2ddl);
+		jpaProperties.put("hibernate.physical_naming_strategy", physicalNamingStrategy);
 		bean.setJpaProperties(jpaProperties);
 		return bean;
 	}

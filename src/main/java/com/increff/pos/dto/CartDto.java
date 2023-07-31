@@ -1,15 +1,19 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.controller.LoginController;
-import com.increff.pos.model.CartData;
-import com.increff.pos.model.CartForm;
+import com.increff.pos.model.data.CartData;
+import com.increff.pos.model.forms.CartForm;
+import com.increff.pos.model.forms.OrderItemForm;
 import com.increff.pos.pojo.CartPojo;
-import com.increff.pos.pojo.InventoryPojo;
+import com.increff.pos.pojo.OrderItemPojo;
+import com.increff.pos.pojo.ProductPojo;
 import com.increff.pos.service.*;
 import com.increff.pos.util.SecurityUtil;
-import com.increff.pos.util.UserPrincipal;
+import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,87 +25,92 @@ public class CartDto {
     private ProductService productService;
     @Autowired
     private InventoryService inventoryService;
-    @Autowired
-    private UserService userService;
 
+    @Transactional
     public void add(CartForm cartForm) throws ApiException {
-        CartPojo cartPojo = cartService.get(cartForm.getProductBarcode(), getUser());
+        normalize(cartForm);
+        ValidationUtil.checkValid(cartForm);
+        ProductPojo productPojo = productService.getCheckBarcode(cartForm.getBarcode());
+        double productMrp = productPojo.getMrp();
+        int productId = productPojo.getId();
+        int availableInventory = inventoryService.get(productId).getQuantity();
+        CartPojo cartPojo = cartService.get(productId, SecurityUtil.getUser());
         if(cartPojo != null){
-            int updatedQuantity = cartPojo.getProductQuantity() + cartForm.getProductQuantity();
-            cartPojo.setProductQuantity(updatedQuantity);
-            cartPojo.setProductSP(cartForm.getProductSP());
-            checkInput(cartPojo);
-            cartService.update(cartPojo.getItemNo(),cartPojo);
+            int updatedQuantity = cartPojo.getQuantity() + cartForm.getQuantity();
+            checkInput(updatedQuantity, cartForm.getSellingPrice(), availableInventory, productMrp);
+            cartService.update(cartPojo.getId(), updatedQuantity, cartForm.getSellingPrice());
             return;
         }
-        cartPojo = convert(cartForm);
-        checkInput(cartPojo);
-        cartService.add(cartPojo);
+        checkInput(cartForm.getQuantity(), cartForm.getSellingPrice(), availableInventory, productMrp);
+        cartService.add(convert(cartForm, productId));
     }
+
 
     public CartData get(int id) throws ApiException {
         CartPojo cartPojo = cartService.get(id);
-        return convert(cartPojo);
+        String productBarcode = productService.get(cartPojo.getProductId()).getBarcode();
+        return convert(cartPojo, productBarcode);
     }
 
-    public List<CartData> getAll() {
-        List<CartPojo> list = cartService.getAll(getUser());
+    public List<CartData> getAll() throws ApiException {
+        List<CartPojo> list = cartService.getAll(SecurityUtil.getUser());
         List<CartData> list2 = new ArrayList<CartData>();
         for (CartPojo cartPojo : list) {
-            list2.add(convert(cartPojo));
+            String productBarcode = productService.get(cartPojo.getProductId()).getBarcode();
+            list2.add(convert(cartPojo, productBarcode));
         }
         return list2;
     }
 
-
-    public void delete(int id){
+    public void delete(int id) throws ApiException{
         cartService.delete(id);
     }
 
     public void update(int id, CartForm cartForm) throws ApiException {
-        CartPojo cartPojo = convert(cartForm);
-        checkInput(cartPojo);
-        cartService.update(id, cartPojo);
+        normalize(cartForm);
+        ValidationUtil.checkValid(cartForm);
+        ProductPojo productPojo = productService.getCheckBarcode(cartForm.getBarcode());
+        double productMrp = productPojo.getMrp();
+        int productId = productPojo.getId();
+        int availableInventory = inventoryService.get(productId).getQuantity();
+        checkInput(cartForm.getQuantity(), cartForm.getSellingPrice(), availableInventory, productMrp);
+        cartService.update(id, cartForm.getQuantity(), cartForm.getSellingPrice());
     }
 
-    private void checkInput(CartPojo cartPojo) throws ApiException {
-        int productId = productService.getId(cartPojo.getProductBarcode());
-        if (productId == -1) {
-            throw new ApiException("Invalid Barcode");
+
+    private void checkInput(int quantity, double sellingPrice, int availableInventory, double productMrp) throws ApiException {
+        int inputQuantity = quantity;
+        if (availableInventory < inputQuantity) {
+            throw new ApiException(availableInventory + " items left in inventory!");
         }
-        InventoryPojo inventoryPojo = inventoryService.get(productId);
-        int productQuantity = inventoryPojo.getProductQuantity();
-        int inputQuantity = cartPojo.getProductQuantity();
-        double productMrp = productService.get(productId).getProductMrp();
-        if (productQuantity < inputQuantity) {
-            throw new ApiException("Inventory has " + productQuantity + " items");
-        }
-        if (productMrp < cartPojo.getProductSP()) {
-            throw new ApiException("Selling price cannot be more than MRP!!  (MRP = " + productMrp + " )");
+        if (productMrp < sellingPrice) {
+            throw new ApiException("Selling price cannot be more than MRP!!  (MRP = " + productMrp + ")!");
         }
     }
 
-    private String getUser(){
-        UserPrincipal principal = SecurityUtil.getPrincipal();
-        return principal.getEmail();
-    }
+    //convert functions
 
-    private static CartData convert(CartPojo cartPojo) {
+    private static CartData convert(CartPojo cartPojo, String productBarcode) {
         CartData cartData = new CartData();
-        cartData.setItemNo(cartPojo.getItemNo());
-        cartData.setProductBarcode(cartPojo.getProductBarcode());
-        cartData.setProductQuantity(cartPojo.getProductQuantity());
-        cartData.setProductSP(cartPojo.getProductSP());
+        cartData.setId(cartPojo.getId());
+        cartData.setBarcode(productBarcode);
+        cartData.setQuantity(cartPojo.getQuantity());
+        cartData.setSellingPrice(cartPojo.getSellingPrice());
         return cartData;
     }
 
-    private CartPojo convert(CartForm cartForm) {
+    private static CartPojo convert(CartForm cartForm, int productId) {
         CartPojo cartPojo = new CartPojo();
-        cartPojo.setUserEmail(getUser());
-        cartPojo.setProductBarcode(cartForm.getProductBarcode());
-        cartPojo.setProductQuantity(cartForm.getProductQuantity());
-        cartPojo.setProductSP(cartForm.getProductSP());
+        cartPojo.setUserEmail(SecurityUtil.getUser());
+        cartPojo.setProductId(productId);
+        cartPojo.setQuantity((int)cartForm.getQuantity());
+        cartPojo.setSellingPrice(cartForm.getSellingPrice());
         return cartPojo;
+    }
+
+    private static void normalize(CartForm cartForm){
+        cartForm.setBarcode(StringUtil.toLowerCase(cartForm.getBarcode()));
+        cartForm.setSellingPrice(StringUtil.roundOff(cartForm.getSellingPrice()));
     }
 
 }

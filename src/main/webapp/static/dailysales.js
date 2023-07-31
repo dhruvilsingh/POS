@@ -1,6 +1,10 @@
-function displayDailySales(){
-        var baseUrl = $("meta[name=baseUrl]").attr("content")
-        var url = baseUrl + "/api/dailysales/";
+function getDailySalesUrl(){
+	var baseUrl = $("meta[name=baseUrl]").attr("content")
+	return baseUrl + "/api/reports/daily-sales";
+}
+
+function getDailySales(){
+        var url = getDailySalesUrl();
         console.log("in display dailysales function " + url);
        $.ajax({
        	   url: url,
@@ -12,24 +16,46 @@ function displayDailySales(){
        	});
 }
 
+var button = document.getElementById("download-report");
+button.addEventListener("click", function() {
+        var url = getDailySalesUrl();
+        $.ajax({
+           url: url,
+           type: 'GET',
+           success: function(data) {
+                downloadReport(data, 'Daily_Sales_Report.tsv');
+           },
+           error: handleAjaxError
+    });
+});
+
+
 function displayDailySalesList(data){
-    console.log("entered display daily sales list");
-	var $tbody = $('#daily-sales-table').find('tbody');
-	$tbody.empty();
+	table.clear().draw();
+	var dataRows=[];
 	for(var i in data){
 		var ds = data[i];
-		var row = '<tr>'
-		+ '<td>' + ds.date + '</td>'
-		+ '<td>' + ds.orderCount + '</td>'
-		+ '<td>' + ds.orderItemCount + '</td>'
-		+ '<td>' + ds.revenue + '</td>'
-		+ '</tr>';
-        $tbody.append(row);
-        console.log("populated data in table");
-	}
+    row = [ds.date,  ds.orderCount,  ds.orderItemCount, ds.revenue];
+                      dataRows.push(row);
+  	}
+  		table.rows.add(dataRows).draw();
 }
 
-$(document).ready(displayDailySales);
+var table;
+$(document).ready(function() {
+    table = $('#daily-sales-table').DataTable({
+        order: [],
+        "columns": [
+                      { "searchable": true, "orderable": true },
+                      { "searchable": false, "orderable": true },
+                      { "searchable": false, "orderable": true },
+                      { "searchable": false, "orderable": true }
+                    ],
+    });
+});
+
+
+$(document).ready(getDailySales);
 $(document).ready(function(){
     const navbarContainer = document.getElementById('navbarContainer');
     const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');

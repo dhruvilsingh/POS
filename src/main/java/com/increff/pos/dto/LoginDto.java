@@ -1,24 +1,18 @@
 package com.increff.pos.dto;
 
-import com.increff.pos.model.InfoData;
-import com.increff.pos.model.LoginForm;
-import com.increff.pos.model.UserForm;
+import com.increff.pos.model.data.InfoData;
+import com.increff.pos.model.forms.LoginForm;
 import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.UserService;
 import com.increff.pos.util.SecurityUtil;
+import com.increff.pos.util.StringUtil.Role;
 import com.increff.pos.util.UserPrincipal;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,20 +41,21 @@ public class LoginDto {
         return authenticateUser(request,userPojo);
     }
 
-//    public ModelAndView signUp(HttpServletRequest request, LoginForm loginForm) throws ApiException {
-//        UserPojo userPojo = userService.get(loginForm.getEmail());
-//        if(userPojo != null){
-//            infoData.setMessage("Email already registered! Try logging in");
-//        }
-//        userPojo = convert(loginForm);
-//        userService.add(userPojo);
-//        infoData.setEmail(userPojo.getEmail());
-//        return authenticateUser(request, userPojo);
-//    }
+    public ModelAndView signUp(HttpServletRequest request, LoginForm loginForm) throws ApiException {
+        UserPojo userPojo = userService.get(loginForm.getEmail());
+        if(userPojo != null){
+            infoData.setMessage("Email already registered! Try logging in");
+            return new ModelAndView("redirect:/site/signup");
+        }
+        userPojo = convert(loginForm);
+        userService.add(userPojo);
+        infoData.setEmail(userPojo.getEmail());
+        return authenticateUser(request, userPojo);
+    }
 
     public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();
-        return new ModelAndView("redirect:/site/logout");
+        return new ModelAndView("redirect:/");
     }
 
     private static ModelAndView authenticateUser(HttpServletRequest request , UserPojo userPojo){
@@ -79,7 +74,7 @@ public class LoginDto {
         UserPojo userPojo = new UserPojo();
         userPojo.setEmail(loginForm.getEmail());
         userPojo.setPassword(loginForm.getPassword());
-        userPojo.setRole("supervisor");
+        userPojo.setRole(Role.OPERATOR);
         return userPojo;
     }
 
@@ -88,9 +83,10 @@ public class LoginDto {
         UserPrincipal principal = new UserPrincipal();
         principal.setEmail(userPojo.getEmail());
         principal.setId(userPojo.getId());
+        principal.setRole(userPojo.getRole().toString());
         // Create Authorities
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(userPojo.getRole()));
+        authorities.add(new SimpleGrantedAuthority(userPojo.getRole().toString()));
         // you can add more roles if required
         // Create Authentication
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, null,

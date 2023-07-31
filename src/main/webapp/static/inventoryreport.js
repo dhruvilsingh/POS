@@ -1,6 +1,10 @@
+function getInventoryReportUrl(){
+	var baseUrl = $("meta[name=baseUrl]").attr("content");
+	return baseUrl + "/api/reports/inventory";
+}
+
 function getInventoryReport(){
-        var baseUrl = $("meta[name=baseUrl]").attr("content")
-        var url = baseUrl + "/api/inventoryreport/";
+        var url = getInventoryReportUrl();
         console.log("in display dailysales function " + url);
        $.ajax({
        	   url: url,
@@ -12,23 +16,52 @@ function getInventoryReport(){
        	});
 }
 
+var button = document.getElementById("download-report");
+button.addEventListener("click", function() {
+        var url = getInventoryReportUrl();
+        $.ajax({
+           url: url,
+           type: 'GET',
+           success: function(data) {
+                downloadReport(data, 'Inventory_Report.tsv');
+           },
+           error: handleAjaxError
+    });
+});
+
 function displayInventoryReport(data){
-    console.log("entered display daily sales list");
-	var $tbody = $('#inventory-table').find('tbody');
-	$tbody.empty();
+    table.clear().draw();
+    var dataRows=[];
 	for(var i in data){
 		var ir = data[i];
-		var row = '<tr>'
-		+ '<td>' + ir.brand + '</td>'
-		+ '<td>' + ir.category + '</td>'
-		+ '<td>' + ir.quantity + '</td>'
-		+ '</tr>';
-        $tbody.append(row);
-        console.log("populated data in table");
-	}
+                        row = [ir.brand,ir.category,ir.quantity];
+                                dataRows.push(row);
+    }
+    	table.rows.add(dataRows).draw();
 }
 
+
 $(document).ready(getInventoryReport);
+
+var table;
+$(document).ready(function() {
+    table = $('#inventory-table').DataTable({
+        order: [],
+                "columns": [
+                                      { "searchable": true, "orderable": true },
+                                      { "searchable": true, "orderable": true },
+                                      { "searchable": false, "orderable": true },
+                                    ],
+                columnDefs:[
+                {
+                targets: '_all',
+                         render:function(data,type,row,meta){
+                            return '<div>'+data+'</div>';
+                         }
+                }
+                ]
+    });
+});
 
 $(document).ready(function(){
     const navbarContainer = document.getElementById('navbarContainer');

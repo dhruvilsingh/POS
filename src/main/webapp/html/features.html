@@ -20,15 +20,14 @@
 					<p class="card-text"> <br>Add brands with category</br>
 						<br>Edit existing brands and categories</br>
 						<br>Upload brand and category list from tsv</br></p>
-					<a th:href="@{/ui/brand}" class="btn btn-primary mt-auto">Go to Brands</a>
 				</div>
 			</div>
 			<div class="card card0">
 				<h3 class="card-header mt-0 py-3 text-center">Products</h3>
 				<div class="card-body pt-0 d-flex flex-column">
 					<p class="card-text"> <br>Add new product</br>
-						<br>Edit product details</br></p>
-					<a th:href="@{/ui/product}"  class="btn btn-primary mt-auto">Go to products</a>
+						<br>Edit product details</br>
+					<br>Upload product list from tsv</br></p>
 				</div>
 			</div>
 			<div class="card card0">
@@ -37,7 +36,6 @@
 					<p class="card-text"><br>Add inventory for products</br>
 						<br>Edit inventory for products</br>
 						<br>Upload inventory list from tsv</br></p>
-					<a th:href="@{/ui/inventory}" class="btn btn-primary mt-auto">Go to Inventory</a>
 				</div>
 			</div>
 			<div class="card card0">
@@ -46,26 +44,15 @@
 					<p><br>Create a new order</br>
 						<br>Edit existing orders</br>
 						<br>View orders and generate invoices</br></p>
-					<a th:href="@{/ui/order}" class="btn btn-primary mt-auto">Go to Orders</a>
 				</div>
 			</div>
 			<div class="card card0">
 				<h3 class="card-header mt-0 py-3 text-center">Report</h3>
 				<div class="card-body pt-0 d-flex flex-column">
 					<p class="card-text"><br>View sales report</br>
+						<br>View daily sales report</br>
 						<br>View brand report</br>
 						<br>View inventory report</br></p>
-					<div class="dropdown">
-						<button type="button" class="btn btn-primary dropdown-toggle mt-auto" data-toggle="dropdown">
-							Reports
-						</button>
-						<div class="dropdown-menu">
-							<a class="dropdown-item" th:href="@{/ui/dailysales}">Daily sales</a>
-							<a class="dropdown-item" th:href="@{/ui/salereport}">Sales</a>
-							<a class="dropdown-item" th:href="@{/ui/brandreport}">Brand</a>
-							<a class="dropdown-item" th:href="@{/ui/inventoryreport}">Inventory</a>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>

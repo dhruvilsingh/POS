@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import javax.transaction.Transactional;
 
+import com.increff.pos.util.StringUtil.Role;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,52 +15,51 @@ import com.increff.pos.dao.UserDao;
 import com.increff.pos.pojo.UserPojo;
 
 @Service
+@Transactional
 public class UserService {
 
 	@Autowired
-	private UserDao dao;
+	private UserDao userDao;
 
 	@Value("${supervisor.email}")
 	private String supervisorEmail;
 
-	@Transactional
 	public void add(UserPojo p) throws ApiException {
 		normalize(p);
-		UserPojo existing = dao.select(p.getEmail());
+		UserPojo existing = userDao.select(p.getEmail());
 		if (existing != null) {
-			throw new ApiException("User with given email already exists");
+			throw new ApiException("User with entered email already exists!");
 		}
 		p = assignRole(p);
-		dao.insert(p);
+		userDao.insert(p);
 	}
 
-	@Transactional(rollbackOn = ApiException.class)
 	public UserPojo get(String email) throws ApiException {
-		return dao.select(email);
+		return userDao.select(email);
 	}
 
-	@Transactional
+	public UserPojo getId(int id){
+		return userDao.selectId(id);
+	}
+
 	public List<UserPojo> getAll() {
-		return dao.selectAll();
+		return userDao.selectAll();
 	}
 
-	@Transactional
-	public void delete(int id) {
-		dao.delete(id);
+	public void delete(int id) throws ApiException {
+		if(getId(id).getRole() == Role.ADMIN){
+			throw new ApiException("Cannot delete an Admin!");
+		}
+		userDao.delete(id);
 	}
-
 	protected static void normalize(UserPojo p) {
 		p.setEmail(p.getEmail().toLowerCase().trim());
-		p.setRole(p.getRole().toLowerCase().trim());
 	}
 
 	private UserPojo assignRole(UserPojo userPojo){
 		List<String> supervisorEmailList = Arrays.asList(supervisorEmail.split("\\s*,\\s*"));
-		for(String email : supervisorEmailList){
-			if(userPojo.getEmail().equals(email)){
-				userPojo.setRole("admin");
-				break;
-			}
+		if(supervisorEmailList.contains(userPojo.getEmail())){
+			userPojo.setRole(Role.ADMIN);
 		}
 		return userPojo;
 	}
