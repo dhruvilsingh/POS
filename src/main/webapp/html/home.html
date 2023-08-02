@@ -1,0 +1,118 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head">
+</head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div th:if = "${info.getRole()=='ADMIN'}" class="container-fluid mb-5 pb-5 container-home">
+	<div class="d-flex flex-wrap justify-content-center">
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/brand}"><img class="col-img" th:src="@{/static/images/brand.png}"></a>
+				<div class="text-center mt-2" style="font-size: 24px;">Brands</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 mt-4 pb-5">
+				<a th:href="@{/ui/inventory}"><img class="col-img" th:src="@{/static/images/inventory.png}"></a>
+				<div class="text-center mt-3" style="font-size: 24px;">Inventory</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/product}"><img class="col-img" th:src="@{/static/images/product.webp}"></a>
+				<div class="text-center mt-2" style="font-size: 24px;">Products</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/orders}"><img class="col-img" th:src="@{/static/images/orders.png}"></a>
+				<div class="text-center mt-2" style="font-size: 24px;">Orders</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/brandreport}"><img class="col-img" th:src="@{/static/images/brand-report.png}"></a>
+				<div class="text-center mt-4" style="font-size: 24px;">Brand Report</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/inventoryreport}"><img class="col-img" th:src="@{/static/images/inventory-report.webp}"></a>
+				<div class="text-center mt-4" style="font-size: 24px;">Inventory Report</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/dailysales}"><img class="col-img" th:src="@{/static/images/daily-sales.png}"></a>
+				<div class="text-center mt-4" style="font-size: 24px;">Daily Sales Report</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-4 col-sm-6 col-home">
+			<div class="card1 mb-5 pb-5">
+				<a th:href="@{/ui/salereport}"><img class="col-img" th:src="@{/static/images/sales-report.png}"></a>
+				<div class="text-center mt-3" style="font-size: 24px;">Revenue Report</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div th:if="${info.getRole()=='OPERATOR'}" class="container-fluid container-home">
+	<div class="row">
+		<div class="col-lg-6 col-md-6 col-sm-6 col-home">
+			<div class="card1 mx-2 mb-5 pb-5">
+				<a th:href="@{/ui/brand}"><img class="col-img" th:src="@{/static/images/brand.png}"></a>
+				<div class="text-center mt-3" style="font-size: 30px;">Brands</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-6 col-home">
+			<div class="card1 mx-2 mb-5 mt-4 pb-5">
+				<a th:href="@{/ui/inventory}"><img class="col-img" th:src="@{/static/images/inventory.png}"></a>
+				<div class="text-center mt-4" style="font-size: 30px;">Inventory</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-6 col-home">
+			<div class="card1 mx-2 mb-5 pb-5">
+				<a th:href="@{/ui/product}"><img class="col-img" th:src="@{/static/images/product.webp}"></a>
+				<div class="text-center mt-3" style="font-size: 30px;">Products</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-6 col-home">
+			<div class="card1 mx-2 mb-5 pb-5">
+				<a th:href="@{/ui/orders}"><img class="col-img" th:src="@{/static/images/orders.png}"></a>
+				<div class="text-center mt-3" style="font-size: 30px;">Orders</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+</div> <!-- Container end-->
+
+</body>
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script>
+$(document).ready(function(){
+const navbarContainer = document.getElementById('navbarContainer');
+const navItems = navbarContainer.querySelectorAll('.navbar-nav > .nav-item');
+navItems.forEach(item => {
+item.classList.remove('active')});
+const navItem = document.getElementById('home-nav');
+navItem.classList.add('active');
+});
+</script>
+
+</html>

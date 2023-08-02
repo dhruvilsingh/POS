@@ -1,0 +1,110 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+
+<head th:fragment="name_head">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="baseUrl" th:attr="content=${baseUrl}">
+  <meta name="role" th:attr="content=${role}">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/static/app.css}">
+
+</head>
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-1" id="navbarContainer1" th:fragment="name_site_navbar">
+  <a class="navbar-brand" th:href="@{/}">
+    <img th:src="@{/static/images/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse mx-3 navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item" id="features-nav">
+        <a class="nav-link" th:href="@{/site/features}">Features</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/site/login}">Login</a>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-1" id="navbarContainer" th:fragment="name_app_navbar">
+  <a class="navbar-brand" th:href="@{/ui/home}">
+    <img th:src="@{/static/images/increfflogo.png}" class="d-inline-block align-top nav-logo" alt="">
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav2" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse mx-3 navbar-collapse" id="navbarNav2">
+    <ul class="navbar-nav">
+      <li class="nav-item mx-3" id="home-nav">
+        <a class="nav-link" th:href="@{/ui/home}">Home</a>
+      </li>
+      <li class="nav-item mx-3" id="brands-nav">
+        <a class="nav-link" th:href="@{/ui/brand}">Brands</a>
+      </li>
+      <li class="nav-item mx-3" id="products-nav">
+        <a class="nav-link" th:href="@{/ui/product}">Products</a>
+      </li>
+      <li class="nav-item mx-3" id="inventory-nav">
+        <a class="nav-link" th:href="@{/ui/inventory}">Inventory</a>
+      </li>
+      <li class="nav-item mx-3" id="orders-nav">
+        <a class="nav-link" th:href="@{/ui/orders}">Orders</a>
+      </li>
+      <li th:if = "${info.getRole()=='ADMIN'}" class="nav-item mx-3 dropdown" id="reports-nav">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown">Reports</a>
+        <div class="dropdown-menu" >
+          <a class="dropdown-item" th:href="@{/ui/dailysales}">Daily Sales</a>
+          <a class="dropdown-item" th:href="@{/ui/salereport}">Revenue</a>
+          <a class="dropdown-item" th:href="@{/ui/brandreport}">Brand</a>
+          <a class="dropdown-item" th:href="@{/ui/inventoryreport}">Inventory</a>
+        </div>
+      </li>
+      <li th:if = "${info.getRole()=='ADMIN'}" class="nav-item mx-3" id="user-nav">
+        <a class="nav-link" th:href="@{/ui/user}">Users</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item dropdown" id="logout-nav">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown">[[${info.getEmail()}]]</a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a class="dropdown-item" id="logoutButton" th:href="@{/session/logout}">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<footer th:fragment="name_footer">
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script src="https://kit.fontawesome.com/c30beb553f.js" crossorigin="anonymous"></script>
+  <script th:src="@{/static/notify.min.js}"/></script>
+  <script th:src="@{/static/app.js}"/></script>
+  <script th:src="@{/static/papaparse.min.js}"/></script>
+
+</footer>
+
+

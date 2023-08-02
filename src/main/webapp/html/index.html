@@ -1,0 +1,44 @@
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_site_navbar"></nav>
+
+
+<div class="container-fluid px-5 index-container">
+    <div class="center">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card3 px-5 mx-5 py-5">
+                <div class="row justify-content-center">
+                    <img th:src="@{/static/images/home.png}" class="image-index" alt="Index image">
+                </div>
+            </div>
+        </div>
+      <div class="col-lg-4 my-auto">
+          <div class="card border-0">
+        <div  class="jumbotron-fluid index-jumbotron">
+          <h3 class="mb-3">POINT OF SALE</h3>
+          <hr class="my-4">
+          <p> Introducing the <b>POINT OF SALE APP</b> to manage your orders, products and inventory, generate invoices
+            along with the ability to track your sales by variety of reports all in one app. </p>
+            <a class="btn btn-success mt-3" th:href="@{/site/login}" role="button">Get Started</a>
+        </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div><!--Container-->
+
+</body>
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+
+</html>

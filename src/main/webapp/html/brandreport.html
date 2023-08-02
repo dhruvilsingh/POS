@@ -1,0 +1,50 @@
+<!doctype html>
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container-fluid px-5">
+
+  <h3>Brand Report</h3>
+
+  <div class="row">
+    &nbsp;
+  </div>
+
+  <button class="btn btn-success"  id="download-report" role="button">Download Report</button>
+
+  <!-- Blank Row -->
+  <div class="row">
+    &nbsp;
+  </div>
+  <div class="row">
+
+    <!-- Table -->
+    <div class="col-12 table-responsive">
+      <table class="table table-striped text-center" id="brand-table">
+        <thead class="thead-dark">
+        <tr>
+          <th scope="col">Brand</th>
+          <th scope="col">Category</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div> <!-- Container end-->
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script th:src="@{/static/brandreport.js}"/></script>
+
+</body>
+
+</html>

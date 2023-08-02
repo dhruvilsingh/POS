@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > OrderItemService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.increff.pos.service</a>
+</div>
+
+<h1>Coverage Summary for Class: OrderItemService (com.increff.pos.service)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OrderItemService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OrderItemService$$EnhancerBySpringCGLIB$$41dd31a4</td>
+  </tr>
+  <tr>
+    <td class="name">OrderItemService$$EnhancerBySpringCGLIB$$41dd31a4$$FastClassBySpringCGLIB$$5b6963d6</td>
+  </tr>
+  <tr>
+    <td class="name">OrderItemService$$FastClassBySpringCGLIB$$ca463691</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service;
+&nbsp;
+&nbsp;import com.increff.pos.dao.InventoryDao;
+&nbsp;import com.increff.pos.dao.OrderItemDao;
+&nbsp;import com.increff.pos.dao.OrderItemDao;
+&nbsp;import com.increff.pos.dao.ProductDao;
+&nbsp;import com.increff.pos.pojo.*;
+&nbsp;import com.increff.pos.pojo.OrderItemPojo;
+&nbsp;import com.increff.pos.util.StringUtil;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import javax.transaction.Transactional;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class OrderItemService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private OrderItemDao orderItemDao;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ProductDao productDao;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private InventoryDao inventoryDao;
+&nbsp;
+&nbsp;    @Transactional(rollbackOn = ApiException.class)
+&nbsp;    public int add(OrderItemPojo orderItemPojo, int productQuantity, double productMrp,
+&nbsp;                    String productBarcode) throws ApiException {
+<b class="fc">&nbsp;        int updatedInventory = checkInput(orderItemPojo, productQuantity, productMrp, productBarcode);</b>
+<b class="fc">&nbsp;        orderItemDao.insert(orderItemPojo);</b>
+<b class="fc">&nbsp;        return updatedInventory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public List&lt;OrderItemPojo&gt; getAll(int orderId) {
+<b class="fc">&nbsp;        return orderItemDao.selectAll(orderId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public OrderItemPojo get(int itemId) throws ApiException {
+<b class="fc">&nbsp;        return getCheck(itemId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void delete(int id) throws ApiException {
+<b class="fc">&nbsp;        getCheck(id);</b>
+<b class="fc">&nbsp;        if(getAll(get(id).getOrderId()).size() == 1){</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;Sorry! order cannot be empty&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        orderItemDao.deleteId(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(rollbackOn  = ApiException.class)
+&nbsp;    public int update(int itemId, OrderItemPojo orderItemPojo, int productQuantity,
+&nbsp;                       double productMrp) throws ApiException {
+<b class="fc">&nbsp;        OrderItemPojo exOrderItemPojo = getCheck(itemId);</b>
+<b class="fc">&nbsp;        checkSellingPrice(orderItemPojo, productMrp);</b>
+<b class="fc">&nbsp;        int updatedInventory = updateInventory(itemId, orderItemPojo, productQuantity);</b>
+<b class="fc">&nbsp;        exOrderItemPojo.setSellingPrice(orderItemPojo.getSellingPrice());</b>
+<b class="fc">&nbsp;        exOrderItemPojo.setProductQuantity(orderItemPojo.getProductQuantity());</b>
+<b class="fc">&nbsp;        return updatedInventory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public OrderItemPojo getCheck(int itemNo) throws ApiException {
+<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = orderItemDao.selectId(itemNo);</b>
+<b class="fc">&nbsp;        if (orderItemPojo == null) {</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;Item with given ID does not exist!&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return orderItemPojo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int updateInventory(int itemId , OrderItemPojo orderItemPojo,int productQuantity) throws ApiException {
+<b class="fc">&nbsp;        int oldQuantity = get(itemId).getProductQuantity();</b>
+<b class="fc">&nbsp;        int newQuantity = orderItemPojo.getProductQuantity();</b>
+<b class="fc">&nbsp;        if(oldQuantity == newQuantity){</b>
+<b class="fc">&nbsp;            return oldQuantity;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        int currentInventory = productQuantity;</b>
+<b class="fc">&nbsp;        if(newQuantity &lt; oldQuantity){</b>
+<b class="fc">&nbsp;           return currentInventory + oldQuantity - newQuantity;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        else if((newQuantity - oldQuantity) &lt; currentInventory) {</b>
+<b class="fc">&nbsp;            return currentInventory - newQuantity + oldQuantity;</b>
+&nbsp;        }
+&nbsp;        else
+<b class="fc">&nbsp;            throw new ApiException(&quot;Sorry! Available up to: &quot; + (oldQuantity+currentInventory));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkSellingPrice(OrderItemPojo orderItemPojo, double productMrp) throws ApiException { //TODO : to remove this check.
+<b class="fc">&nbsp;        if (productMrp &lt; orderItemPojo.getSellingPrice()) {</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;Selling price cannot be more than MRP!!  (MRP = &quot; + productMrp + &quot;)&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int checkInput(OrderItemPojo orderItemPojo, int productQuantity, double productMrp, //TODO :  to check the inv validation in  inv.service.
+&nbsp;                                 String productBarcode ) throws ApiException {
+<b class="fc">&nbsp;        if(orderItemPojo.getProductQuantity() &gt; productQuantity){</b>
+<b class="fc">&nbsp;            throw new ApiException(productQuantity + &quot; items are left for &quot; + productBarcode);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if(orderItemPojo.getSellingPrice() &gt; productMrp){</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;Selling price for &quot; + productBarcode + &quot; is greater than Mrp &quot; + productMrp);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        int updatedQuantity = productQuantity - orderItemPojo.getProductQuantity();</b>
+<b class="fc">&nbsp;        return updatedQuantity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-07-19 16:25</div>
+</div>
+</body>
+</html>
