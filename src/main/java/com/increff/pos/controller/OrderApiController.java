@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @Api
-public class OrderApiController { //TODO : to create a api to create order
+public class OrderApiController {
     @Autowired
     private OrderDto orderDto;
 

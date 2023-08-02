@@ -6,7 +6,8 @@ import com.increff.pos.pojo.UserPojo;
 import com.increff.pos.service.ApiException;
 import com.increff.pos.service.UserService;
 import com.increff.pos.util.SecurityUtil;
-import com.increff.pos.util.StringUtil.Role;
+import com.increff.pos.model.enums.Role;
+
 import com.increff.pos.util.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

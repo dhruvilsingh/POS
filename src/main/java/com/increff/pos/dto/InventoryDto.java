@@ -25,7 +25,7 @@ public class InventoryDto {
     @Autowired
     private ProductService productService;
 
-    public void addInventory(InventoryForm inventoryForm) throws ApiException { //TODO :  to rename the function name.
+    public void addInventory(InventoryForm inventoryForm) throws ApiException {
         normalize(inventoryForm);
         ValidationUtil.checkValid(inventoryForm);
         String productBarcode = inventoryForm.getBarcode();
@@ -34,7 +34,7 @@ public class InventoryDto {
             throw new ApiException("Quantity to add should be more than zero!");
         }
         InventoryPojo inventoryPojo =  convert(inventoryForm, productPojo.getId());
-        inventoryService.addInventory(inventoryPojo); //TODO:  to call api and fetch the inv. pojo and send the update qty to api layer.
+        inventoryService.addInventory(inventoryPojo);
     }
 
     @Transactional(rollbackOn = ApiException.class)

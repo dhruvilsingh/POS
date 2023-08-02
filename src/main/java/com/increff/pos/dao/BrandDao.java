@@ -8,8 +8,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
-
-//TODO: to read about critiria builder.
 @Repository
 public class BrandDao extends AbstractDao{
 

@@ -19,7 +19,7 @@ public class InventoryService {
         inventoryDao.insert(inventoryPojo);
     }
 
-    public InventoryPojo get(int productId) throws ApiException { //todo : to rename it to getcheck.
+    public InventoryPojo get(int productId) throws ApiException {
         return getCheck(productId);
     }
 
@@ -46,7 +46,7 @@ public class InventoryService {
         exInventoryPojo.setQuantity(inventoryPojo.getQuantity());
     }
 
-    public void updateInventory(int productId, int oldQuantity, int newQuantity) throws ApiException { //todo : to simply the logic.
+    public void updateInventory(int productId, int oldQuantity, int newQuantity) throws ApiException {
         int updatedInventory;
         int availableInventory = getCheck(productId).getQuantity();
         if(oldQuantity == newQuantity){

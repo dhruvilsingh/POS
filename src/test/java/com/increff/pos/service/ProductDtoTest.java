@@ -34,7 +34,7 @@ public class ProductDtoTest extends AbstractUnitTest{
     @Test
     public void testAddProduct() throws ApiException {
         ProductForm productForm = new ProductForm();
-        productForm.setBarcode(" BarCode1     "); //TODO to create a private function for getting forms.
+        productForm.setBarcode(" BarCode1     ");
         productForm.setBrand(brandDto.getAll().get(0).getBrand());
         productForm.setCategory(brandDto.getAll().get(0).getCategory());
         productForm.setName("  ProducT1   ");

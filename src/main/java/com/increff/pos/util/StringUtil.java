@@ -4,17 +4,6 @@ import java.text.DecimalFormat;
 
 public class StringUtil {
 
-	public enum OrderStatus { //TODO : to move all enums to model package.
-		CREATED,
-		INVOICED,
-		CANCELLED
-	}
-
-	public enum Role {
-		ADMIN,
-		OPERATOR
-	}
-
 	public static boolean isEmpty(String s) {
 		return s == null || s.trim().length() == 0;
 	}

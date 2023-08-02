@@ -21,4 +21,4 @@ public class BrandPojo extends AbstractPojo{
     private String category;
 }
 
-//TODO: to read about optimistic locking...
+

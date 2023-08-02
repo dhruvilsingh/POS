@@ -29,7 +29,7 @@ public class CartService {
     }
 
     public List<CartPojo> getAll(String userEmail) throws ApiException {
-        List<CartPojo> list = cartDao.selectAll(userEmail); //todo to rename the variable name.
+        List<CartPojo> list = cartDao.selectAll(userEmail);
         return list;
     }
 
@@ -52,7 +52,7 @@ public class CartService {
 
     //check functions
 
-    public CartPojo getCheck(int itemNo) throws ApiException { //todo make this private.
+    public CartPojo getCheck(int itemNo) throws ApiException {
         CartPojo cartPojo = cartDao.selectId(itemNo);
         if (cartPojo == null) {
             throw new ApiException("Cart item with given ID does not exist!");

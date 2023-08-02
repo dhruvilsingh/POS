@@ -30,7 +30,7 @@ public class ProductService {
     }
 
     public void update(int productId, String name, Double mrp) throws ApiException {
-        ProductPojo exProductPojo = getCheck(productId); //TODO: change variable name ex to existing
+        ProductPojo exProductPojo = getCheck(productId);
         exProductPojo.setName(name);
         exProductPojo.setMrp(mrp);
     }

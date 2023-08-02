@@ -3,7 +3,7 @@ package com.increff.pos.dao;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.CartPojo;
 import com.increff.pos.pojo.OrderItemPojo;
-import com.increff.pos.util.StringUtil.OrderStatus;
+import com.increff.pos.model.enums.OrderStatus;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

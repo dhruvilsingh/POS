@@ -37,7 +37,7 @@ public class ProductDto {
         BrandPojo brandPojo = brandService.getBrandCategory(productForm.getBrand(), productForm.getCategory());
         ProductPojo productPojo = convert(productForm, brandPojo.getId());
         productService.add(productPojo);
-        InventoryPojo inventoryPojo = new InventoryPojo(); //TODO : to create inv. pojo in service layer.
+        InventoryPojo inventoryPojo = new InventoryPojo();
         inventoryPojo.setProductId(productPojo.getId());
         inventoryPojo.setQuantity(0);
         inventoryService.add(inventoryPojo);
@@ -75,7 +75,7 @@ public class ProductDto {
         List<ProductPojo> list = productService.getAll();
         List<ProductData> list2 = new ArrayList<ProductData>();
         for (ProductPojo productPojo : list) {
-            BrandPojo brandPojo = brandService.get(productPojo.getBrandCategoryId()); //TODO to use list API and fetch all brands.
+            BrandPojo brandPojo = brandService.get(productPojo.getBrandCategoryId());
             list2.add(convert(productPojo, brandPojo.getBrand(), brandPojo.getCategory()));
         }
         return list2;

@@ -2,7 +2,7 @@
 //
 //import com.increff.pos.dto.*;
 //import com.increff.pos.model.forms.*;
-//import com.increff.pos.util.StringUtil.OrderStatus;
+//import com.increff.pos.model.enums.OrderStatus;
 //import org.junit.Before;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.mock.web.MockHttpServletRequest;

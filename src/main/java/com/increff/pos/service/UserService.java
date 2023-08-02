@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import javax.transaction.Transactional;
 
-import com.increff.pos.util.StringUtil.Role;
+import com.increff.pos.model.enums.Role;
+
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

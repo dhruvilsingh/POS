@@ -1,6 +1,7 @@
 package com.increff.pos.spring;
 
-import com.increff.pos.util.StringUtil.Role;
+import com.increff.pos.model.enums.Role;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

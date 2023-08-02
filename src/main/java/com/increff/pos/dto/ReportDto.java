@@ -33,8 +33,7 @@ public class ReportDto {
     private BrandService brandService;
 
     @Transactional
-    @Scheduled(fixedDelay = 30000) //TODO to use app.properties and make it confi.
-    //TODO : to add schedulers in separate package.
+    @Scheduled(fixedDelay = 30000)
     public void addDailySalesReport() throws ApiException {
         ZonedDateTime currentDateTime = ZonedDateTime.now();
         ZonedDateTime date = LocalDate.now().atStartOfDay(ZoneId.of("UTC"));
@@ -42,7 +41,7 @@ public class ReportDto {
         dailySalesPojo.setDate(date);
         dailySalesPojo.setOrderCount(orderService.getOrderCount(currentDateTime));
         dailySalesPojo.setOrderItemCount(orderItemService.getItemCount(currentDateTime));
-        dailySalesPojo.setRevenue(orderItemService.getRevenue(currentDateTime)); //todo : to merge getItemCount, getRevenue to a single function.
+        dailySalesPojo.setRevenue(orderItemService.getRevenue(currentDateTime));
         DailySalesPojo existingDailySalesPojo = reportService.getSaleByDate(date);
         if(existingDailySalesPojo != null){
             existingDailySalesPojo.setDate(dailySalesPojo.getDate());

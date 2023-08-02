@@ -51,7 +51,7 @@ public class OrderItemDto {
     @Transactional(rollbackOn = ApiException.class)
     public void delete(int id) throws ApiException {
         OrderItemPojo orderItemPojo = orderItemService.get(id);
-        orderService.getCheckInvoicedStatus(orderItemPojo.getOrderId()); //TODO : to fetch order and validate the status.
+        orderService.getCheckInvoicedStatus(orderItemPojo.getOrderId());
         orderService.getCheckCancelledStatus(orderItemPojo.getOrderId());
         orderItemService.delete(id);
         int productId = orderItemPojo.getProductId();
@@ -70,7 +70,7 @@ public class OrderItemDto {
         Double productMrp = productService.get(productId).getMrp();
         checkSellingPrice(orderItemForm.getSellingPrice(), productMrp, productService.get(productId).getBarcode());
         inventoryService.updateInventory(productId, orderItemService.get(itemId).getQuantity(), orderItemForm.getQuantity());
-        orderItemService.update(itemId, convert(orderItemForm, orderItemService.get(itemId).getOrderId(), productId)); //TODO : to send only the updatable fields.
+        orderItemService.update(itemId, convert(orderItemForm, orderItemService.get(itemId).getOrderId(), productId));
     }
 
     public OrderItemData get(int id) throws ApiException {
@@ -121,7 +121,7 @@ public class OrderItemDto {
         return  orderItemPojo;
     }
 
-    private static void normalize(OrderItemForm orderItemForm){ //TODO : to create a separate utils for norm. and converts.
+    private static void normalize(OrderItemForm orderItemForm){
         orderItemForm.setSellingPrice(StringUtil.roundOff(orderItemForm.getSellingPrice()));
     }
 

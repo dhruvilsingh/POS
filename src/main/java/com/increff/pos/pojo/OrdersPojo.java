@@ -1,6 +1,6 @@
 package com.increff.pos.pojo;
 
-import com.increff.pos.util.StringUtil.OrderStatus;
+import com.increff.pos.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 

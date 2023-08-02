@@ -24,7 +24,7 @@ public class InvoiceService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public ResponseEntity<Resource> getInvoice(InvoiceData invoiceData) throws IOException { //TODO : to create a clientWrapper class and implement all external apis in that
+    public ResponseEntity<Resource> getInvoice(InvoiceData invoiceData) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<InvoiceData> requestEntity = new HttpEntity<>(invoiceData, headers);
@@ -33,7 +33,7 @@ public class InvoiceService {
         return convertBase64ToPdf(base64String);
     }
 
-    private ResponseEntity<Resource> convertBase64ToPdf(String base64String) throws IOException { //TODO to create a separate helper function
+    private ResponseEntity<Resource> convertBase64ToPdf(String base64String) throws IOException {
         byte[] pdfBytes = Base64.getDecoder().decode(base64String);
         File outputFile = new File(filePath);
         FileOutputStream fos = new FileOutputStream(outputFile);

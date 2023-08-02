@@ -32,11 +32,11 @@ public class OrderItemService {
         return orderItemDao.selectAll(orderId);
     }
 
-    public OrderItemPojo get(int itemId) throws ApiException {//todo: remove get or getcheck
+    public OrderItemPojo get(int itemId) throws ApiException {
         return getCheck(itemId);
     }
 
-    public OrderItemPojo getCheckOrderItem(int productId, int orderId) throws ApiException {//todo: remove get or getcheck
+    public OrderItemPojo getCheckOrderItem(int productId, int orderId) throws ApiException {
         OrderItemPojo orderItemPojo = orderItemDao.selectOrderItem(productId, orderId);
         if (orderItemPojo == null) {
             throw new ApiException("Item with given ID does not exist!");

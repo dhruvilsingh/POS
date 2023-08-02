@@ -1,7 +1,8 @@
 package com.increff.pos.dao;
 
+import com.increff.pos.model.enums.OrderStatus;
 import com.increff.pos.pojo.OrdersPojo;
-import com.increff.pos.util.StringUtil.OrderStatus;
+
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

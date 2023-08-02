@@ -48,7 +48,7 @@ public class ReportService {
         return reportDao.selectSaleByDate(date);
     }
 
-    public List<Object[]> getSaleReport(SaleReportForm saleReportForm) throws ApiException, ParseException { //TODO to create separate class instead of using object[]
+    public List<Object[]> getSaleReport(SaleReportForm saleReportForm) throws ApiException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String brand = saleReportForm.getBrand();
         String category = saleReportForm.getCategory();

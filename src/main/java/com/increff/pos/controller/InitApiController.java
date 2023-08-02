@@ -2,7 +2,8 @@
 //
 //import java.util.List;
 //import com.increff.pos.dto.AbstractUiDto;
-//import com.increff.pos.util.StringUtil.Role;
+//import com.increff.pos.model.enums.Role;
+
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Controller;
 //import org.springframework.web.bind.annotation.RequestMapping;

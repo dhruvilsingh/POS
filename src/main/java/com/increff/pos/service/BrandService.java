@@ -24,7 +24,6 @@ public class BrandService {
         brandDao.insert(brandPojo);
     }
 
-     //TODO : to remove the get method.
     public BrandPojo get(int id) throws ApiException {
         return getCheck(id);
     }
@@ -33,7 +32,7 @@ public class BrandService {
         return brandDao.selectAll();
     }
 
-    public void update(int id, BrandPojo brandPojo) throws ApiException { //TODO: to send only the updatable fields in the function
+    public void update(int id, BrandPojo brandPojo) throws ApiException {
         BrandPojo exBrandPojo = getCheck(id);
         BrandPojo brandPojo1 = brandDao.selectBrandCategory(brandPojo.getBrand(), brandPojo.getCategory());
         if( brandPojo1 != null && brandPojo1.getId() != id) {
@@ -54,7 +53,7 @@ public class BrandService {
     public BrandPojo getCheck(int id) throws ApiException {
         BrandPojo brandPojo = brandDao.select(id);
         if (brandPojo == null) {
-            throw new ApiException("Brand with given ID does not exist!"); //TODO : to mention ID in error msg.
+            throw new ApiException("Brand with given ID does not exist!");
         }
         return brandPojo;
     }

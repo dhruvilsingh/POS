@@ -30,12 +30,11 @@ public class BrandDto {
     public void add(BrandForm brandForm) throws ApiException {
         normalize(brandForm);
         ValidationUtil.checkValid(brandForm);
-        BrandPojo brandPojo = convert(brandForm); //TODO : to use copy bean and create a generic function
+        BrandPojo brandPojo = convert(brandForm);
         brandService.add(brandPojo);
     }
 
-    @Transactional(rollbackOn = ApiException.class) //TODO : validate the form in DTO and avoid @transac
-    //TODO: to send whole form list with error in the response
+    @Transactional(rollbackOn = ApiException.class)
     public void upload(List<BrandForm> fileData) throws ApiException{
         List<Map<String,String>> errorList = new ArrayList<>();
         for(BrandForm brandForm : fileData){
@@ -59,7 +58,6 @@ public class BrandDto {
         return convert(brandPojo);
     }
 
-    //TODO : to implement pagination.
     public List<BrandData> getAll() {
         List<BrandPojo> list = brandService.getAll();
         List<BrandData> list2 = new ArrayList<BrandData>();

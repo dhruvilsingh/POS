@@ -16,7 +16,6 @@ public class BrandDtoTest extends AbstractUnitTest{
 	@Autowired
 	private BrandDto brandDto;
 
-	//TODO : to create a separate class for creating master data.
 	@Test
 	public void testBrandAdd() throws ApiException {
 		BrandForm brandForm = new BrandForm();
@@ -28,13 +27,13 @@ public class BrandDtoTest extends AbstractUnitTest{
 	}
 
 	@Test
-	public void addExistingBrandCategory(){ //TODO to add @test annotation for all tests.
+	public void addExistingBrandCategory(){
 		BrandForm brandForm = new BrandForm();
 		brandForm.setBrand(" Brand1 ");
 		brandForm.setCategory("cAt1   ");
 		try{
-			brandDto.add(brandForm); //TODO : to use dao layer to create master data.
-			brandDto.add(brandForm); //TODO : use fail for all api exceptions tests.
+			brandDto.add(brandForm);
+			brandDto.add(brandForm);
 			fail();
 		}catch(ApiException exception){
 			assertEquals("Brand and category pair already exist!", exception.getMessage());

@@ -5,7 +5,7 @@ import com.increff.pos.model.data.InvoiceItem;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.ProductPojo;
 import com.increff.pos.service.*;
-import com.increff.pos.util.StringUtil.OrderStatus;
+import com.increff.pos.model.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;

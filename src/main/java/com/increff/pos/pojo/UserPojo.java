@@ -1,6 +1,7 @@
 package com.increff.pos.pojo;
 
-import com.increff.pos.util.StringUtil.Role;
+
+import com.increff.pos.model.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 

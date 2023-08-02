@@ -4,7 +4,7 @@
 //import com.increff.pos.model.data.InventoryData;
 //import com.increff.pos.model.data.OrderItemData;
 //import com.increff.pos.model.forms.*;
-//import com.increff.pos.util.StringUtil.OrderStatus;
+//import com.increff.pos.model.enums.OrderStatus;
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.springframework.beans.factory.annotation.Autowired;

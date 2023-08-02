@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class BrandForm {
 
     @NotBlank(message = "Brand name cannot be empty")
-    @Pattern(regexp = "^$|^[\\p{Ll}\\p{Lu}&@$£€¥0-9.,:;\\-\\p{P}\\p{S}\\s&&[^*+=#%]]+$", message = "Invalid characters in brand name") //TODO to add comment.
+    @Pattern(regexp = "^$|^[\\p{Ll}\\p{Lu}&@$£€¥0-9.,:;\\-\\p{P}\\p{S}\\s&&[^*+=#%]]+$", message = "Invalid characters in brand name")
     @Size(max = 255, message = "Brand name must have less than 255 characters")
     private String brand;
 
