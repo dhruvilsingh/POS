@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > IOUtil</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Role</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -18,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.increff.pos.util</a>
+    <a href="../index.html">com.increff.pos.model.enums</a>
 </div>
 
-<h1>Coverage Summary for Class: IOUtil (com.increff.pos.util)</h1>
+<h1>Coverage Summary for Class: Role (com.increff.pos.model.enums)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -40,29 +41,29 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">IOUtil</td>
+  <td class="name">Role</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/5)
+    (3/3)
   </span>
 </td>
 </tr>
@@ -74,25 +75,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.util;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.model.enums;
 &nbsp;
-&nbsp;import java.io.Closeable;
-&nbsp;import java.io.IOException;
-&nbsp;
-<b class="nc">&nbsp;public class IOUtil {</b>
-&nbsp;
-&nbsp;	public static void closeQuietly(Closeable c) {
-<b class="nc">&nbsp;		if (c == null) {</b>
-&nbsp;			return;
-&nbsp;		}
-&nbsp;
-&nbsp;		try {
-<b class="nc">&nbsp;			c.close();</b>
-<b class="nc">&nbsp;		} catch (IOException e) {</b>
-&nbsp;			// do nothing
-<b class="nc">&nbsp;		}</b>
-&nbsp;	}
-&nbsp;
+<b class="fc">&nbsp;public enum Role {</b>
+<b class="fc">&nbsp;    ADMIN,</b>
+<b class="fc">&nbsp;    OPERATOR</b>
 &nbsp;}
 </code>
 </pre>
@@ -117,7 +104,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-05 14:08</div>
 </div>
 </body>
 </html>

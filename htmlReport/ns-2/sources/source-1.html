@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > AbstractUiDto</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BrandDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,15 +22,12 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.dto</a>
 </div>
 
-<h1>Coverage Summary for Class: AbstractUiDto (com.increff.pos.dto)</h1>
+<h1>Coverage Summary for Class: BrandDto (com.increff.pos.dto)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -40,33 +38,52 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">AbstractUiDto</td>
+  <td class="name">BrandDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (7/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    100%
   </span>
   <span class="absValue">
-    (1/2)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    12.5%
-  </span>
-  <span class="absValue">
-    (1/8)
+    (30/30)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">BrandDto$$EnhancerBySpringCGLIB$$c3de6523</td>
+  </tr>
+  <tr>
+    <td class="name">BrandDto$$EnhancerBySpringCGLIB$$c3de6523$$FastClassBySpringCGLIB$$8decc87f</td>
+  </tr>
+  <tr>
+    <td class="name">BrandDto$$FastClassBySpringCGLIB$$8dfdea8b</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -76,32 +93,79 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.dto;
 &nbsp;
-&nbsp;import com.increff.pos.model.data.InfoData;
-&nbsp;import com.increff.pos.util.SecurityUtil;
-&nbsp;import com.increff.pos.util.UserPrincipal;
+&nbsp;import com.increff.pos.model.data.BrandData;
+&nbsp;import com.increff.pos.model.form.BrandForm;
+&nbsp;import com.increff.pos.pojo.BrandPojo;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import com.increff.pos.service.BrandService;
+&nbsp;import com.increff.pos.util.ConversionUtil;
+&nbsp;import com.increff.pos.util.NormalizeUtil;
+&nbsp;import com.increff.pos.util.ValidationUtil;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
-&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;
 &nbsp;import org.springframework.stereotype.Component;
-&nbsp;import org.springframework.web.servlet.ModelAndView;
+&nbsp;
+&nbsp;import javax.transaction.Transactional;
+&nbsp;import java.util.*;
 &nbsp;
 &nbsp;@Component
-<b class="fc">&nbsp;public class AbstractUiDto {</b>
-&nbsp;    @Autowired
-&nbsp;    private InfoData info;
-&nbsp;    @Value(&quot;${app.baseUrl}&quot;)
-&nbsp;    private String baseUrl;
+<b class="fc">&nbsp;public class BrandDto {</b>
 &nbsp;
-&nbsp;    protected ModelAndView mav(String page) {
-&nbsp;        // Get current user
-<b class="nc">&nbsp;        UserPrincipal principal = SecurityUtil.getPrincipal();</b>
-<b class="nc">&nbsp;        info.setEmail(principal == null ? &quot;&quot; : principal.getEmail());</b>
-<b class="nc">&nbsp;        info.setRole(principal == null ? &quot;&quot; : principal.getRole());</b>
-&nbsp;        // Set info
-<b class="nc">&nbsp;        ModelAndView mav = new ModelAndView(page);</b>
-<b class="nc">&nbsp;        mav.addObject(&quot;info&quot;, info);</b>
-<b class="nc">&nbsp;        mav.addObject(&quot;baseUrl&quot;, baseUrl);</b>
-<b class="nc">&nbsp;        return mav;</b>
+&nbsp;    @Autowired
+&nbsp;    private BrandService brandService;
+&nbsp;
+&nbsp;    public void add(BrandForm brandForm) throws ApiException {
+<b class="fc">&nbsp;        NormalizeUtil.normalize(brandForm);</b>
+<b class="fc">&nbsp;        ValidationUtil.checkValid(brandForm);</b>
+<b class="fc">&nbsp;        brandService.add(ConversionUtil.convert(brandForm, BrandPojo.class));</b>
 &nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(rollbackOn = ApiException.class)
+&nbsp;    public void upload(List&lt;BrandForm&gt; fileData) throws ApiException {
+<b class="fc">&nbsp;        List&lt;Map&lt;String, String&gt;&gt; errorList = ValidationUtil.normalizeValidateFormList(fileData);</b>
+<b class="fc">&nbsp;        checkDuplicateForms(fileData,errorList);</b>
+<b class="fc">&nbsp;        if (!errorList.isEmpty()){</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;One or more errors occurred while processing the data!\nDownload error list to view errors&quot;, errorList);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        brandService.addList(ConversionUtil.convert(fileData, BrandPojo.class));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BrandData get(int id) throws ApiException {
+<b class="fc">&nbsp;        BrandPojo brandPojo = brandService.getCheck(id);</b>
+<b class="fc">&nbsp;        return ConversionUtil.convert(brandPojo, BrandData.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BrandData&gt; getAll() throws ApiException {
+<b class="fc">&nbsp;        List&lt;BrandPojo&gt; list = brandService.getAll();</b>
+<b class="fc">&nbsp;        List&lt;BrandData&gt; list2 = new ArrayList&lt;BrandData&gt;();</b>
+<b class="fc">&nbsp;        for (BrandPojo brandPojo : list) {</b>
+<b class="fc">&nbsp;            list2.add(ConversionUtil.convert(brandPojo, BrandData.class));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return list2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void update(int id, BrandForm brandForm) throws ApiException {
+<b class="fc">&nbsp;        NormalizeUtil.normalize(brandForm);</b>
+<b class="fc">&nbsp;        ValidationUtil.checkValid(brandForm);</b>
+<b class="fc">&nbsp;        BrandPojo brandPojo = ConversionUtil.convert(brandForm, BrandPojo.class);</b>
+<b class="fc">&nbsp;        brandService.update(id, brandPojo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkDuplicateForms(List&lt;BrandForm&gt; brandFormList, List&lt;Map&lt;String, String&gt;&gt; errorList) {
+<b class="fc">&nbsp;        Set&lt;String&gt; brandFormSet = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i=0; i&lt;brandFormList.size(); i++) {</b>
+<b class="fc">&nbsp;            BrandForm brandForm = brandFormList.get(i);</b>
+<b class="fc">&nbsp;            String brandFormString = brandForm.getBrand() + &quot;_&quot; + brandForm.getCategory();</b>
+<b class="fc">&nbsp;            if (!brandFormSet.add(brandFormString)) {</b>
+<b class="fc">&nbsp;                Map&lt;String, String&gt; row = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;                row.put(&quot;index&quot;, Integer.toString(i));</b>
+<b class="fc">&nbsp;                row.put(&quot;error&quot;, &quot;Duplicate entry!&quot;);</b>
+<b class="fc">&nbsp;                errorList.add(row);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -126,7 +190,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

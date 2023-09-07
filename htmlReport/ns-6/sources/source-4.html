@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > InventoryService</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InvoiceService</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,12 +22,15 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.service</a>
 </div>
 
-<h1>Coverage Summary for Class: InventoryService (com.increff.pos.service)</h1>
+<h1>Coverage Summary for Class: InvoiceService (com.increff.pos.service)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -37,7 +41,23 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InventoryService</td>
+  <td class="name">InvoiceService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
 <td class="coverageStat">
   <span class="percent">
     14.3%
@@ -46,37 +66,8 @@ Current scope:     <a href="../../index.html">all classes</a>
     (1/7)
   </span>
 </td>
-<td class="coverageStat">
-  <span class="percent">
-    5.9%
-  </span>
-  <span class="absValue">
-    (1/17)
-  </span>
-</td>
 </tr>
-  <tr>
-    <td class="name">InventoryService$$EnhancerBySpringCGLIB$$b03d33e5</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    14.3%
-  </span>
-  <span class="absValue">
-    (1/7)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    5.9%
-  </span>
-  <span class="absValue">
-    (1/17)
-  </span>
-</td>
-</tr>
+
 </table>
 
 <br/>
@@ -86,61 +77,38 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service;
 &nbsp;
-&nbsp;import com.increff.pos.dao.InventoryDao;
-&nbsp;import com.increff.pos.model.data.InventoryReportData;
-&nbsp;import com.increff.pos.pojo.InventoryPojo;
+&nbsp;import com.increff.pos.model.data.InvoiceData;
+&nbsp;import com.increff.pos.util.FileUtil;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.core.io.FileSystemResource;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.http.*;
 &nbsp;import org.springframework.stereotype.Service;
-&nbsp;import javax.transaction.Transactional;
-&nbsp;import java.util.List;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Base64;
 &nbsp;
 &nbsp;@Service
-<b class="fc">&nbsp;public class InventoryService {</b>
+<b class="fc">&nbsp;public class InvoiceService {</b>
+&nbsp;    @Value(&quot;${invoiceAppUrl}&quot;)
+&nbsp;    private String invoiceAppUrl;
 &nbsp;
 &nbsp;    @Autowired
-&nbsp;    private InventoryDao inventoryDao;
+&nbsp;    private RestTemplate restTemplate;
 &nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void add(InventoryPojo inventoryPojo) throws ApiException {
-<b class="nc">&nbsp;        inventoryDao.insert(inventoryPojo);</b>
+&nbsp;    public ResponseEntity&lt;Resource&gt; getInvoice(InvoiceData invoiceData) throws IOException {
+<b class="nc">&nbsp;        HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;        headers.setContentType(MediaType.APPLICATION_JSON);</b>
+<b class="nc">&nbsp;        HttpEntity&lt;InvoiceData&gt; requestEntity = new HttpEntity&lt;&gt;(invoiceData, headers);</b>
+<b class="nc">&nbsp;        ResponseEntity&lt;String&gt; response = restTemplate.postForEntity(invoiceAppUrl, requestEntity, String.class);</b>
+<b class="nc">&nbsp;        String base64String = response.getBody();</b>
+<b class="nc">&nbsp;        return FileUtil.convertBase64ToPdf(base64String);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public InventoryPojo get(int productId) throws ApiException {
-<b class="nc">&nbsp;        return getCheck(productId);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;   @Transactional(rollbackOn  = ApiException.class)
-&nbsp;    public void addInventory(InventoryPojo inventoryPojo) throws ApiException {
-<b class="nc">&nbsp;        int presentQuantity = get(inventoryPojo.getProductId()).getProductQuantity();</b>
-<b class="nc">&nbsp;        int updatedQuantity = presentQuantity + inventoryPojo.getProductQuantity();</b>
-<b class="nc">&nbsp;        if(presentQuantity == updatedQuantity){</b>
-<b class="nc">&nbsp;            throw new ApiException(&quot;Quantity to add should be more than zero!&quot;);</b>
-&nbsp;        }
-<b class="nc">&nbsp;        inventoryPojo.setProductQuantity(updatedQuantity);</b>
-<b class="nc">&nbsp;        update(inventoryPojo.getProductId(), inventoryPojo);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional
-&nbsp;    public List&lt;InventoryPojo&gt; getAll() {
-<b class="nc">&nbsp;        return inventoryDao.selectAll();</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional(rollbackOn  = ApiException.class)
-&nbsp;    public void update(int productId, InventoryPojo inventoryPojo) throws ApiException {
-<b class="nc">&nbsp;        InventoryPojo exInventoryPojo = getCheck(productId);</b>
-<b class="nc">&nbsp;        exInventoryPojo.setProductQuantity(inventoryPojo.getProductQuantity());</b>
-<b class="nc">&nbsp;        inventoryDao.update(exInventoryPojo);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional
-&nbsp;    public InventoryPojo getCheck(int productId) throws ApiException {
-<b class="nc">&nbsp;        InventoryPojo inventoryPojo = inventoryDao.select(productId);</b>
-<b class="nc">&nbsp;        if (inventoryPojo == null) {</b>
-<b class="nc">&nbsp;            throw new ApiException(&quot;Product with given ID does not exist!&quot;);</b>
-&nbsp;        }
-<b class="nc">&nbsp;        return inventoryPojo;</b>
-&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -165,7 +133,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-17 11:41</div>
+    <div style="float:right;">generated on 2023-09-05 14:08</div>
 </div>
 </body>
 </html>

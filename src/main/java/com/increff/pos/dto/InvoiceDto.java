@@ -6,6 +6,8 @@ import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.ProductPojo;
 import com.increff.pos.service.*;
 import com.increff.pos.model.enums.OrderStatus;
+import com.increff.pos.service.exception.ApiException;
+import com.increff.pos.util.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -39,22 +41,16 @@ public class InvoiceDto {
         ZonedDateTime orderDateTime = orderService.getCheck(orderId).getTime();
         List<InvoiceItem> list2 = new ArrayList<InvoiceItem>();
         for (OrderItemPojo orderItemPojo : list) {
-            ProductPojo productPojo = productService.get(orderItemPojo.getProductId());
-            list2.add(convert(orderItemPojo, productPojo));
+            ProductPojo productPojo = productService.getCheck(orderItemPojo.getProductId());
+            InvoiceItem invoiceItem = ConversionUtil.convert(orderItemPojo, InvoiceItem.class);
+            invoiceItem.setItemName(productPojo.getName());
+            invoiceItem.setMrp(productPojo.getMrp());
+            list2.add(invoiceItem);
         }
         InvoiceData invoiceData = convert(list2, orderId, orderDateTime);
         ResponseEntity<Resource> responseEntity = invoiceService.getInvoice(invoiceData);
         orderService.update(Integer.valueOf(invoiceData.getNumber()), OrderStatus.INVOICED);
         return responseEntity;
-    }
-
-    private InvoiceItem convert(OrderItemPojo orderItemPojo, ProductPojo productPojo){
-        InvoiceItem invoiceItem = new InvoiceItem();
-        invoiceItem.setItemName(productPojo.getName());
-        invoiceItem.setQuantity(orderItemPojo.getQuantity());
-        invoiceItem.setMrp(productPojo.getMrp());
-        invoiceItem.setSellingPrice(orderItemPojo.getSellingPrice());
-        return invoiceItem;
     }
 
     private InvoiceData convert(List<InvoiceItem> list, int orderId, ZonedDateTime orderDateTime){
@@ -66,8 +62,4 @@ public class InvoiceDto {
         invoiceData.setNumber(String.valueOf(orderId));
         return invoiceData;
     }
-
-
-
-
 }

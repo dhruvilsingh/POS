@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > OrderItemDto</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProductDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.dto</a>
 </div>
 
-<h1>Coverage Summary for Class: OrderItemDto (com.increff.pos.dto)</h1>
+<h1>Coverage Summary for Class: ProductDto (com.increff.pos.dto)</h1>
 
 <table class="coverageStats">
 
@@ -37,7 +38,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">OrderItemDto</td>
+  <td class="name">ProductDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -48,21 +49,21 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.4%
+    100%
   </span>
   <span class="absValue">
-    (62/63)
+    (69/69)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">OrderItemDto$$EnhancerBySpringCGLIB$$56959664</td>
+    <td class="name">ProductDto$$EnhancerBySpringCGLIB$$37c1baab</td>
   </tr>
   <tr>
-    <td class="name">OrderItemDto$$EnhancerBySpringCGLIB$$56959664$$FastClassBySpringCGLIB$$6e0c120</td>
+    <td class="name">ProductDto$$EnhancerBySpringCGLIB$$37c1baab$$FastClassBySpringCGLIB$$3e01ce68</td>
   </tr>
   <tr>
-    <td class="name">OrderItemDto$$FastClassBySpringCGLIB$$f18ecad1</td>
+    <td class="name">ProductDto$$FastClassBySpringCGLIB$$1e3a6f63</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -76,10 +77,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98.4%
+    100%
   </span>
   <span class="absValue">
-    (62/63)
+    (69/69)
   </span>
 </td>
 </tr>
@@ -92,129 +93,145 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.dto;
 &nbsp;
-&nbsp;import com.increff.pos.model.data.OrderItemData;
-&nbsp;import com.increff.pos.model.forms.OrderItemForm;
-&nbsp;import com.increff.pos.pojo.*;
-&nbsp;import com.increff.pos.service.*;
-&nbsp;import com.increff.pos.util.SecurityUtil;
-&nbsp;import com.increff.pos.util.StringUtil;
+&nbsp;import com.increff.pos.model.data.ProductData;
+&nbsp;import com.increff.pos.model.form.ProductForm;
+&nbsp;import com.increff.pos.pojo.BrandPojo;
+&nbsp;import com.increff.pos.pojo.ProductPojo;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import com.increff.pos.service.BrandService;
+&nbsp;import com.increff.pos.service.InventoryService;
+&nbsp;import com.increff.pos.service.ProductService;
+&nbsp;import com.increff.pos.util.ConversionUtil;
+&nbsp;import com.increff.pos.util.NormalizeUtil;
 &nbsp;import com.increff.pos.util.ValidationUtil;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
 &nbsp;import org.springframework.stereotype.Component;
 &nbsp;
 &nbsp;import javax.transaction.Transactional;
-&nbsp;import java.util.ArrayList;
-&nbsp;import java.util.List;
+&nbsp;import java.util.*;
 &nbsp;
 &nbsp;@Component
-<b class="fc">&nbsp;public class OrderItemDto {</b>
-&nbsp;    @Autowired
-&nbsp;    private OrderItemService orderItemService;
-&nbsp;    @Autowired
-&nbsp;    private CartService cartService;
+<b class="fc">&nbsp;public class ProductDto {</b>
+&nbsp;
 &nbsp;    @Autowired
 &nbsp;    private ProductService productService;
 &nbsp;    @Autowired
-&nbsp;    private OrderService orderService;
+&nbsp;    private BrandService brandService;
 &nbsp;    @Autowired
 &nbsp;    private InventoryService inventoryService;
 &nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void add() throws ApiException {
-<b class="fc">&nbsp;        List&lt;CartPojo&gt; list = cartService.getAll(SecurityUtil.getUser());</b>
-<b class="fc">&nbsp;        if(list.isEmpty()){</b>
-<b class="nc">&nbsp;            throw new ApiException(&quot;Order empty!&quot;);</b>
+&nbsp;    @Transactional
+&nbsp;    public void add(ProductForm productForm) throws ApiException {
+<b class="fc">&nbsp;        NormalizeUtil.normalize(productForm);</b>
+<b class="fc">&nbsp;        ValidationUtil.checkValid(productForm);</b>
+<b class="fc">&nbsp;        BrandPojo brandPojo = brandService.getBrandCategory(productForm.getBrand(), productForm.getCategory());</b>
+<b class="fc">&nbsp;        ProductPojo productPojo = ConversionUtil.convert(productForm, ProductPojo.class);</b>
+<b class="fc">&nbsp;        productPojo.setBrandCategoryId(brandPojo.getId());</b>
+<b class="fc">&nbsp;        productService.add(productPojo);</b>
+<b class="fc">&nbsp;        inventoryService.addEmptyInventory(productPojo.getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void upload(List&lt;ProductForm&gt; fileData) throws ApiException {
+<b class="fc">&nbsp;        List&lt;Map&lt;String, String&gt;&gt; errorList = ValidationUtil.normalizeValidateFormList(fileData);</b>
+<b class="fc">&nbsp;        checkDuplicateForms(fileData,errorList);</b>
+<b class="fc">&nbsp;        if (!errorList.isEmpty()){</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;One or more errors occurred while processing the data!\nDownload error list to view errors&quot;, errorList);</b>
 &nbsp;        }
-<b class="fc">&nbsp;        int orderId = orderService.add();</b>
-<b class="fc">&nbsp;        for(CartPojo cartPojo : list){</b>
-<b class="fc">&nbsp;            int productQuantity = inventoryService.get(cartPojo.getProductId()).getProductQuantity();</b>
-<b class="fc">&nbsp;            Double productMrp = productService.get(cartPojo.getProductId()).getProductMrp();</b>
-<b class="fc">&nbsp;            String productBarcode = productService.get(cartPojo.getProductId()).getProductBarcode();</b>
-<b class="fc">&nbsp;            int updatedInventory = orderItemService.add(convert(cartPojo,orderId), productQuantity, productMrp, productBarcode);</b>
-<b class="fc">&nbsp;            InventoryPojo inventoryPojo = inventoryService.get(cartPojo.getProductId());</b>
-<b class="fc">&nbsp;            inventoryPojo.setProductQuantity(updatedInventory);</b>
-<b class="fc">&nbsp;            inventoryService.update(cartPojo.getProductId(), inventoryPojo);</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        cartService.deleteAll(SecurityUtil.getUser());</b>
+<b class="fc">&nbsp;        addList(fileData);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void delete(int id) throws ApiException {
-<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = orderItemService.get(id);</b>
-<b class="fc">&nbsp;        orderService.getCheckStatus(orderItemPojo.getOrderId());</b>
-<b class="fc">&nbsp;        orderItemService.delete(id);</b>
-<b class="fc">&nbsp;        int productId = orderItemPojo.getProductId();</b>
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo = inventoryService.get(productId);</b>
-<b class="fc">&nbsp;        inventoryPojo.setProductQuantity(inventoryPojo.getProductQuantity() + orderItemPojo.getProductQuantity());</b>
-<b class="fc">&nbsp;        inventoryService.update(productId, inventoryPojo);</b>
+&nbsp;    public void addList(List&lt;ProductForm&gt; productFormList) throws ApiException {
+<b class="fc">&nbsp;        List&lt;Map&lt;String, String&gt;&gt; errorList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        validateListBarcodes(productFormList, errorList);</b>
+<b class="fc">&nbsp;        Map&lt;String,Integer&gt; brandPojoMap = validateListBrandCategory(productFormList, errorList);</b>
+<b class="fc">&nbsp;        if (!errorList.isEmpty()) {</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;One or more errors occurred while processing the data!\nDownload error list to view errors&quot;, errorList);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        List&lt;ProductPojo&gt; productPojoList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; productFormList.size(); i++) {</b>
+<b class="fc">&nbsp;            ProductForm productForm = productFormList.get(i);</b>
+<b class="fc">&nbsp;            String brandString = productForm.getBrand() + &quot;_&quot; + productForm.getCategory();</b>
+<b class="fc">&nbsp;            ProductPojo productPojo = ConversionUtil.convert(productForm, ProductPojo.class);</b>
+<b class="fc">&nbsp;            productPojo.setBrandCategoryId(brandPojoMap.get(brandString));</b>
+<b class="fc">&nbsp;            productPojoList.add(productPojo);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        List&lt;Integer&gt; idList = productService.addList(productPojoList);</b>
+<b class="fc">&nbsp;        inventoryService.addEmptyInventoryList(idList);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void update(int itemId, OrderItemForm orderItemForm) throws ApiException {
-<b class="fc">&nbsp;        normalize(orderItemForm);</b>
-<b class="fc">&nbsp;        ValidationUtil.checkValid(orderItemForm);</b>
-<b class="fc">&nbsp;        orderService.getCheckStatus(orderItemService.get(itemId).getOrderId()); //TODO to check the status in order level.</b>
-<b class="fc">&nbsp;        int productId = orderItemService.get(itemId).getProductId();</b>
-<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = convert(orderItemForm);</b>
-<b class="fc">&nbsp;        int productQuantity = inventoryService.get(productId).getProductQuantity();</b>
-<b class="fc">&nbsp;        Double productMrp = productService.get(productId).getProductMrp();</b>
-<b class="fc">&nbsp;        int updatedInventory = orderItemService.update(itemId, orderItemPojo, productQuantity, productMrp);</b>
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo = inventoryService.get(productId);</b>
-<b class="fc">&nbsp;        inventoryPojo.setProductQuantity(updatedInventory);</b>
-<b class="fc">&nbsp;        inventoryService.update(productId, inventoryPojo);</b>
+&nbsp;    private void validateListBarcodes(List&lt;ProductForm&gt; productFormList, List&lt;Map&lt;String, String&gt;&gt; errorList) {
+<b class="fc">&nbsp;        List&lt;String&gt; barcodeList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; productFormList.size(); i++) {</b>
+<b class="fc">&nbsp;            ProductForm productForm = productFormList.get(i);</b>
+<b class="fc">&nbsp;            barcodeList.add(productForm.getBarcode());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        productService.validateListBarcodes(barcodeList, errorList, 1);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public OrderItemData get(int id) throws ApiException {
-<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = orderItemService.get(id);</b>
-<b class="fc">&nbsp;        ProductPojo productPojo = productService.get(orderItemPojo.getProductId());</b>
-<b class="fc">&nbsp;        return convert(orderItemPojo, productPojo);</b>
+&nbsp;    private Map&lt;String,Integer&gt; validateListBrandCategory(List&lt;ProductForm&gt; productFormList, List&lt;Map&lt;String, String&gt;&gt; errorList){
+<b class="fc">&nbsp;        List&lt;BrandPojo&gt; brandPojoList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; productFormList.size(); i++) {</b>
+<b class="fc">&nbsp;            ProductForm productForm = productFormList.get(i);</b>
+<b class="fc">&nbsp;            BrandPojo brandPojo = new BrandPojo();</b>
+<b class="fc">&nbsp;            brandPojo.setBrand(productForm.getBrand());</b>
+<b class="fc">&nbsp;            brandPojo.setCategory(productForm.getCategory());</b>
+<b class="fc">&nbsp;            brandPojoList.add(brandPojo);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return brandService.validateBrandPojoList(brandPojoList, errorList,2);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public List&lt;OrderItemData&gt; getAll(int orderId) throws ApiException {
-<b class="fc">&nbsp;        List&lt;OrderItemPojo&gt; list = orderItemService.getAll(orderId);</b>
-<b class="fc">&nbsp;        List&lt;OrderItemData&gt; list2 = new ArrayList&lt;OrderItemData&gt;();</b>
-<b class="fc">&nbsp;        for (OrderItemPojo orderItemPojo : list) {</b>
-<b class="fc">&nbsp;            ProductPojo productPojo = productService.get(orderItemPojo.getProductId());</b>
-<b class="fc">&nbsp;            list2.add(convert(orderItemPojo, productPojo));</b>
+&nbsp;    public ProductData get(int id) throws ApiException {
+<b class="fc">&nbsp;        ProductPojo productPojo = productService.getCheck(id);</b>
+<b class="fc">&nbsp;        BrandPojo brandPojo = brandService.getCheck(productPojo.getBrandCategoryId());</b>
+<b class="fc">&nbsp;        ProductData productData = ConversionUtil.convert(productPojo, ProductData.class);</b>
+<b class="fc">&nbsp;        productData.setBrand(brandPojo.getBrand());</b>
+<b class="fc">&nbsp;        productData.setCategory(brandPojo.getCategory());</b>
+<b class="fc">&nbsp;        return productData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ProductData&gt; getAll() throws ApiException{
+<b class="fc">&nbsp;        List&lt;ProductPojo&gt; list = productService.getAll();</b>
+<b class="fc">&nbsp;        List&lt;ProductData&gt; list2 = new ArrayList&lt;ProductData&gt;();</b>
+<b class="fc">&nbsp;        for (ProductPojo productPojo : list) {</b>
+<b class="fc">&nbsp;            BrandPojo brandPojo = brandService.getCheck(productPojo.getBrandCategoryId());</b>
+<b class="fc">&nbsp;            ProductData productData = ConversionUtil.convert(productPojo, ProductData.class);</b>
+<b class="fc">&nbsp;            productData.setBrand(brandPojo.getBrand());</b>
+<b class="fc">&nbsp;            productData.setCategory(brandPojo.getCategory());</b>
+<b class="fc">&nbsp;            list2.add(productData);</b>
 <b class="fc">&nbsp;        }</b>
 <b class="fc">&nbsp;        return list2;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    //convert functions
-&nbsp;
-&nbsp;    private static OrderItemData convert(OrderItemPojo orderItemPojo, ProductPojo productPojo){
-<b class="fc">&nbsp;        OrderItemData orderItemData = new OrderItemData();</b>
-<b class="fc">&nbsp;        orderItemData.setOrderItemId(orderItemPojo.getOrderItemId());</b>
-<b class="fc">&nbsp;        orderItemData.setOrderId(orderItemPojo.getOrderId());</b>
-<b class="fc">&nbsp;        orderItemData.setProductBarcode(productPojo.getProductBarcode());</b>
-<b class="fc">&nbsp;        orderItemData.setProductName(productPojo.getProductName());</b>
-<b class="fc">&nbsp;        orderItemData.setProductQuantity(orderItemPojo.getProductQuantity());</b>
-<b class="fc">&nbsp;        orderItemData.setProductMrp(productPojo.getProductMrp());</b>
-<b class="fc">&nbsp;        orderItemData.setProductSP(orderItemPojo.getSellingPrice());</b>
-<b class="fc">&nbsp;        return orderItemData;</b>
+&nbsp;    public void update(int id, ProductForm productForm) throws ApiException {
+<b class="fc">&nbsp;        NormalizeUtil.normalize(productForm);</b>
+<b class="fc">&nbsp;        ValidationUtil.checkValid(productForm);</b>
+<b class="fc">&nbsp;        productService.update(id, productForm.getName(), productForm.getMrp());</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private OrderItemPojo convert(OrderItemForm orderItemForm){
-<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = new OrderItemPojo();</b>
-<b class="fc">&nbsp;        orderItemPojo.setProductQuantity((int) orderItemForm.getProductQuantity());</b>
-<b class="fc">&nbsp;        orderItemPojo.setSellingPrice(orderItemForm.getProductSP());</b>
-<b class="fc">&nbsp;        return  orderItemPojo;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private OrderItemPojo convert(CartPojo cartPojo, int orderId){
-<b class="fc">&nbsp;        OrderItemPojo orderItemPojo = new OrderItemPojo();</b>
-<b class="fc">&nbsp;        orderItemPojo.setOrderId(orderId);</b>
-<b class="fc">&nbsp;        orderItemPojo.setProductQuantity(cartPojo.getProductQuantity());</b>
-<b class="fc">&nbsp;        orderItemPojo.setSellingPrice(cartPojo.getProductSP());</b>
-<b class="fc">&nbsp;        orderItemPojo.setProductId(cartPojo.getProductId());</b>
-<b class="fc">&nbsp;        return  orderItemPojo;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private static void normalize(OrderItemForm orderItemForm){
-<b class="fc">&nbsp;        orderItemForm.setProductSP(StringUtil.roundOff(orderItemForm.getProductSP()));</b>
+&nbsp;    private void checkDuplicateForms(List&lt;ProductForm&gt; productFormList, List&lt;Map&lt;String, String&gt;&gt; errorList) {
+<b class="fc">&nbsp;        Set&lt;String&gt; productFormSet = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i=0; i&lt;productFormList.size(); i++) {</b>
+<b class="fc">&nbsp;            ProductForm productForm = productFormList.get(i);</b>
+<b class="fc">&nbsp;            String productFormString = productForm.getBarcode() + &quot;_&quot; + productForm.getBrand() + &quot;_&quot; + productForm.getCategory()</b>
+<b class="fc">&nbsp;                        + &quot;_&quot; + productForm.getName() + &quot;_&quot; + productForm.getMrp();</b>
+<b class="fc">&nbsp;            if (!productFormSet.add(productFormString)) {</b>
+<b class="fc">&nbsp;                Map&lt;String, String&gt; row = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;                row.put(&quot;index&quot;, Integer.toString(i));</b>
+<b class="fc">&nbsp;                row.put(&quot;error&quot;, &quot;Duplicate entry!&quot;);</b>
+<b class="fc">&nbsp;                errorList.add(row);</b>
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;
 &nbsp;}
+&nbsp;
+&nbsp;//todo: refactor invoice app and other code
+&nbsp;//todo: remove unnecessary transactional
+&nbsp;//todo: complete unit testing
+&nbsp;//todo: put scheduler in job package
+&nbsp;//todo: read about criteria builder
+&nbsp;//todo: read about indexing
 </code>
 </pre>
 </div>
@@ -238,7 +255,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

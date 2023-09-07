@@ -1,6 +1,7 @@
 package com.increff.pos.service;
 
 import com.increff.pos.model.data.InvoiceData;
+import com.increff.pos.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -18,8 +19,6 @@ import java.util.Base64;
 public class InvoiceService {
     @Value("${invoiceAppUrl}")
     private String invoiceAppUrl;
-    @Value("${filePath}")
-    private String filePath;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -30,25 +29,7 @@ public class InvoiceService {
         HttpEntity<InvoiceData> requestEntity = new HttpEntity<>(invoiceData, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(invoiceAppUrl, requestEntity, String.class);
         String base64String = response.getBody();
-        return convertBase64ToPdf(base64String);
+        return FileUtil.convertBase64ToPdf(base64String);
     }
-
-    private ResponseEntity<Resource> convertBase64ToPdf(String base64String) throws IOException {
-        byte[] pdfBytes = Base64.getDecoder().decode(base64String);
-        File outputFile = new File(filePath);
-        FileOutputStream fos = new FileOutputStream(outputFile);
-        fos.write(pdfBytes);
-        fos.close();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", outputFile.getName());
-        ResponseEntity<Resource> responseOut = new ResponseEntity<>(
-                new FileSystemResource(filePath),
-                headers,
-                HttpStatus.OK
-        );
-        return responseOut;
-    }
-
 
 }

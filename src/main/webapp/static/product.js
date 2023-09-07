@@ -139,7 +139,6 @@ function getProductList(){
 // FILE UPLOAD METHODS
 var fileData = [];
 var errorData = [];
-var processCount = 0;
 
 function processData() {
  var isValid = $("#productFile")[0].checkValidity();
@@ -147,7 +146,6 @@ function processData() {
               $("#productFile")[0].reportValidity();
                  return;
             }
-  processCount = 0;
   fileData = [];
   errorData = [];
   var file = $('#productFile')[0].files[0];
@@ -161,8 +159,8 @@ function readFileDataCallback(results) {
 
 function uploadRows() {
   var jsonData = [];
-  for ( processCount = 0; processCount < fileData.length; processCount++) {
-    var row = fileData[processCount];
+  for ( var i = 0; i < fileData.length; i++) {
+    var row = fileData[i];
     if (row.hasOwnProperty("")) {
                   delete row[""];
                 }
@@ -196,12 +194,24 @@ function uploadRows() {
     },
     error: function(xhr, textStatus, errorThrown) {
                    var errorList = xhr.responseJSON.errors;
-                   for (var i = 0; i < errorList.length; i++) {
-                        var errorRow = errorList[i];
-                        errorData.push(errorRow);
-                   }
-                   updateUploadDialog();
-                   $.notify(xhr.responseJSON.message);
+                   const propertyName = "error";
+                   fileData.forEach(obj => {
+                     obj[propertyName] = "";
+                   });
+                    for (var i = 0; i < errorList.length; i++) {
+                         var index = parseInt(errorList[i].index);
+                         console.log(index);
+                         if(fileData[index][propertyName]!="")
+                           fileData[index][propertyName] += "\t" + errorList[i].error;
+                         else
+                           fileData[index][propertyName] += errorList[i].error;
+                         console.log(errorList[i].error);
+                         console.log(fileData[index].error);
+                    }
+                    errorData = [...fileData];
+                    errorCount = errorList.length;
+                    updateUploadDialog();
+                    $.notify(xhr.responseJSON.message);
           }
   });
 }
@@ -252,7 +262,7 @@ function resetUploadDialog(){
 	$file.val('');
 	$('#productFileName').html("Choose File");
 	//Reset various counts
-	processCount = 0;
+	errorCount = 0;
 	fileData = [];
 	errorData = [];
 	//Update counts
@@ -270,8 +280,9 @@ $(document).ready(function(){
     });
 });
 
+var errorCount=0;
 function updateUploadDialog(){
-	$('#errorCount').html("" + errorData.length);
+	$('#errorCount').html("" + errorCount);
 }
 
 function displayUploadData(){

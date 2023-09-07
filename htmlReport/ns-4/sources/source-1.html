@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > CookieUtil</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ApiException</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -18,10 +19,10 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.increff.pos.util</a>
+    <a href="../index.html">com.increff.pos.service.exception</a>
 </div>
 
-<h1>Coverage Summary for Class: CookieUtil (com.increff.pos.util)</h1>
+<h1>Coverage Summary for Class: ApiException (com.increff.pos.service.exception)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -40,29 +41,29 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">CookieUtil</td>
+  <td class="name">ApiException</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/8)
+    (4/4)
   </span>
 </td>
 </tr>
@@ -74,30 +75,27 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.util;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service.exception;
 &nbsp;
-&nbsp;import javax.servlet.http.Cookie;
-&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
 &nbsp;
-<b class="nc">&nbsp;public class CookieUtil {</b>
+&nbsp;public class ApiException extends Exception {
+&nbsp;	private List&lt;Map&lt;String,String&gt;&gt; errorList;
+&nbsp;	
+&nbsp;	public ApiException(String string) {
+<b class="fc">&nbsp;		super(string);</b>
+&nbsp;	}
 &nbsp;
-&nbsp;	public static String getCookie(HttpServletRequest req, String name) {
-<b class="nc">&nbsp;		Cookie[] cookies = req.getCookies();</b>
-<b class="nc">&nbsp;		if (cookies == null) {</b>
-<b class="nc">&nbsp;			return null;</b>
-&nbsp;		}
-<b class="nc">&nbsp;		for (Cookie c : cookies) {</b>
-<b class="nc">&nbsp;			if (name.equals(c.getName())) {</b>
-<b class="nc">&nbsp;				return c.getValue();</b>
-&nbsp;			}
-&nbsp;		}
+&nbsp;	public ApiException(String message, List&lt;Map&lt;String,String&gt;&gt; errorList) {
+<b class="fc">&nbsp;		super(message);</b>
+<b class="fc">&nbsp;		this.errorList = errorList;</b>
+&nbsp;	}
 &nbsp;
-<b class="nc">&nbsp;		return null;</b>
+&nbsp;	public List&lt;Map&lt;String,String&gt;&gt; getErrorList() {
+<b class="fc">&nbsp;		return errorList;</b>
 &nbsp;	}
 &nbsp;}
-&nbsp;
-&nbsp;
-&nbsp;
 </code>
 </pre>
 </div>
@@ -121,7 +119,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > InventoryDto</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InvoiceDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.dto</a>
 </div>
 
-<h1>Coverage Summary for Class: InventoryDto (com.increff.pos.dto)</h1>
+<h1>Coverage Summary for Class: InvoiceDto (com.increff.pos.dto)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -40,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InventoryDto</td>
+  <td class="name">InvoiceDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -54,15 +55,15 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.2%
+    100%
   </span>
   <span class="absValue">
-    (51/53)
+    (23/23)
   </span>
 </td>
 </tr>
@@ -76,114 +77,68 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.dto;
 &nbsp;
-&nbsp;import com.increff.pos.model.data.InventoryData;
-&nbsp;import com.increff.pos.model.forms.InventoryForm;
-&nbsp;import com.increff.pos.pojo.InventoryPojo;
+&nbsp;import com.increff.pos.model.data.InvoiceData;
+&nbsp;import com.increff.pos.model.data.InvoiceItem;
+&nbsp;import com.increff.pos.pojo.OrderItemPojo;
 &nbsp;import com.increff.pos.pojo.ProductPojo;
-&nbsp;import com.increff.pos.service.ApiException;
-&nbsp;import com.increff.pos.service.InventoryService;
-&nbsp;import com.increff.pos.service.ProductService;
-&nbsp;import com.increff.pos.util.StringUtil;
-&nbsp;import com.increff.pos.util.ValidationUtil;
+&nbsp;import com.increff.pos.service.*;
+&nbsp;import com.increff.pos.model.enums.OrderStatus;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import com.increff.pos.util.ConversionUtil;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.core.io.Resource;
+&nbsp;import org.springframework.http.*;
 &nbsp;import org.springframework.stereotype.Component;
 &nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.time.ZonedDateTime;
+&nbsp;import java.time.format.DateTimeFormatter;
 &nbsp;import java.util.ArrayList;
 &nbsp;import java.util.List;
-&nbsp;import java.util.Map;
 &nbsp;
 &nbsp;@Component
-<b class="fc">&nbsp;public class InventoryDto {</b>
+<b class="fc">&nbsp;public class InvoiceDto {</b>
+&nbsp;
 &nbsp;    @Autowired
-&nbsp;    private InventoryService inventoryService;
+&nbsp;    private OrderService orderService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private OrderItemService orderItemService;
+&nbsp;
 &nbsp;    @Autowired
 &nbsp;    private ProductService productService;
 &nbsp;
-&nbsp;    public void addInventory(InventoryForm inventoryForm) throws ApiException {
-<b class="fc">&nbsp;        normalize(inventoryForm);</b>
-<b class="fc">&nbsp;        ValidationUtil.checkValid(inventoryForm);</b>
-<b class="fc">&nbsp;        String productBarcode = inventoryForm.getProductBarcode();</b>
-<b class="fc">&nbsp;        ProductPojo productPojo = productService.getCheckBarcode(productBarcode);</b>
-<b class="fc">&nbsp;        if(inventoryForm.getProductQuantity() == 0){</b>
-<b class="nc">&nbsp;            throw new ApiException(&quot;Quantity to add should be more than zero!&quot;);</b>
-&nbsp;        }
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo =  convert(inventoryForm, productPojo.getProductId());</b>
-<b class="fc">&nbsp;        inventoryService.addInventory(inventoryPojo);</b>
-&nbsp;    }
+&nbsp;    @Autowired
+&nbsp;    private InvoiceService invoiceService;
 &nbsp;
-&nbsp;    public List&lt;Map&lt;String, Object&gt;&gt;  upload(List&lt;Map&lt;String, Object&gt;&gt; fileData){
-<b class="fc">&nbsp;        List&lt;Map&lt;String, Object&gt;&gt; errorData = new ArrayList&lt;&gt;();</b>
-<b class="fc">&nbsp;        for(Map&lt;String,Object&gt; row : fileData){</b>
-&nbsp;            try {
-<b class="fc">&nbsp;                InventoryForm inventoryForm = convert(row);</b>
-<b class="fc">&nbsp;                ValidationUtil.checkValid(inventoryForm);</b>
-<b class="fc">&nbsp;                ProductPojo productPojo = productService.getCheckBarcode(inventoryForm.getProductBarcode());</b>
-<b class="fc">&nbsp;                if(inventoryForm.getProductQuantity() == 0){</b>
-<b class="nc">&nbsp;                    throw new ApiException(&quot;Quantity to add should be more than zero!&quot;);</b>
-&nbsp;                }
-<b class="fc">&nbsp;                InventoryPojo inventoryPojo =  convert(inventoryForm, productPojo.getProductId());</b>
-<b class="fc">&nbsp;                inventoryService.addInventory(inventoryPojo);</b>
-<b class="fc">&nbsp;            } catch (ApiException e) {</b>
-<b class="fc">&nbsp;                row.put(&quot;error&quot;, e.getMessage());</b>
-<b class="fc">&nbsp;                errorData.add(row);</b>
-<b class="fc">&nbsp;            }</b>
+&nbsp;
+&nbsp;    public ResponseEntity&lt;Resource&gt; getInvoice(int orderId) throws ApiException, IOException {
+<b class="fc">&nbsp;        orderService.getCheckCancelledStatus(orderId);</b>
+<b class="fc">&nbsp;        List&lt;OrderItemPojo&gt; list = orderItemService.getAll(orderId);</b>
+<b class="fc">&nbsp;        ZonedDateTime orderDateTime = orderService.getCheck(orderId).getTime();</b>
+<b class="fc">&nbsp;        List&lt;InvoiceItem&gt; list2 = new ArrayList&lt;InvoiceItem&gt;();</b>
+<b class="fc">&nbsp;        for (OrderItemPojo orderItemPojo : list) {</b>
+<b class="fc">&nbsp;            ProductPojo productPojo = productService.getCheck(orderItemPojo.getProductId());</b>
+<b class="fc">&nbsp;            InvoiceItem invoiceItem = ConversionUtil.convert(orderItemPojo, InvoiceItem.class);</b>
+<b class="fc">&nbsp;            invoiceItem.setItemName(productPojo.getName());</b>
+<b class="fc">&nbsp;            invoiceItem.setMrp(productPojo.getMrp());</b>
+<b class="fc">&nbsp;            list2.add(invoiceItem);</b>
 <b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        return errorData;</b>
+<b class="fc">&nbsp;        InvoiceData invoiceData = convert(list2, orderId, orderDateTime);</b>
+<b class="fc">&nbsp;        ResponseEntity&lt;Resource&gt; responseEntity = invoiceService.getInvoice(invoiceData);</b>
+<b class="fc">&nbsp;        orderService.update(Integer.valueOf(invoiceData.getNumber()), OrderStatus.INVOICED);</b>
+<b class="fc">&nbsp;        return responseEntity;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public InventoryData get(int id) throws ApiException {
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo = inventoryService.get(id);</b>
-<b class="fc">&nbsp;        String productBarcode = productService.get(inventoryPojo.getProductId()).getProductBarcode();</b>
-<b class="fc">&nbsp;        return convert(inventoryPojo, productBarcode);</b>
+&nbsp;    private InvoiceData convert(List&lt;InvoiceItem&gt; list, int orderId, ZonedDateTime orderDateTime){
+<b class="fc">&nbsp;        InvoiceData invoiceData = new InvoiceData();</b>
+<b class="fc">&nbsp;        invoiceData.setInvoiceItems(list);</b>
+<b class="fc">&nbsp;        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</b>
+<b class="fc">&nbsp;        String formattedDateTime = orderDateTime.format(dateTimeFormatter);</b>
+<b class="fc">&nbsp;        invoiceData.setDate(formattedDateTime.toString());</b>
+<b class="fc">&nbsp;        invoiceData.setNumber(String.valueOf(orderId));</b>
+<b class="fc">&nbsp;        return invoiceData;</b>
 &nbsp;    }
-&nbsp;
-&nbsp;    public List&lt;InventoryData&gt; getAll() throws ApiException{
-<b class="fc">&nbsp;        List&lt;InventoryPojo&gt; list = inventoryService.getAll();</b>
-<b class="fc">&nbsp;        List&lt;InventoryData&gt; list2 = new ArrayList&lt;InventoryData&gt;();</b>
-<b class="fc">&nbsp;        for (InventoryPojo inventoryPojo : list) {</b>
-<b class="fc">&nbsp;            String productBarcode = productService.get(inventoryPojo.getProductId()).getProductBarcode();</b>
-<b class="fc">&nbsp;            list2.add(convert(inventoryPojo, productBarcode));</b>
-<b class="fc">&nbsp;        }</b>
-<b class="fc">&nbsp;        return list2;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    public void update(int id, InventoryForm inventoryForm) throws ApiException {
-<b class="fc">&nbsp;        ValidationUtil.checkValid(inventoryForm);</b>
-<b class="fc">&nbsp;        ProductPojo productPojo = productService.getCheckBarcode(inventoryForm.getProductBarcode());</b>
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo= convert(inventoryForm, productPojo.getProductId());</b>
-<b class="fc">&nbsp;        inventoryService.update(id, inventoryPojo);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;
-&nbsp;    //Convert functions
-&nbsp;
-&nbsp;    private static InventoryData convert(InventoryPojo inventoryPojo, String productBarcode){
-<b class="fc">&nbsp;        InventoryData inventoryData = new InventoryData();</b>
-<b class="fc">&nbsp;        inventoryData.setProductId(inventoryPojo.getProductId());</b>
-<b class="fc">&nbsp;        inventoryData.setProductBarcode(productBarcode);</b>
-<b class="fc">&nbsp;        inventoryData.setProductQuantity(inventoryPojo.getProductQuantity());</b>
-<b class="fc">&nbsp;        return inventoryData;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private static InventoryForm convert(Map&lt;String,Object&gt; row){
-<b class="fc">&nbsp;        InventoryForm inventoryForm = new InventoryForm();</b>
-<b class="fc">&nbsp;        String productBarcode = row.get(&quot;productBarcode&quot;).toString().trim();</b>
-<b class="fc">&nbsp;        inventoryForm.setProductBarcode(productBarcode);</b>
-<b class="fc">&nbsp;        inventoryForm.setProductQuantity(Integer.valueOf(row.get(&quot;productQuantity&quot;).toString()).intValue());</b>
-<b class="fc">&nbsp;        return inventoryForm;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private static InventoryPojo convert(InventoryForm inventoryForm, int productId){
-<b class="fc">&nbsp;        InventoryPojo inventoryPojo = new InventoryPojo();</b>
-<b class="fc">&nbsp;        inventoryPojo.setProductQuantity((int) inventoryForm.getProductQuantity());</b>
-<b class="fc">&nbsp;        inventoryPojo.setProductId(productId);</b>
-<b class="fc">&nbsp;        return inventoryPojo;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private static void normalize(InventoryForm inventoryForm){
-<b class="fc">&nbsp;        inventoryForm.setProductBarcode(StringUtil.toLowerCase(inventoryForm.getProductBarcode()));</b>
-&nbsp;    }
-&nbsp;
 &nbsp;}
 </code>
 </pre>
@@ -208,7 +163,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

@@ -1,25 +1,19 @@
 package com.increff.pos.dto;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.increff.pos.model.data.BrandData;
-import com.increff.pos.model.forms.BrandForm;
+import com.increff.pos.model.form.BrandForm;
 import com.increff.pos.pojo.BrandPojo;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.service.exception.ApiException;
 import com.increff.pos.service.BrandService;
-import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ConversionUtil;
+import com.increff.pos.util.NormalizeUtil;
 import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.awt.datatransfer.StringSelection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class BrandDto {
@@ -28,73 +22,55 @@ public class BrandDto {
     private BrandService brandService;
 
     public void add(BrandForm brandForm) throws ApiException {
-        normalize(brandForm);
+        NormalizeUtil.normalize(brandForm);
         ValidationUtil.checkValid(brandForm);
-        BrandPojo brandPojo = convert(brandForm);
-        brandService.add(brandPojo);
+        brandService.add(ConversionUtil.convert(brandForm, BrandPojo.class));
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public void upload(List<BrandForm> fileData) throws ApiException{
-        List<Map<String,String>> errorList = new ArrayList<>();
-        for(BrandForm brandForm : fileData){
-            try {
-                add(brandForm);
-            } catch (Exception e) {
-                Map<String,String> row = new HashMap<>();
-                row.put("Brand", brandForm.getBrand());
-                row.put("Category", brandForm.getCategory());
-                row.put("Error", e.getMessage());
-                errorList.add(row);
-            }
-        }
-        if (!errorList.isEmpty()) {
+    public void upload(List<BrandForm> fileData) throws ApiException {
+        List<Map<String, String>> errorList = ValidationUtil.normalizeValidateFormList(fileData);
+        checkDuplicateForms(fileData,errorList);
+        if (!errorList.isEmpty()){
             throw new ApiException("One or more errors occurred while processing the data!\nDownload error list to view errors", errorList);
         }
+        brandService.addList(ConversionUtil.convert(fileData, BrandPojo.class));
     }
 
     public BrandData get(int id) throws ApiException {
-        BrandPojo brandPojo = brandService.get(id);
-        return convert(brandPojo);
+        BrandPojo brandPojo = brandService.getCheck(id);
+        return ConversionUtil.convert(brandPojo, BrandData.class);
     }
 
-    public List<BrandData> getAll() {
+    public List<BrandData> getAll() throws ApiException {
         List<BrandPojo> list = brandService.getAll();
         List<BrandData> list2 = new ArrayList<BrandData>();
         for (BrandPojo brandPojo : list) {
-            list2.add(convert(brandPojo));
+            list2.add(ConversionUtil.convert(brandPojo, BrandData.class));
         }
         return list2;
     }
 
     public void update(int id, BrandForm brandForm) throws ApiException {
-        normalize(brandForm);
+        NormalizeUtil.normalize(brandForm);
         ValidationUtil.checkValid(brandForm);
-        BrandPojo brandPojo = convert(brandForm);
+        BrandPojo brandPojo = ConversionUtil.convert(brandForm, BrandPojo.class);
         brandService.update(id, brandPojo);
     }
 
-
-    //convert functions
-
-    private static BrandData convert(BrandPojo brandPojo) {
-        BrandData brandData = new BrandData();
-        brandData.setBrand(brandPojo.getBrand());
-        brandData.setCategory(brandPojo.getCategory());
-        brandData.setId(brandPojo.getId());
-        return brandData;
+    private void checkDuplicateForms(List<BrandForm> brandFormList, List<Map<String, String>> errorList) {
+        Set<String> brandFormSet = new HashSet<>();
+        for (int i=0; i<brandFormList.size(); i++) {
+            BrandForm brandForm = brandFormList.get(i);
+            String brandFormString = brandForm.getBrand() + "_" + brandForm.getCategory();
+            if (!brandFormSet.add(brandFormString)) {
+                Map<String, String> row = new HashMap<>();
+                row.put("index", Integer.toString(i));
+                row.put("error", "Duplicate entry!");
+                errorList.add(row);
+            }
+        }
     }
 
-    private static BrandPojo convert(BrandForm brandForm) {
-        BrandPojo brandPojo = new BrandPojo();
-        brandPojo.setCategory(brandForm.getCategory());
-        brandPojo.setBrand(brandForm.getBrand());
-        return brandPojo;
-    }
-
-    protected static void normalize(BrandForm brandForm) {
-        brandForm.setBrand(StringUtil.toLowerCase(brandForm.getBrand()));
-        brandForm.setCategory(StringUtil.toLowerCase(brandForm.getCategory().trim().toLowerCase()));
-    }
 
 }

@@ -12,10 +12,4 @@ public class StringUtil {
 		return s == null ? null : s.trim().toLowerCase();
 	}
 
-	public static double roundOff(double number){
-		DecimalFormat df = new DecimalFormat("#.##");
-		double roundedNumber = Double.parseDouble(df.format(number));
-		return roundedNumber;
-	}
-
 }

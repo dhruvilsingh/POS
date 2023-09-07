@@ -55,7 +55,7 @@ public class ReportDao extends AbstractDao{
     public DailySalesPojo selectSaleByDate(ZonedDateTime date){
         TypedQuery<DailySalesPojo> query= getQuery(SELECT_SALE_BY_DATE, DailySalesPojo.class);
         query.setParameter("date", date);
-        return query.getSingleResult();
+        return getSingle(query);
     }
 
     public List<Object[]> selectSaleReport(String brand, String category, Date startDate , Date endDate) throws ParseException {

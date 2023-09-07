@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
   <title>Coverage Report > ReportDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
@@ -40,40 +41,46 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">ReportDao</td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    85.7%
   </span>
   <span class="absValue">
-    (2/6)
+    (6/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    26.7%
+    68.4%
   </span>
   <span class="absValue">
-    (4/15)
+    (13/19)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">ReportDao$$EnhancerBySpringCGLIB$$9aa172b</td>
+    <td class="name">ReportDao$$EnhancerBySpringCGLIB$$cfb8e27c</td>
+  </tr>
+  <tr>
+    <td class="name">ReportDao$$EnhancerBySpringCGLIB$$cfb8e27c$$FastClassBySpringCGLIB$$8b9ac70d</td>
+  </tr>
+  <tr>
+    <td class="name">ReportDao$$FastClassBySpringCGLIB$$b974805e</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    85.7%
   </span>
   <span class="absValue">
-    (2/6)
+    (6/7)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    26.7%
+    68.4%
   </span>
   <span class="absValue">
-    (4/15)
+    (13/19)
   </span>
 </td>
 </tr>
@@ -90,10 +97,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import org.springframework.stereotype.Repository;
 &nbsp;
 &nbsp;import javax.persistence.EntityManager;
+&nbsp;import javax.persistence.NoResultException;
 &nbsp;import javax.persistence.PersistenceContext;
 &nbsp;import javax.persistence.TypedQuery;
 &nbsp;import javax.transaction.Transactional;
 &nbsp;import java.text.ParseException;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.ZonedDateTime;
 &nbsp;import java.util.Date;
 &nbsp;import java.util.List;
 &nbsp;
@@ -103,24 +113,43 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    @PersistenceContext
 &nbsp;    private EntityManager entityManager;
 &nbsp;
-<b class="fc">&nbsp;    private static String SELECT_SALE_REPORT = &quot;SELECT SUM(oi.productQuantity), SUM(oi.sellingPrice * oi.productQuantity), bp.brand, bp.category &quot;+</b>
+<b class="fc">&nbsp;    private static String SELECT_SALE_REPORT = &quot;SELECT SUM(oi.quantity), SUM(oi.sellingPrice * oi.quantity), bp.brand, bp.category &quot;+</b>
 &nbsp;            &quot;FROM OrdersPojo op &quot;+
-&nbsp;            &quot;INNER JOIN OrderItemPojo oi ON op.orderId = oi.orderId &quot;+
-&nbsp;            &quot;INNER JOIN ProductPojo pp ON pp.productId = oi.productId &quot;+
-&nbsp;            &quot;INNER JOIN BrandPojo bp ON bp.brandId = pp.productBrandCategory &quot;+
+&nbsp;            &quot;INNER JOIN OrderItemPojo oi ON op.id = oi.orderId &quot;+
+&nbsp;            &quot;INNER JOIN ProductPojo pp ON pp.id = oi.productId &quot;+
+&nbsp;            &quot;INNER JOIN BrandPojo bp ON bp.id = pp.brandCategoryId &quot;+
 &nbsp;            &quot;WHERE (:name is null or bp.brand=:name) &quot;+
 &nbsp;            &quot;AND (:category is null or bp.category = :category) &quot;+
-&nbsp;            &quot;AND DATE(op.orderTime) between :startDate and :endDate &quot;+
+&nbsp;            &quot;AND DATE(op.time) between :startDate and :endDate &quot;+
+&nbsp;            &quot;AND op.status = &#39;INVOICED&#39; &quot;+
 &nbsp;            &quot;GROUP BY bp.brand, bp.category&quot;;
 &nbsp;
 <b class="fc">&nbsp;    private static String SELECT_DAILY_SALE_REPORT = &quot;select dailySalesPojo from DailySalesPojo dailySalesPojo order by &quot; +</b>
 &nbsp;                                        &quot;dailySalesPojo.id desc&quot;;
 &nbsp;
-<b class="fc">&nbsp;    private static String SELECT_INVENTORY_REPORT = &quot;SELECT bp.brand, bp.category, SUM(ip.productQuantity)&quot; +</b>
+<b class="fc">&nbsp;    private static String SELECT_SALE_BY_DATE = &quot;select dailySalesPojo from DailySalesPojo dailySalesPojo where date=:date&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;    private static String SELECT_INVENTORY_REPORT = &quot;SELECT bp.brand, bp.category, COALESCE(SUM(ip.quantity),0)&quot; +</b>
 &nbsp;            &quot;FROM InventoryPojo ip &quot; +
-&nbsp;            &quot;INNER JOIN ProductPojo pp ON ip.productId = pp.productId &quot; +
-&nbsp;            &quot;INNER JOIN BrandPojo bp ON pp.productBrandCategory = bp.brandId &quot; +
+&nbsp;            &quot;INNER JOIN ProductPojo pp ON ip.productId = pp.id &quot; +
+&nbsp;            &quot;RIGHT JOIN BrandPojo bp ON pp.brandCategoryId = bp.id &quot; +
 &nbsp;            &quot;GROUP BY bp.brand, bp.category&quot;;
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public void insertDailySales(DailySalesPojo dailySalesPojo) {
+<b class="fc">&nbsp;        entityManager.persist(dailySalesPojo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;DailySalesPojo&gt; selectDailySalesReport() {
+<b class="fc">&nbsp;        TypedQuery&lt;DailySalesPojo&gt; query = getQuery(SELECT_DAILY_SALE_REPORT, DailySalesPojo.class);</b>
+<b class="fc">&nbsp;        return query.getResultList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DailySalesPojo selectSaleByDate(ZonedDateTime date){
+<b class="fc">&nbsp;        TypedQuery&lt;DailySalesPojo&gt; query= getQuery(SELECT_SALE_BY_DATE, DailySalesPojo.class);</b>
+<b class="fc">&nbsp;        query.setParameter(&quot;date&quot;, date);</b>
+<b class="fc">&nbsp;        return getSingle(query);</b>
+&nbsp;    }
 &nbsp;
 &nbsp;    public List&lt;Object[]&gt; selectSaleReport(String brand, String category, Date startDate , Date endDate) throws ParseException {
 <b class="nc">&nbsp;        TypedQuery&lt;Object[]&gt; query = getQuery(SELECT_SALE_REPORT, Object[].class);</b>
@@ -131,23 +160,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;        return query.getResultList();</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Transactional
-&nbsp;    public void insertDailySales(DailySalesPojo dailySalesPojo) {
-<b class="nc">&nbsp;        entityManager.persist(dailySalesPojo);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    public List&lt;DailySalesPojo&gt; selectDailySalesReport() {
-<b class="nc">&nbsp;        TypedQuery&lt;DailySalesPojo&gt; query = getQuery(SELECT_DAILY_SALE_REPORT, DailySalesPojo.class);</b>
-<b class="nc">&nbsp;        return query.getResultList();</b>
-&nbsp;    }
-&nbsp;
 &nbsp;    public List&lt;Object[]&gt; selectInventoryReport(){
-<b class="nc">&nbsp;        TypedQuery&lt;Object[]&gt; query = getQuery(SELECT_INVENTORY_REPORT, Object[].class);</b>
-<b class="nc">&nbsp;        return query.getResultList();</b>
+<b class="fc">&nbsp;        TypedQuery&lt;Object[]&gt; query = getQuery(SELECT_INVENTORY_REPORT, Object[].class);</b>
+<b class="fc">&nbsp;        return query.getResultList();</b>
 &nbsp;    }
-&nbsp;
-&nbsp;
-&nbsp;
 &nbsp;
 &nbsp;}
 </code>
@@ -173,7 +189,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

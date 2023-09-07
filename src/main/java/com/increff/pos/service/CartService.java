@@ -1,9 +1,8 @@
 package com.increff.pos.service;
 
 import com.increff.pos.dao.CartDao;
-import com.increff.pos.model.forms.CartForm;
 import com.increff.pos.pojo.CartPojo;
-import com.increff.pos.util.SecurityUtil;
+import com.increff.pos.service.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,6 @@ public class CartService {
 
     public void add(CartPojo cartPojo) throws ApiException {
         cartDao.insert(cartPojo);
-    }
-
-    public CartPojo get(int itemNo) throws ApiException {
-        return getCheck(itemNo);
     }
 
     public CartPojo get(int productId, String userEmail) throws ApiException {

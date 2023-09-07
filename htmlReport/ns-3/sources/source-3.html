@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > CartService</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InventoryService</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.service</a>
 </div>
 
-<h1>Coverage Summary for Class: CartService (com.increff.pos.service)</h1>
+<h1>Coverage Summary for Class: InventoryService (com.increff.pos.service)</h1>
 
 <table class="coverageStats">
 
@@ -37,32 +38,32 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">CartService</td>
+  <td class="name">InventoryService</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    86.4%
   </span>
   <span class="absValue">
-    (30/30)
+    (38/44)
   </span>
 </td>
 </tr>
   <tr>
-    <td class="name">CartService$$EnhancerBySpringCGLIB$$28514279</td>
+    <td class="name">InventoryService$$EnhancerBySpringCGLIB$$c639d64</td>
   </tr>
   <tr>
-    <td class="name">CartService$$EnhancerBySpringCGLIB$$28514279$$FastClassBySpringCGLIB$$b4c6c8c3</td>
+    <td class="name">InventoryService$$EnhancerBySpringCGLIB$$c639d64$$FastClassBySpringCGLIB$$28d5ea6</td>
   </tr>
   <tr>
-    <td class="name">CartService$$FastClassBySpringCGLIB$$c65ef6b8</td>
+    <td class="name">InventoryService$$FastClassBySpringCGLIB$$7f418056</td>
   </tr>
 <tr>
   <td class="name"><strong>Total</strong></td>
@@ -71,15 +72,15 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (10/10)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    86.4%
   </span>
   <span class="absValue">
-    (30/30)
+    (38/44)
   </span>
 </td>
 </tr>
@@ -92,94 +93,98 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service;
 &nbsp;
-&nbsp;import com.increff.pos.dao.CartDao;
-&nbsp;import com.increff.pos.pojo.CartPojo;
-&nbsp;import com.increff.pos.util.SecurityUtil;
+&nbsp;import com.increff.pos.dao.InventoryDao;
+&nbsp;import com.increff.pos.pojo.InventoryPojo;
+&nbsp;import com.increff.pos.pojo.ProductPojo;
+&nbsp;import com.increff.pos.service.exception.ApiException;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
 &nbsp;import org.springframework.stereotype.Service;
-&nbsp;
 &nbsp;import javax.transaction.Transactional;
 &nbsp;import java.util.List;
 &nbsp;
 &nbsp;@Service
-<b class="fc">&nbsp;public class CartService {</b>
+&nbsp;@Transactional
+<b class="fc">&nbsp;public class InventoryService {</b>
+&nbsp;
 &nbsp;    @Autowired
-&nbsp;    private CartDao cartDao;
+&nbsp;    private InventoryDao inventoryDao;
 &nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void add(CartPojo cartPojo, int productQuantity, double productMrp) throws ApiException {
-<b class="fc">&nbsp;        CartPojo cartPojo1 = get(cartPojo.getProductId(), SecurityUtil.getUser());</b>
-<b class="fc">&nbsp;        if(cartPojo1 != null){</b>
-<b class="fc">&nbsp;            int updatedQuantity = cartPojo1.getProductQuantity() + cartPojo.getProductQuantity();</b>
-<b class="fc">&nbsp;            cartPojo1.setProductQuantity(updatedQuantity);</b>
-<b class="fc">&nbsp;            cartPojo1.setProductSP(cartPojo.getProductSP());</b>
-<b class="fc">&nbsp;            update(cartPojo1.getItemNo(), cartPojo1, productQuantity, productMrp);</b>
-&nbsp;            return;
+&nbsp;    public void addEmptyInventory(int productId) throws ApiException {
+<b class="fc">&nbsp;        InventoryPojo inventoryPojo = new InventoryPojo();</b>
+<b class="fc">&nbsp;        inventoryPojo.setProductId(productId);</b>
+<b class="fc">&nbsp;        inventoryPojo.setQuantity(0);</b>
+<b class="fc">&nbsp;        inventoryDao.insert(inventoryPojo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addEmptyInventoryList(List&lt;Integer&gt; productIdList){
+<b class="fc">&nbsp;        for(Integer productId: productIdList){</b>
+<b class="fc">&nbsp;            InventoryPojo inventoryPojo = new InventoryPojo();</b>
+<b class="fc">&nbsp;            inventoryPojo.setProductId(productId);</b>
+<b class="fc">&nbsp;            inventoryPojo.setQuantity(0);</b>
+<b class="fc">&nbsp;            inventoryDao.insert(inventoryPojo);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void increaseInventory(InventoryPojo inventoryPojo) throws ApiException {
+<b class="fc">&nbsp;        InventoryPojo exInventoryPojo = getCheck(inventoryPojo.getProductId());</b>
+<b class="fc">&nbsp;        int presentQuantity = exInventoryPojo.getQuantity();</b>
+<b class="fc">&nbsp;        int updatedQuantity = presentQuantity + inventoryPojo.getQuantity();</b>
+<b class="fc">&nbsp;        if(updatedQuantity&lt; 0){</b>
+<b class="nc">&nbsp;            throw new ApiException(&quot;Value exceeded &quot; + Integer.MAX_VALUE);</b>
 &nbsp;        }
-<b class="fc">&nbsp;        checkInput(cartPojo, productQuantity, productMrp);</b>
-<b class="fc">&nbsp;        cartDao.insert(cartPojo);</b>
+<b class="fc">&nbsp;        exInventoryPojo.setQuantity(updatedQuantity);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Transactional
-&nbsp;    public CartPojo get(int itemNo) throws ApiException {
-<b class="fc">&nbsp;        return getCheck(itemNo);</b>
+&nbsp;    public List&lt;InventoryPojo&gt; getAll() {
+<b class="fc">&nbsp;        return inventoryDao.selectAll();</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    @Transactional
-&nbsp;    public CartPojo get(int productId, String userEmail) throws ApiException {
-<b class="fc">&nbsp;        return cartDao.selectProduct(productId, userEmail);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional
-&nbsp;    public List&lt;CartPojo&gt; getAll(String userEmail) throws ApiException {
-<b class="fc">&nbsp;        List&lt;CartPojo&gt; list = cartDao.selectAll(userEmail);</b>
-<b class="fc">&nbsp;        return list;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional(rollbackOn  = ApiException.class)
-&nbsp;    public void update(int itemNo, CartPojo cartPojo, int productQuantity, double productMrp) throws ApiException {
-<b class="fc">&nbsp;        CartPojo exCartPojo = getCheck(itemNo);</b>
-<b class="fc">&nbsp;        checkInput(cartPojo, productQuantity, productMrp);</b>
-<b class="fc">&nbsp;        exCartPojo.setProductId(cartPojo.getProductId());</b>
-<b class="fc">&nbsp;        exCartPojo.setProductQuantity(cartPojo.getProductQuantity());</b>
-<b class="fc">&nbsp;        exCartPojo.setProductSP(cartPojo.getProductSP());</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional(rollbackOn = ApiException.class)
-&nbsp;    public void delete(int id) throws ApiException {
-<b class="fc">&nbsp;        getCheck(id);</b>
-<b class="fc">&nbsp;        cartDao.deleteId(id);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    @Transactional
-&nbsp;    public void deleteAll(String userEmail){
-<b class="fc">&nbsp;        cartDao.deleteAll(userEmail);</b>
-&nbsp;    }
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;    //check functions
-&nbsp;
-&nbsp;    @Transactional
-&nbsp;    public CartPojo getCheck(int itemNo) throws ApiException {
-<b class="fc">&nbsp;        CartPojo cartPojo = cartDao.selectId(itemNo);</b>
-<b class="fc">&nbsp;        if (cartPojo == null) {</b>
-<b class="fc">&nbsp;            throw new ApiException(&quot;Cart item with given ID does not exist!&quot;);</b>
+&nbsp;    public void update(int productId, int quantity) throws ApiException {
+<b class="fc">&nbsp;        InventoryPojo exInventoryPojo = getCheck(productId);</b>
+<b class="fc">&nbsp;        if(quantity&lt; 0){</b>
+<b class="nc">&nbsp;            throw new ApiException(&quot;Value exceeded &quot; + Integer.MAX_VALUE);</b>
 &nbsp;        }
-<b class="fc">&nbsp;        return cartPojo;</b>
+<b class="fc">&nbsp;        exInventoryPojo.setQuantity(quantity);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;
-&nbsp;    private void checkInput(CartPojo cartPojo, int productQuantity, double productMrp) throws ApiException {
-<b class="fc">&nbsp;        int inputQuantity = cartPojo.getProductQuantity();</b>
-<b class="fc">&nbsp;        if (productQuantity &lt; inputQuantity) {</b>
-<b class="fc">&nbsp;            throw new ApiException(&quot;Inventory has only &quot; + productQuantity + &quot; items!&quot;);</b>
+&nbsp;    public void updateInventory(int productId, int oldQuantity, int newQuantity) throws ApiException {
+&nbsp;        int updatedInventory;
+<b class="fc">&nbsp;        int availableInventory = getCheck(productId).getQuantity();</b>
+<b class="fc">&nbsp;        if(oldQuantity == newQuantity){</b>
+<b class="nc">&nbsp;            updatedInventory = oldQuantity;</b>
 &nbsp;        }
-<b class="fc">&nbsp;        if (productMrp &lt; cartPojo.getProductSP()) {</b>
-<b class="fc">&nbsp;            throw new ApiException(&quot;Selling price cannot be more than MRP!!  (MRP = &quot; + productMrp + &quot;)!&quot;);</b>
+<b class="fc">&nbsp;        else if(newQuantity &lt; oldQuantity){</b>
+<b class="fc">&nbsp;            updatedInventory = availableInventory + oldQuantity - newQuantity;</b>
 &nbsp;        }
+<b class="fc">&nbsp;        else if((newQuantity - oldQuantity) &lt;= availableInventory) {</b>
+<b class="fc">&nbsp;            updatedInventory = availableInventory - newQuantity + oldQuantity;</b>
+&nbsp;        }
+&nbsp;        else
+<b class="fc">&nbsp;            throw new ApiException((oldQuantity+availableInventory)+ &quot; items left in inventory!&quot;);</b>
+<b class="fc">&nbsp;        InventoryPojo inventoryPojo = getCheck(productId);</b>
+<b class="fc">&nbsp;        if(inventoryPojo.getQuantity()&lt; 0){</b>
+<b class="nc">&nbsp;            throw new ApiException(&quot;Value exceeded &quot; + Integer.MAX_VALUE);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        inventoryPojo.setQuantity(updatedInventory);</b>
 &nbsp;    }
 &nbsp;
+&nbsp;    public void checkInputQuantity(int productId, int inputQuantity, String barcode) throws ApiException {
+<b class="fc">&nbsp;        int availableInventory = getCheck(productId).getQuantity();</b>
+<b class="fc">&nbsp;        if(inputQuantity &gt; availableInventory){</b>
+<b class="nc">&nbsp;            throw new ApiException(availableInventory + &quot; items are left for &quot; + barcode);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        int updatedInventory = availableInventory - inputQuantity;</b>
+<b class="fc">&nbsp;        InventoryPojo inventoryPojo = getCheck(productId);</b>
+<b class="fc">&nbsp;        inventoryPojo.setQuantity(updatedInventory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public InventoryPojo getCheck(int productId) throws ApiException {
+<b class="fc">&nbsp;        InventoryPojo inventoryPojo = inventoryDao.select(productId);</b>
+<b class="fc">&nbsp;        if (inventoryPojo == null) {</b>
+<b class="nc">&nbsp;            throw new ApiException(&quot;Product with given ID does not exist!&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return inventoryPojo;</b>
+&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -204,7 +209,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

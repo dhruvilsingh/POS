@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > ReportDto</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.dto</a>
 </div>
 
-<h1>Coverage Summary for Class: ReportDto (com.increff.pos.dto)</h1>
+<h1>Coverage Summary for Class: UserDto (com.increff.pos.dto)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -40,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">ReportDto</td>
+  <td class="name">UserDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -51,18 +52,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    14.3%
+    100%
   </span>
   <span class="absValue">
-    (1/7)
+    (4/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    2.8%
+    100%
   </span>
   <span class="absValue">
-    (1/36)
+    (12/12)
   </span>
 </td>
 </tr>
@@ -76,78 +77,48 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.dto;
 &nbsp;
-&nbsp;import com.increff.pos.model.data.DailySalesData;
-&nbsp;import com.increff.pos.model.data.InventoryReportData;
-&nbsp;import com.increff.pos.model.data.SaleReportData;
-&nbsp;import com.increff.pos.model.forms.SaleReportForm;
-&nbsp;import com.increff.pos.pojo.DailySalesPojo;
-&nbsp;import com.increff.pos.service.ApiException;
-&nbsp;import com.increff.pos.service.ReportService;
+&nbsp;import com.increff.pos.model.data.UserData;
+&nbsp;import com.increff.pos.model.form.UserForm;
+&nbsp;import com.increff.pos.pojo.UserPojo;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import com.increff.pos.service.CartService;
+&nbsp;import com.increff.pos.service.UserService;
+&nbsp;
+&nbsp;import com.increff.pos.util.ConversionUtil;
+&nbsp;import com.increff.pos.util.ValidationUtil;
 &nbsp;import org.springframework.beans.factory.annotation.Autowired;
 &nbsp;import org.springframework.stereotype.Component;
-&nbsp;
-&nbsp;import java.text.ParseException;
 &nbsp;import java.util.ArrayList;
 &nbsp;import java.util.List;
 &nbsp;
 &nbsp;@Component
-<b class="fc">&nbsp;public class ReportDto {</b>
+<b class="fc">&nbsp;public class UserDto {</b>
+&nbsp;    @Autowired
+&nbsp;    private UserService userService;
 &nbsp;
 &nbsp;    @Autowired
-&nbsp;    private ReportService reportService;
+&nbsp;    private CartService cartService;
 &nbsp;
-&nbsp;    public List&lt;DailySalesData&gt; getDailySalesReport() {
-<b class="nc">&nbsp;        List&lt;DailySalesPojo&gt; list = reportService.getDailySalesReport();</b>
-<b class="nc">&nbsp;        List&lt;DailySalesData&gt; list2 = new ArrayList&lt;DailySalesData&gt;();</b>
-<b class="nc">&nbsp;        for (DailySalesPojo dailySalesPojo : list) {</b>
-<b class="nc">&nbsp;            list2.add(convert(dailySalesPojo));</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        return list2;</b>
+&nbsp;    public void addUser(UserForm userForm) throws ApiException {
+<b class="fc">&nbsp;        ValidationUtil.checkValid(userForm);</b>
+<b class="fc">&nbsp;        UserPojo p = ConversionUtil.convert(userForm, UserPojo.class);</b>
+<b class="fc">&nbsp;        userService.add(p);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public List&lt;InventoryReportData&gt; getInventoryReport(){
-<b class="nc">&nbsp;        List&lt;Object[]&gt; resultList = reportService.getInventoryReport();;</b>
-<b class="nc">&nbsp;        List&lt;InventoryReportData&gt; reportDataList = new ArrayList&lt;&gt;();</b>
-<b class="nc">&nbsp;        for (Object[] result : resultList) {</b>
-<b class="nc">&nbsp;            reportDataList.add(convertInventory(result));</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        return reportDataList;</b>
+&nbsp;    public void deleteUser(int id) throws ApiException {
+<b class="fc">&nbsp;        cartService.deleteAll(userService.getCheckId(id).getEmail());</b>
+<b class="fc">&nbsp;        userService.delete(id);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    public List&lt;SaleReportData&gt; getSaleReport(SaleReportForm saleReportForm) throws ParseException, ApiException {
-<b class="nc">&nbsp;        List&lt;Object[]&gt; resultList = reportService.getSaleReport(saleReportForm);;</b>
-<b class="nc">&nbsp;        List&lt;SaleReportData&gt; saleReportDataList = new ArrayList&lt;&gt;();</b>
-<b class="nc">&nbsp;        for (Object[] result : resultList) {</b>
-<b class="nc">&nbsp;            saleReportDataList.add(convertSale(result));</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        return saleReportDataList;</b>
+&nbsp;    public List&lt;UserData&gt; getAllUser() throws ApiException {
+<b class="fc">&nbsp;        List&lt;UserPojo&gt; list = userService.getAll();</b>
+<b class="fc">&nbsp;        List&lt;UserData&gt; list2 = new ArrayList&lt;UserData&gt;();</b>
+<b class="fc">&nbsp;        for (UserPojo p : list) {</b>
+<b class="fc">&nbsp;            list2.add(ConversionUtil.convert(p, UserData.class));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return list2;</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private static DailySalesData convert(DailySalesPojo dailySalesPojo) {
-<b class="nc">&nbsp;        DailySalesData dailySalesData = new DailySalesData();</b>
-<b class="nc">&nbsp;        dailySalesData.setDate(dailySalesPojo.getDate());</b>
-<b class="nc">&nbsp;        dailySalesData.setOrderCount(dailySalesPojo.getOrderCount());</b>
-<b class="nc">&nbsp;        dailySalesData.setOrderItemCount(dailySalesPojo.getOrderItemCount());</b>
-<b class="nc">&nbsp;        dailySalesData.setRevenue(dailySalesPojo.getRevenue());</b>
-<b class="nc">&nbsp;        return dailySalesData;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private InventoryReportData convertInventory(Object object[]){
-<b class="nc">&nbsp;        InventoryReportData inventoryReportData = new InventoryReportData();</b>
-<b class="nc">&nbsp;        inventoryReportData.setBrand((String) object[0]);</b>
-<b class="nc">&nbsp;        inventoryReportData.setCategory((String) object[1]);</b>
-<b class="nc">&nbsp;        inventoryReportData.setQuantity(((Long) object[2]).intValue());</b>
-<b class="nc">&nbsp;        return inventoryReportData;</b>
-&nbsp;    }
-&nbsp;
-&nbsp;    private SaleReportData convertSale(Object object[]){
-<b class="nc">&nbsp;        SaleReportData saleReportData = new SaleReportData();</b>
-<b class="nc">&nbsp;        saleReportData.setCategory(object[3].toString());</b>
-<b class="nc">&nbsp;        saleReportData.setBrandName(object[2].toString());</b>
-<b class="nc">&nbsp;        saleReportData.setQuantity(Integer.valueOf(object[0].toString()).intValue());</b>
-<b class="nc">&nbsp;        saleReportData.setRevenue(Double.valueOf(object[1].toString()).doubleValue());</b>
-<b class="nc">&nbsp;        return saleReportData;</b>
-&nbsp;    }
 &nbsp;}
 </code>
 </pre>
@@ -172,7 +143,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

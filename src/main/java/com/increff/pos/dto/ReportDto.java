@@ -1,10 +1,12 @@
 package com.increff.pos.dto;
 
 import com.increff.pos.model.data.*;
-import com.increff.pos.model.forms.SaleReportForm;
+import com.increff.pos.model.form.SaleReportForm;
 import com.increff.pos.pojo.BrandPojo;
 import com.increff.pos.pojo.DailySalesPojo;
 import com.increff.pos.service.*;
+import com.increff.pos.service.exception.ApiException;
+import com.increff.pos.util.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,40 +26,13 @@ public class ReportDto {
     private ReportService reportService;
 
     @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private OrderItemService orderItemService;
-
-    @Autowired
     private BrandService brandService;
 
-    @Transactional
-    @Scheduled(fixedDelay = 30000)
-    public void addDailySalesReport() throws ApiException {
-        ZonedDateTime currentDateTime = ZonedDateTime.now();
-        ZonedDateTime date = LocalDate.now().atStartOfDay(ZoneId.of("UTC"));
-        DailySalesPojo dailySalesPojo = new DailySalesPojo();
-        dailySalesPojo.setDate(date);
-        dailySalesPojo.setOrderCount(orderService.getOrderCount(currentDateTime));
-        dailySalesPojo.setOrderItemCount(orderItemService.getItemCount(currentDateTime));
-        dailySalesPojo.setRevenue(orderItemService.getRevenue(currentDateTime));
-        DailySalesPojo existingDailySalesPojo = reportService.getSaleByDate(date);
-        if(existingDailySalesPojo != null){
-            existingDailySalesPojo.setDate(dailySalesPojo.getDate());
-            existingDailySalesPojo.setOrderCount(dailySalesPojo.getOrderCount());
-            existingDailySalesPojo.setOrderItemCount(dailySalesPojo.getOrderItemCount());
-            existingDailySalesPojo.setRevenue(dailySalesPojo.getRevenue());
-            return;
-        }
-        reportService.addDailySales(dailySalesPojo);
-    }
-
-    public List<DailySalesData> getDailySalesReport() {
+    public List<DailySalesData> getDailySalesReport() throws ApiException {
         List<DailySalesPojo> list = reportService.getDailySalesReport();
         List<DailySalesData> list2 = new ArrayList<DailySalesData>();
         for (DailySalesPojo dailySalesPojo : list) {
-            list2.add(convertDailySale(dailySalesPojo));
+            list2.add(ConversionUtil.convert(dailySalesPojo, DailySalesData.class));
         }
         return list2;
     }
@@ -71,11 +46,11 @@ public class ReportDto {
         return reportDataList;
     }
 
-    public List<BrandReportData> getBrandReport() {
+    public List<BrandReportData> getBrandReport() throws ApiException {
         List<BrandPojo> list = brandService.getAll();
         List<BrandReportData> list2 = new ArrayList<BrandReportData>();
         for (BrandPojo brandPojo : list) {
-            list2.add(convertBrand(brandPojo));
+            list2.add(ConversionUtil.convert(brandPojo, BrandReportData.class));
         }
         return list2;
     }
@@ -89,28 +64,12 @@ public class ReportDto {
         return saleReportDataList;
     }
 
-    private static DailySalesData convertDailySale(DailySalesPojo dailySalesPojo) {
-        DailySalesData dailySalesData = new DailySalesData();
-        dailySalesData.setDate(dailySalesPojo.getDate());
-        dailySalesData.setOrderCount(dailySalesPojo.getOrderCount());
-        dailySalesData.setOrderItemCount(dailySalesPojo.getOrderItemCount());
-        dailySalesData.setRevenue(dailySalesPojo.getRevenue());
-        return dailySalesData;
-    }
-
     private static InventoryReportData convertInventory(Object object[]){
         InventoryReportData inventoryReportData = new InventoryReportData();
         inventoryReportData.setBrand((String) object[0]);
         inventoryReportData.setCategory((String) object[1]);
         inventoryReportData.setQuantity(((Long) object[2]).intValue());
         return inventoryReportData;
-    }
-
-    private static BrandReportData convertBrand(BrandPojo brandPojo){
-        BrandReportData brandReportData = new BrandReportData();
-        brandReportData.setBrand(brandPojo.getBrand());
-        brandReportData.setCategory(brandPojo.getCategory());
-        return brandReportData;
     }
 
     private static SaleReportData convertSale(Object object[]){

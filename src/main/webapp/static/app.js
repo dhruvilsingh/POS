@@ -60,12 +60,9 @@ function trimLowerCase(obj, desiredOrder) {
     if (obj.hasOwnProperty(key)) {
       const trimmedKey = key.trim().toLowerCase();
       updatedObject[trimmedKey] = obj[key];
-      console.log(updatedObject[trimmedKey]);
     }
   }
 
-  console.log(Object.keys(updatedObject).length);
-  console.log(Object.keys(desiredOrder).length);
    if (!desiredOrder.every((key) => updatedObject.hasOwnProperty(key)) || Object.keys(updatedObject).length !== Object.keys(desiredOrder).length) {
      return null;
    }
@@ -74,7 +71,6 @@ function trimLowerCase(obj, desiredOrder) {
   desiredOrder.forEach((key) => {
     if (updatedObject.hasOwnProperty(key)) {
       orderedObject[key] = updatedObject[key];
-      console.log(orderedObject[key]);
     }
   });
   return orderedObject;

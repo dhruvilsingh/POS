@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
   <title>Coverage Report > BrandDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
@@ -56,10 +57,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 </tr>
   <tr>
-    <td class="name">BrandDao$$EnhancerBySpringCGLIB$$aab2a1f2</td>
+    <td class="name">BrandDao$$EnhancerBySpringCGLIB$$70c16d43</td>
   </tr>
   <tr>
-    <td class="name">BrandDao$$EnhancerBySpringCGLIB$$aab2a1f2$$FastClassBySpringCGLIB$$1fc22a5a</td>
+    <td class="name">BrandDao$$EnhancerBySpringCGLIB$$70c16d43$$FastClassBySpringCGLIB$$f65364e2</td>
   </tr>
   <tr>
     <td class="name">BrandDao$$FastClassBySpringCGLIB$$8104a3eb</td>
@@ -100,14 +101,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import javax.persistence.TypedQuery;
 &nbsp;import javax.transaction.Transactional;
 &nbsp;import java.util.List;
-&nbsp;
-&nbsp;//TODO: to read about critiria builder.
 &nbsp;@Repository
 <b class="fc">&nbsp;public class BrandDao extends AbstractDao{</b>
 &nbsp;
-<b class="fc">&nbsp;    private static String SELECT_ID = &quot;select brandPojo from BrandPojo brandPojo where brandId=:id&quot;; //TODO : all static variables should be in CAPs</b>
-<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select brandPojo from BrandPojo brandPojo order by brandPojo.brandId desc&quot;;</b>
-<b class="fc">&nbsp;    private static String CHECK_BRAND_CATEGORY = &quot;select brandPojo from BrandPojo brandPojo where brand=:brand and category=:category&quot;;//TODO to rename the variable.</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_ID = &quot;select brandPojo from BrandPojo brandPojo where id=:brandId&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select brandPojo from BrandPojo brandPojo order by brandPojo.id desc&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_BRAND_CATEGORY = &quot;select brandPojo from BrandPojo brandPojo where brand=:brand and category=:category&quot;;</b>
 &nbsp;
 &nbsp;    @PersistenceContext
 &nbsp;    private EntityManager entityManager;
@@ -118,8 +117,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public BrandPojo select(int brandId) {
-<b class="fc">&nbsp;        TypedQuery&lt;BrandPojo&gt; query = getQuery(SELECT_ID, BrandPojo.class);</b>
-<b class="fc">&nbsp;        query.setParameter(&quot;id&quot;, brandId);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;BrandPojo&gt; query = getQuery(SELECT_BY_ID, BrandPojo.class);</b>
+<b class="fc">&nbsp;        query.setParameter(&quot;brandId&quot;, brandId);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
 &nbsp;    }
 &nbsp;
@@ -129,7 +128,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public BrandPojo selectBrandCategory(String brand, String category){
-<b class="fc">&nbsp;        TypedQuery&lt;BrandPojo&gt; query = getQuery(CHECK_BRAND_CATEGORY,BrandPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;BrandPojo&gt; query = getQuery(SELECT_BY_BRAND_CATEGORY,BrandPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;brand&quot;,brand );</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;category&quot;,category);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
@@ -158,7 +157,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

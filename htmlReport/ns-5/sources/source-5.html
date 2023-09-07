@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > OrderItemPojo</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OrderItemForm</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -18,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.increff.pos.pojo</a>
+    <a href="../index.html">com.increff.pos.model.form</a>
 </div>
 
-<h1>Coverage Summary for Class: OrderItemPojo (com.increff.pos.pojo)</h1>
+<h1>Coverage Summary for Class: OrderItemForm (com.increff.pos.model.form)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -37,46 +41,33 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">OrderItemPojo</td>
+  <td class="name">OrderItemForm</td>
 <td class="coverageStat">
   <span class="percent">
-    14.3%
+    100%
   </span>
   <span class="absValue">
-    (1/7)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    14.3%
+    100%
   </span>
   <span class="absValue">
-    (1/7)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">OrderItemPojo$HibernateProxy$mOkYesvo</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    14.3%
-  </span>
-  <span class="absValue">
-    (1/7)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    14.3%
+    100%
   </span>
   <span class="absValue">
-    (1/7)
+    (5/5)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -84,25 +75,30 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.pojo;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.model.form;
 &nbsp;
 &nbsp;import lombok.Getter;
 &nbsp;import lombok.Setter;
+&nbsp;import org.hibernate.validator.constraints.NotBlank;
 &nbsp;
-&nbsp;import javax.persistence.*;
+&nbsp;import javax.validation.constraints.*;
 &nbsp;
 &nbsp;@Getter
-<b class="nc">&nbsp;@Setter</b>
-&nbsp;@Entity
-<b class="fc">&nbsp;public class OrderItemPojo {</b>
-&nbsp;    @Id
-&nbsp;    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = &quot;sequence_generator_1&quot;)
-&nbsp;    @SequenceGenerator(name = &quot;sequence_generator_1&quot;, sequenceName = &quot;sequence_1&quot;, initialValue = 100001, allocationSize = 1)
-<b class="nc">&nbsp;    private int orderItemId;</b>
-<b class="nc">&nbsp;    private int orderId;</b>
-<b class="nc">&nbsp;    private int productId;</b>
-<b class="nc">&nbsp;    private int productQuantity;</b>
-<b class="nc">&nbsp;    private double sellingPrice;</b>
+<b class="fc">&nbsp;@Setter</b>
+<b class="fc">&nbsp;public class OrderItemForm {</b>
+&nbsp;
+&nbsp;    @NotBlank(message = &quot;Barcode cannot be empty&quot;)
+&nbsp;    @Pattern(regexp = &quot;^$|^[\\p{L}0-9\\-\\.\\$\\/\\+\\%\\s]+$&quot;, message = &quot;Invalid characters in barcode&quot;)
+&nbsp;    @Size(max = 255, message = &quot;Barcode must have less than 255 characters&quot;)
+<b class="fc">&nbsp;    private String barcode;</b>
+&nbsp;
+&nbsp;    @Min(value = 1, message = &quot;Quantity should be more than 0&quot;)
+&nbsp;    @Digits(integer = 10, fraction = 0, message = &quot;Quantity should be a natural number less than 100000&quot;)
+&nbsp;    @Max(value = 2147483647, message = &quot;Quantity should be less than or equal to &quot; + Integer.MAX_VALUE)
+<b class="fc">&nbsp;    private Integer quantity;</b>
+&nbsp;
+&nbsp;    @Min(value = 0, message = &quot;Selling price cannot be negative&quot;)
+<b class="fc">&nbsp;    private Double sellingPrice;</b>
 &nbsp;}
 </code>
 </pre>
@@ -127,7 +123,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-17 11:41</div>
+    <div style="float:right;">generated on 2023-09-05 14:08</div>
 </div>
 </body>
 </html>

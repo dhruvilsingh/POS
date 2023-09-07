@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > ApiException</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BrandService</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,15 +22,12 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.service</a>
 </div>
 
-<h1>Coverage Summary for Class: ApiException (com.increff.pos.service)</h1>
+<h1>Coverage Summary for Class: BrandService (com.increff.pos.service)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -40,33 +38,52 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">ApiException</td>
+  <td class="name">BrandService</td>
 <td class="coverageStat">
   <span class="percent">
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (9/9)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    100%
+    93.9%
   </span>
   <span class="absValue">
-    (1/1)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    100%
-  </span>
-  <span class="absValue">
-    (1/1)
+    (46/49)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">BrandService$$EnhancerBySpringCGLIB$$df854863</td>
+  </tr>
+  <tr>
+    <td class="name">BrandService$$EnhancerBySpringCGLIB$$df854863$$FastClassBySpringCGLIB$$6c19370e</td>
+  </tr>
+  <tr>
+    <td class="name">BrandService$$FastClassBySpringCGLIB$$45e56e4b</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.9%
+  </span>
+  <span class="absValue">
+    (46/49)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -76,12 +93,103 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service;
 &nbsp;
-&nbsp;public class ApiException extends Exception {
-&nbsp;	private static final long serialVersionUID = 1L;
-&nbsp;	
-&nbsp;	public ApiException(String string) {
-<b class="fc">&nbsp;		super(string);</b>
-&nbsp;	}
+&nbsp;import com.increff.pos.dao.BrandDao;
+&nbsp;import com.increff.pos.model.form.BrandForm;
+&nbsp;import com.increff.pos.pojo.BrandPojo;
+&nbsp;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import javax.transaction.Transactional;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;
+&nbsp;@Service
+&nbsp;@Transactional
+<b class="fc">&nbsp;public class BrandService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private BrandDao brandDao;
+&nbsp;
+&nbsp;    public void add(BrandPojo brandPojo) throws ApiException {
+<b class="fc">&nbsp;        getCheckExistingPojo(brandPojo);</b>
+<b class="fc">&nbsp;        brandDao.insert(brandPojo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addList(List&lt;BrandPojo&gt; brandPojoList) throws ApiException {
+<b class="fc">&nbsp;        List&lt;Map&lt;String, String&gt;&gt; errorList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        validateBrandPojoList(brandPojoList, errorList,1);</b>
+<b class="fc">&nbsp;        if (!errorList.isEmpty()) {</b>
+<b class="fc">&nbsp;            throw new ApiException(&quot;One or more errors occurred while processing the data!\nDownload error list to view errors&quot;, errorList);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for(BrandPojo brandPojo: brandPojoList){</b>
+<b class="fc">&nbsp;                brandDao.insert(brandPojo);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String,Integer&gt; validateBrandPojoList(List&lt;BrandPojo&gt; brandPojoList, List&lt;Map&lt;String, String&gt;&gt; errorList, int type){
+<b class="fc">&nbsp;        Map&lt;String,Integer&gt; brandPojoMap = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;BrandPojo&gt; brandPojos = getAll();</b>
+<b class="fc">&nbsp;        for(BrandPojo brandPojo : brandPojos){</b>
+<b class="fc">&nbsp;            String brandPojoString = brandPojo.getBrand() + &quot;_&quot; + brandPojo.getCategory();</b>
+<b class="fc">&nbsp;            brandPojoMap.put(brandPojoString, brandPojo.getId());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        for (int i=0; i&lt;brandPojoList.size(); i++) {</b>
+<b class="fc">&nbsp;            BrandPojo brandPojo = brandPojoList.get(i);</b>
+<b class="fc">&nbsp;            String brandPojoString = brandPojo.getBrand() + &quot;_&quot; + brandPojo.getCategory();</b>
+<b class="fc">&nbsp;            if (type==2 &amp;&amp; brandPojoMap.get(brandPojoString) == null) {</b>
+<b class="fc">&nbsp;                Map&lt;String, String&gt; row = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;                row.put(&quot;index&quot;, Integer.toString(i));</b>
+<b class="fc">&nbsp;                row.put(&quot;error&quot;, brandPojo.getBrand() + &quot; and &quot; + brandPojo.getCategory() + &quot; pair does not exist!&quot;);</b>
+<b class="fc">&nbsp;                errorList.add(row);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            else if (type==1 &amp;&amp; brandPojoMap.get(brandPojoString) != null) {</b>
+<b class="fc">&nbsp;                Map&lt;String, String&gt; row = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;                row.put(&quot;index&quot;, Integer.toString(i));</b>
+<b class="fc">&nbsp;                row.put(&quot;error&quot;, brandPojo.getBrand() + &quot; and &quot; + brandPojo.getCategory() + &quot; pair already exist!&quot;);</b>
+<b class="fc">&nbsp;                errorList.add(row);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return brandPojoMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BrandPojo&gt; getAll() {
+<b class="fc">&nbsp;        return brandDao.selectAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void update(int id, BrandPojo brandPojo) throws ApiException {
+<b class="fc">&nbsp;        BrandPojo exBrandPojo = getCheck(id);</b>
+<b class="fc">&nbsp;        BrandPojo brandPojo1 = brandDao.selectBrandCategory(brandPojo.getBrand(), brandPojo.getCategory());</b>
+<b class="fc">&nbsp;        if( brandPojo1 != null &amp;&amp; brandPojo1.getId() != id) {</b>
+<b class="nc">&nbsp;            throw new ApiException(brandPojo.getBrand()+&quot; and &quot;+brandPojo.getCategory()+&quot; pair already exist!&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        exBrandPojo.setBrand(brandPojo.getBrand());</b>
+<b class="fc">&nbsp;        exBrandPojo.setCategory(brandPojo.getCategory());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BrandPojo getBrandCategory(String brand, String category) throws ApiException{
+<b class="fc">&nbsp;        BrandPojo brandPojo = brandDao.selectBrandCategory(brand,category);</b>
+<b class="fc">&nbsp;        if(brandPojo == null){</b>
+<b class="fc">&nbsp;            throw new ApiException(brand +&quot; and &quot;+category+&quot; pair does not exist!&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return brandPojo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BrandPojo getCheck(int id) throws ApiException {
+<b class="fc">&nbsp;        BrandPojo brandPojo = brandDao.select(id);</b>
+<b class="fc">&nbsp;        if (brandPojo == null) {</b>
+<b class="nc">&nbsp;            throw new ApiException(&quot;Brand with given ID does not exist!&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return brandPojo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void getCheckExistingPojo(BrandPojo brandPojo) throws ApiException {
+<b class="fc">&nbsp;        BrandPojo existingbrandPojo = brandDao.selectBrandCategory(brandPojo.getBrand(), brandPojo.getCategory());</b>
+<b class="fc">&nbsp;        if(existingbrandPojo != null) {</b>
+<b class="nc">&nbsp;            throw new ApiException(brandPojo.getBrand()+&quot; and &quot;+brandPojo.getCategory()+&quot; pair already exist!&quot;);</b>
+&nbsp;        }
+&nbsp;    }
 &nbsp;
 &nbsp;}
 </code>
@@ -107,7 +215,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

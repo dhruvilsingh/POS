@@ -4,6 +4,7 @@ import com.increff.pos.dao.InventoryDao;
 import com.increff.pos.dao.OrderItemDao;
 import com.increff.pos.dao.ProductDao;
 import com.increff.pos.pojo.OrderItemPojo;
+import com.increff.pos.service.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,30 +33,23 @@ public class OrderItemService {
         return orderItemDao.selectAll(orderId);
     }
 
-    public OrderItemPojo get(int itemId) throws ApiException {
-        return getCheck(itemId);
-    }
-
-    public OrderItemPojo getCheckOrderItem(int productId, int orderId) throws ApiException {
+    public OrderItemPojo getOrderItem(int productId, int orderId) throws ApiException {
         OrderItemPojo orderItemPojo = orderItemDao.selectOrderItem(productId, orderId);
-        if (orderItemPojo == null) {
-            throw new ApiException("Item with given ID does not exist!");
-        }
         return orderItemPojo;
     }
 
     public void delete(int id) throws ApiException {
         getCheck(id);
-        if(getAll(get(id).getOrderId()).size() == 1){
+        if(getAll(getCheck(id).getOrderId()).size() == 1){
             throw new ApiException("Order cannot be empty!");
         }
         orderItemDao.deleteId(id);
     }
 
-    public void update(int itemId, OrderItemPojo orderItemPojo) throws ApiException {
-        OrderItemPojo exOrderItemPojo = getCheck(itemId);
-        exOrderItemPojo.setSellingPrice(orderItemPojo.getSellingPrice());
-        exOrderItemPojo.setQuantity(orderItemPojo.getQuantity());
+    public void update(int id, double sellingPrice, int quantity) throws ApiException {
+        OrderItemPojo exOrderItemPojo = getCheck(id);
+        exOrderItemPojo.setSellingPrice(sellingPrice);
+        exOrderItemPojo.setQuantity(quantity);
     }
 
     public int getItemCount(ZonedDateTime dateTime){
@@ -70,8 +64,8 @@ public class OrderItemService {
         return orderItemDao.selectRevenue(dateTimeStartOfDay, dateTimeStartOfNextDay);
     }
 
-    public OrderItemPojo getCheck(int itemNo) throws ApiException {
-        OrderItemPojo orderItemPojo = orderItemDao.selectId(itemNo);
+    public OrderItemPojo getCheck(int id) throws ApiException {
+        OrderItemPojo orderItemPojo = orderItemDao.selectId(id);
         if (orderItemPojo == null) {
             throw new ApiException("Item with given ID does not exist!");
         }

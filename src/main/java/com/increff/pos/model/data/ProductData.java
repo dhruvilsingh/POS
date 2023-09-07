@@ -1,6 +1,6 @@
 package com.increff.pos.model.data;
 
-import com.increff.pos.model.forms.ProductForm;
+import com.increff.pos.model.form.ProductForm;
 import lombok.Getter;
 import lombok.Setter;
 

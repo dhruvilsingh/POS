@@ -1,15 +1,13 @@
 package com.increff.pos.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.transaction.Transactional;
 
 import com.increff.pos.model.enums.Role;
 
-import io.swagger.annotations.Api;
+import com.increff.pos.service.exception.ApiException;
+import com.increff.pos.util.AuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.increff.pos.dao.UserDao;
@@ -22,16 +20,13 @@ public class UserService {
 	@Autowired
 	private UserDao userDao;
 
-	@Value("${supervisor.email}")
-	private String supervisorEmail;
-
 	public void add(UserPojo p) throws ApiException {
 		normalize(p);
 		UserPojo existing = userDao.select(p.getEmail());
 		if (existing != null) {
 			throw new ApiException("User with entered email already exists!");
 		}
-		p = assignRole(p);
+		p.setRole(AuthenticationUtil.assignRole(p.getEmail()));
 		userDao.insert(p);
 	}
 
@@ -39,8 +34,11 @@ public class UserService {
 		return userDao.select(email);
 	}
 
-	public UserPojo getId(int id){
-		return userDao.selectId(id);
+	public UserPojo getCheckId(int id) throws ApiException {
+		UserPojo userPojo = userDao.selectId(id);
+		if(userPojo != null)
+			return userPojo;
+		throw new ApiException("User with given Id does not exist !");
 	}
 
 	public List<UserPojo> getAll() {
@@ -48,21 +46,13 @@ public class UserService {
 	}
 
 	public void delete(int id) throws ApiException {
-		if(getId(id).getRole() == Role.ADMIN){
+		if(getCheckId(id).getRole() == Role.ADMIN){
 			throw new ApiException("Cannot delete an Admin!");
 		}
 		userDao.delete(id);
 	}
+
 	protected static void normalize(UserPojo p) {
 		p.setEmail(p.getEmail().toLowerCase().trim());
 	}
-
-	private UserPojo assignRole(UserPojo userPojo){
-		List<String> supervisorEmailList = Arrays.asList(supervisorEmail.split("\\s*,\\s*"));
-		if(supervisorEmailList.contains(userPojo.getEmail())){
-			userPojo.setRole(Role.ADMIN);
-		}
-		return userPojo;
-	}
-
 }

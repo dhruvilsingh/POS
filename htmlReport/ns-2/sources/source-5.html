@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > InvoiceDto</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoginDto</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -21,7 +22,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.increff.pos.dto</a>
 </div>
 
-<h1>Coverage Summary for Class: InvoiceDto (com.increff.pos.dto)</h1>
+<h1>Coverage Summary for Class: LoginDto (com.increff.pos.dto)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -40,7 +41,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">InvoiceDto</td>
+  <td class="name">LoginDto</td>
 <td class="coverageStat">
   <span class="percent">
     100%
@@ -51,18 +52,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    25%
+    100%
   </span>
   <span class="absValue">
-    (1/4)
+    (5/5)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    4.5%
+    100%
   </span>
   <span class="absValue">
-    (1/22)
+    (23/23)
   </span>
 </td>
 </tr>
@@ -76,70 +77,73 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.dto;
 &nbsp;
-&nbsp;import com.increff.pos.model.data.InvoiceData;
-&nbsp;import com.increff.pos.model.data.InvoiceItem;
-&nbsp;import com.increff.pos.pojo.OrderItemPojo;
-&nbsp;import com.increff.pos.pojo.ProductPojo;
-&nbsp;import com.increff.pos.service.*;
-&nbsp;import com.increff.pos.util.StringUtil;
-&nbsp;import org.springframework.beans.factory.annotation.Autowired;
-&nbsp;import org.springframework.core.io.Resource;
-&nbsp;import org.springframework.http.*;
-&nbsp;import org.springframework.stereotype.Component;
+&nbsp;import com.increff.pos.model.data.InfoData;
+&nbsp;import com.increff.pos.model.form.LoginForm;
+&nbsp;import com.increff.pos.pojo.UserPojo;
+&nbsp;import com.increff.pos.service.exception.ApiException;
+&nbsp;import com.increff.pos.service.UserService;
+&nbsp;import com.increff.pos.util.AuthenticationUtil;
+&nbsp;import com.increff.pos.util.ConversionUtil;
+&nbsp;import com.increff.pos.util.SecurityUtil;
 &nbsp;
-&nbsp;import java.io.IOException;
-&nbsp;import java.util.ArrayList;
-&nbsp;import java.util.List;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;import org.springframework.web.servlet.ModelAndView;
+&nbsp;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import javax.servlet.http.HttpSession;
+&nbsp;import java.util.Objects;
 &nbsp;
 &nbsp;@Component
-<b class="fc">&nbsp;public class InvoiceDto {</b>
+<b class="fc">&nbsp;public class LoginDto {</b>
 &nbsp;
 &nbsp;    @Autowired
-&nbsp;    private OrderService orderService;
-&nbsp;
+&nbsp;    private UserService userService;
 &nbsp;    @Autowired
-&nbsp;    private OrderItemService orderItemService;
-&nbsp;
-&nbsp;    @Autowired
-&nbsp;    private ProductService productService;
-&nbsp;
-&nbsp;    @Autowired
-&nbsp;    private InvoiceService invoiceService;
+&nbsp;    private InfoData infoData;
 &nbsp;
 &nbsp;
-&nbsp;    public ResponseEntity&lt;Resource&gt; getInvoice(int orderId) throws ApiException, IOException {
-<b class="nc">&nbsp;        List&lt;OrderItemPojo&gt; list = orderItemService.getAll(orderId);</b>
-<b class="nc">&nbsp;        InvoiceData invoiceData = convert(list, orderId);</b>
-<b class="nc">&nbsp;        ResponseEntity&lt;Resource&gt; responseEntity = invoiceService.getInvoice(invoiceData);</b>
-<b class="nc">&nbsp;        orderService.update(Integer.valueOf(invoiceData.getNumber()), StringUtil.invoiced);</b>
-<b class="nc">&nbsp;        return responseEntity;</b>
+&nbsp;    public ModelAndView login(HttpServletRequest request, LoginForm loginForm) throws ApiException {
+<b class="fc">&nbsp;        UserPojo userPojo = userService.get(loginForm.getEmail());</b>
+<b class="fc">&nbsp;        boolean authenticated = (userPojo != null &amp;&amp; Objects.equals(userPojo.getPassword(), loginForm.getPassword()));</b>
+<b class="fc">&nbsp;        if (!authenticated) {</b>
+<b class="fc">&nbsp;            infoData.setMessage(&quot;Invalid username or password&quot;);</b>
+<b class="fc">&nbsp;            return new ModelAndView(&quot;redirect:/site/login&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        infoData.setEmail(userPojo.getEmail());</b>
+<b class="fc">&nbsp;        return authenticateUser(request,userPojo);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;
-&nbsp;    private InvoiceItem convert(OrderItemPojo orderItemPojo) throws ApiException {
-<b class="nc">&nbsp;        InvoiceItem invoiceItem = new InvoiceItem();</b>
-<b class="nc">&nbsp;        ProductPojo productPojo = productService.get(orderItemPojo.getProductId());</b>
-<b class="nc">&nbsp;        invoiceItem.setItemName(productPojo.getProductName());</b>
-<b class="nc">&nbsp;        invoiceItem.setQuantity(orderItemPojo.getProductQuantity());</b>
-<b class="nc">&nbsp;        invoiceItem.setMrp(productPojo.getProductMrp());</b>
-<b class="nc">&nbsp;        invoiceItem.setSellingPrice(orderItemPojo.getSellingPrice());</b>
-<b class="nc">&nbsp;        return invoiceItem;</b>
+&nbsp;    public ModelAndView signUp(HttpServletRequest request, LoginForm loginForm) throws ApiException {
+<b class="fc">&nbsp;        UserPojo userPojo = userService.get(loginForm.getEmail());</b>
+<b class="fc">&nbsp;        if(userPojo != null){</b>
+<b class="fc">&nbsp;            infoData.setMessage(&quot;Email already registered! Try logging in&quot;);</b>
+<b class="fc">&nbsp;            return new ModelAndView(&quot;redirect:/site/signup&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        userPojo = ConversionUtil.convert(loginForm, UserPojo.class);</b>
+<b class="fc">&nbsp;        userService.add(userPojo);</b>
+<b class="fc">&nbsp;        infoData.setEmail(userPojo.getEmail());</b>
+<b class="fc">&nbsp;        return authenticateUser(request, userPojo);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;    private InvoiceData convert(List&lt;OrderItemPojo&gt; list, int orderId) throws ApiException {
-<b class="nc">&nbsp;        List&lt;InvoiceItem&gt; list2 = new ArrayList&lt;InvoiceItem&gt;();</b>
-<b class="nc">&nbsp;        for (OrderItemPojo orderItemPojo : list) {</b>
-<b class="nc">&nbsp;            list2.add(convert(orderItemPojo));</b>
-<b class="nc">&nbsp;        }</b>
-<b class="nc">&nbsp;        InvoiceData invoiceData = new InvoiceData();</b>
-<b class="nc">&nbsp;        invoiceData.setInvoiceItems(list2);</b>
-<b class="nc">&nbsp;        invoiceData.setDate(orderService.get(orderId).getOrderTime().toLocalDate().toString());</b>
-<b class="nc">&nbsp;        invoiceData.setNumber(String.valueOf(orderId));</b>
-<b class="nc">&nbsp;        return invoiceData;</b>
+&nbsp;    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) {
+<b class="fc">&nbsp;        request.getSession().invalidate();</b>
+<b class="fc">&nbsp;        return new ModelAndView(&quot;redirect:/&quot;);</b>
 &nbsp;    }
 &nbsp;
-&nbsp;
-&nbsp;
+&nbsp;    private static ModelAndView authenticateUser(HttpServletRequest request , UserPojo userPojo){
+&nbsp;        // Create authentication object
+<b class="fc">&nbsp;        Authentication authentication = AuthenticationUtil.convert(userPojo);</b>
+&nbsp;        // Create new session
+<b class="fc">&nbsp;        HttpSession session = request.getSession(true);</b>
+&nbsp;        // Attach Spring SecurityContext to this new session
+<b class="fc">&nbsp;        SecurityUtil.createContext(session);</b>
+&nbsp;        // Attach Authentication object to the Security Context
+<b class="fc">&nbsp;        SecurityUtil.setAuthentication(authentication);</b>
+<b class="fc">&nbsp;        return new ModelAndView(&quot;redirect:/ui/home&quot;);</b>
+&nbsp;    }
 &nbsp;
 &nbsp;}
 </code>
@@ -165,7 +169,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

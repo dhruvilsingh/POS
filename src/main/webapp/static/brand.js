@@ -44,7 +44,6 @@ function updateBrand(event){
 	//Get the ID
 	var id = $("#brand-edit-form input[name=id]").val();
 	var url = getBrandUrl() + "/" + id;
-
 	//Set the values to update
 	var $form = $("#brand-edit-form");
 	var json = toJson($form);
@@ -82,7 +81,6 @@ function getBrandList(){
 
 var fileData = [];
 var errorData = [];
-var processCount = 0;
 
 function processData() {
     var isValid = $("#brandFile")[0].checkValidity();
@@ -90,7 +88,6 @@ function processData() {
               $("#brandFile")[0].reportValidity();
                  return;
             }
-  processCount = 0;
   fileData = [];
   errorData = [];
   var file = $('#brandFile')[0].files[0];
@@ -103,11 +100,10 @@ function readFileDataCallback(results) {
 }
 
 
-
 function uploadRows() {
   var jsonData = [];
-  for ( processCount = 0; processCount < fileData.length; processCount++) {
-    var row = fileData[processCount];
+  for ( var i = 0; i < fileData.length; i++) {
+    var row = fileData[i];
     if (row.hasOwnProperty("")) {
           delete row[""];
         }
@@ -136,10 +132,22 @@ function uploadRows() {
     },
     error: function(xhr, textStatus, errorThrown) {
                  var errorList = xhr.responseJSON.errors;
+                 const propertyName = "error";
+                fileData.forEach(obj => {
+                  obj[propertyName] = "";
+                });
                  for (var i = 0; i < errorList.length; i++) {
-                      var errorRow = errorList[i];
-                      errorData.push(errorRow);
+                      var index = parseInt(errorList[i].index);
+                      console.log(index);
+                      if(fileData[index][propertyName]!="")
+                        fileData[index][propertyName] += "\t" + errorList[i].error;
+                      else
+                        fileData[index][propertyName] += errorList[i].error;
+                      console.log(errorList[i].error);
+                      console.log(fileData[index].error);
                  }
+                 errorData = [...fileData];
+                 errorCount = errorList.length;
                  updateUploadDialog();
                  $.notify(xhr.responseJSON.message);
     }
@@ -192,7 +200,7 @@ function resetUploadDialog(){
 	$file.val('');
 	$('#brandFileName').html("Choose File");
 	//Reset various counts
-	processCount = 0;
+	errorCount = 0;
 	fileData = [];
 	errorData = [];
 	//Update counts
@@ -204,7 +212,7 @@ $(document).ready(function(){
         var fileInput = this;
         if (fileInput.files && fileInput.files[0]) {
             var fileName = fileInput.files[0].name;
-            processCount = 0;
+            errorCount = 0;
             fileData = [];
             errorData = [];
             updateUploadDialog();
@@ -216,9 +224,9 @@ $(document).ready(function(){
     });
 });
 
-
+var errorCount = 0;
 function updateUploadDialog(){
-	$('#errorCount').html("" + errorData.length);
+	$('#errorCount').html("" + errorCount);
 }
 
 function displayUploadData(){

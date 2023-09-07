@@ -1,24 +1,21 @@
 package com.increff.pos.dto;
 
 import com.increff.pos.model.data.ProductData;
-import com.increff.pos.model.forms.ProductForm;
+import com.increff.pos.model.form.ProductForm;
 import com.increff.pos.pojo.BrandPojo;
-import com.increff.pos.pojo.InventoryPojo;
 import com.increff.pos.pojo.ProductPojo;
-import com.increff.pos.service.ApiException;
+import com.increff.pos.service.exception.ApiException;
 import com.increff.pos.service.BrandService;
 import com.increff.pos.service.InventoryService;
 import com.increff.pos.service.ProductService;
-import com.increff.pos.util.StringUtil;
+import com.increff.pos.util.ConversionUtil;
+import com.increff.pos.util.NormalizeUtil;
 import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ProductDto {
@@ -32,88 +29,113 @@ public class ProductDto {
 
     @Transactional
     public void add(ProductForm productForm) throws ApiException {
-        normalize(productForm);
+        NormalizeUtil.normalize(productForm);
         ValidationUtil.checkValid(productForm);
         BrandPojo brandPojo = brandService.getBrandCategory(productForm.getBrand(), productForm.getCategory());
-        ProductPojo productPojo = convert(productForm, brandPojo.getId());
+        ProductPojo productPojo = ConversionUtil.convert(productForm, ProductPojo.class);
+        productPojo.setBrandCategoryId(brandPojo.getId());
         productService.add(productPojo);
-        InventoryPojo inventoryPojo = new InventoryPojo();
-        inventoryPojo.setProductId(productPojo.getId());
-        inventoryPojo.setQuantity(0);
-        inventoryService.add(inventoryPojo);
+        inventoryService.addEmptyInventory(productPojo.getId());
+    }
+
+    public void upload(List<ProductForm> fileData) throws ApiException {
+        List<Map<String, String>> errorList = ValidationUtil.normalizeValidateFormList(fileData);
+        checkDuplicateForms(fileData,errorList);
+        if (!errorList.isEmpty()){
+            throw new ApiException("One or more errors occurred while processing the data!\nDownload error list to view errors", errorList);
+        }
+        addList(fileData);
     }
 
     @Transactional(rollbackOn = ApiException.class)
-    public void upload(List<ProductForm> fileData) throws ApiException {
+    public void addList(List<ProductForm> productFormList) throws ApiException {
         List<Map<String, String>> errorList = new ArrayList<>();
-        for(ProductForm productForm : fileData){
-            try {
-                add(productForm);
-            } catch (ApiException e) {
-                Map<String,String> row = new HashMap<>();
-                row.put("Barcode", productForm.getBarcode());
-                row.put("Brand", productForm.getBrand());
-                row.put("Category", productForm.getCategory());
-                row.put("Name", productForm.getName());
-                row.put("MRP", productForm.getMrp().toString());
-                row.put("Error", e.getMessage());
-                errorList.add(row);
-            }
-        }
+        validateListBarcodes(productFormList, errorList);
+        Map<String,Integer> brandPojoMap = validateListBrandCategory(productFormList, errorList);
         if (!errorList.isEmpty()) {
             throw new ApiException("One or more errors occurred while processing the data!\nDownload error list to view errors", errorList);
         }
+        List<ProductPojo> productPojoList = new ArrayList<>();
+        for (int i = 0; i < productFormList.size(); i++) {
+            ProductForm productForm = productFormList.get(i);
+            String brandString = productForm.getBrand() + "_" + productForm.getCategory();
+            ProductPojo productPojo = ConversionUtil.convert(productForm, ProductPojo.class);
+            productPojo.setBrandCategoryId(brandPojoMap.get(brandString));
+            productPojoList.add(productPojo);
+        }
+        List<Integer> idList = productService.addList(productPojoList);
+        inventoryService.addEmptyInventoryList(idList);
+    }
+
+    private void validateListBarcodes(List<ProductForm> productFormList, List<Map<String, String>> errorList) {
+        List<String> barcodeList = new ArrayList<>();
+        for (int i = 0; i < productFormList.size(); i++) {
+            ProductForm productForm = productFormList.get(i);
+            barcodeList.add(productForm.getBarcode());
+        }
+        productService.validateListBarcodes(barcodeList, errorList, 1);
+    }
+
+    private Map<String,Integer> validateListBrandCategory(List<ProductForm> productFormList, List<Map<String, String>> errorList){
+        List<BrandPojo> brandPojoList = new ArrayList<>();
+        for (int i = 0; i < productFormList.size(); i++) {
+            ProductForm productForm = productFormList.get(i);
+            BrandPojo brandPojo = new BrandPojo();
+            brandPojo.setBrand(productForm.getBrand());
+            brandPojo.setCategory(productForm.getCategory());
+            brandPojoList.add(brandPojo);
+        }
+        return brandService.validateBrandPojoList(brandPojoList, errorList,2);
     }
 
     public ProductData get(int id) throws ApiException {
-        ProductPojo productPojo = productService.get(id);
-        BrandPojo brandPojo = brandService.get(productPojo.getBrandCategoryId());
-        return convert(productPojo, brandPojo.getBrand(), brandPojo.getCategory());
+        ProductPojo productPojo = productService.getCheck(id);
+        BrandPojo brandPojo = brandService.getCheck(productPojo.getBrandCategoryId());
+        ProductData productData = ConversionUtil.convert(productPojo, ProductData.class);
+        productData.setBrand(brandPojo.getBrand());
+        productData.setCategory(brandPojo.getCategory());
+        return productData;
     }
 
     public List<ProductData> getAll() throws ApiException{
         List<ProductPojo> list = productService.getAll();
         List<ProductData> list2 = new ArrayList<ProductData>();
         for (ProductPojo productPojo : list) {
-            BrandPojo brandPojo = brandService.get(productPojo.getBrandCategoryId());
-            list2.add(convert(productPojo, brandPojo.getBrand(), brandPojo.getCategory()));
+            BrandPojo brandPojo = brandService.getCheck(productPojo.getBrandCategoryId());
+            ProductData productData = ConversionUtil.convert(productPojo, ProductData.class);
+            productData.setBrand(brandPojo.getBrand());
+            productData.setCategory(brandPojo.getCategory());
+            list2.add(productData);
         }
         return list2;
     }
 
     public void update(int id, ProductForm productForm) throws ApiException {
-        normalize(productForm);
+        NormalizeUtil.normalize(productForm);
         ValidationUtil.checkValid(productForm);
         productService.update(id, productForm.getName(), productForm.getMrp());
     }
 
-    //Convert functions
-
-    private static ProductData convert(ProductPojo productPojo, String brand, String category){
-        ProductData productData = new ProductData();
-        productData.setName(productPojo.getName());
-        productData.setBarcode(productPojo.getBarcode());
-        productData.setId(productPojo.getId());
-        productData.setMrp(productPojo.getMrp());
-        productData.setBrand(brand);
-        productData.setCategory(category);
-        return productData;
+    private void checkDuplicateForms(List<ProductForm> productFormList, List<Map<String, String>> errorList) {
+        Set<String> productFormSet = new HashSet<>();
+        for (int i=0; i<productFormList.size(); i++) {
+            ProductForm productForm = productFormList.get(i);
+            String productFormString = productForm.getBarcode() + "_" + productForm.getBrand() + "_" + productForm.getCategory()
+                        + "_" + productForm.getName() + "_" + productForm.getMrp();
+            if (!productFormSet.add(productFormString)) {
+                Map<String, String> row = new HashMap<>();
+                row.put("index", Integer.toString(i));
+                row.put("error", "Duplicate entry!");
+                errorList.add(row);
+            }
+        }
     }
 
-    private static ProductPojo convert(ProductForm productForm, int brandId){
-        ProductPojo productPojo = new ProductPojo();
-        productPojo.setBarcode(productForm.getBarcode());
-        productPojo.setName(productForm.getName());
-        productPojo.setMrp(productForm.getMrp());
-        productPojo.setBrandCategoryId(brandId);
-        return productPojo;
-    }
-
-    private static void normalize(ProductForm productForm){
-        productForm.setBarcode(StringUtil.toLowerCase(productForm.getBarcode()));
-        productForm.setBrand(StringUtil.toLowerCase(productForm.getBrand()));
-        productForm.setCategory(StringUtil.toLowerCase(productForm.getCategory()));
-        productForm.setName(StringUtil.toLowerCase(productForm.getName()));
-        productForm.setMrp(StringUtil.roundOff(productForm.getMrp()));
-    }
 }
+
+//todo: refactor invoice app and other code
+//todo: remove unnecessary transactional
+//todo: complete unit testing
+//todo: put scheduler in job package
+//todo: read about criteria builder
+//todo: read about indexing

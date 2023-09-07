@@ -2,7 +2,8 @@ package com.increff.pos.service;
 
 import com.increff.pos.dao.InventoryDao;
 import com.increff.pos.pojo.InventoryPojo;
-import com.increff.pos.pojo.OrderItemPojo;
+import com.increff.pos.pojo.ProductPojo;
+import com.increff.pos.service.exception.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -15,35 +16,42 @@ public class InventoryService {
     @Autowired
     private InventoryDao inventoryDao;
 
-    public void add(InventoryPojo inventoryPojo) throws ApiException {
+    public void addEmptyInventory(int productId) throws ApiException {
+        InventoryPojo inventoryPojo = new InventoryPojo();
+        inventoryPojo.setProductId(productId);
+        inventoryPojo.setQuantity(0);
         inventoryDao.insert(inventoryPojo);
     }
 
-    public InventoryPojo get(int productId) throws ApiException {
-        return getCheck(productId);
+    public void addEmptyInventoryList(List<Integer> productIdList){
+        for(Integer productId: productIdList){
+            InventoryPojo inventoryPojo = new InventoryPojo();
+            inventoryPojo.setProductId(productId);
+            inventoryPojo.setQuantity(0);
+            inventoryDao.insert(inventoryPojo);
+        }
     }
 
-    public void addInventory(InventoryPojo inventoryPojo) throws ApiException {
-        int presentQuantity = get(inventoryPojo.getProductId()).getQuantity();
+    public void increaseInventory(InventoryPojo inventoryPojo) throws ApiException {
+        InventoryPojo exInventoryPojo = getCheck(inventoryPojo.getProductId());
+        int presentQuantity = exInventoryPojo.getQuantity();
         int updatedQuantity = presentQuantity + inventoryPojo.getQuantity();
-        if(updatedQuantity<0){
+        if(updatedQuantity< 0){
             throw new ApiException("Value exceeded " + Integer.MAX_VALUE);
         }
-
-        inventoryPojo.setQuantity(updatedQuantity);
-        update(inventoryPojo.getProductId(), inventoryPojo);
+        exInventoryPojo.setQuantity(updatedQuantity);
     }
 
     public List<InventoryPojo> getAll() {
         return inventoryDao.selectAll();
     }
 
-    public void update(int productId, InventoryPojo inventoryPojo) throws ApiException {
+    public void update(int productId, int quantity) throws ApiException {
         InventoryPojo exInventoryPojo = getCheck(productId);
-        if(inventoryPojo.getQuantity()< 0){
+        if(quantity< 0){
             throw new ApiException("Value exceeded " + Integer.MAX_VALUE);
         }
-        exInventoryPojo.setQuantity(inventoryPojo.getQuantity());
+        exInventoryPojo.setQuantity(quantity);
     }
 
     public void updateInventory(int productId, int oldQuantity, int newQuantity) throws ApiException {
@@ -60,7 +68,7 @@ public class InventoryService {
         }
         else
             throw new ApiException((oldQuantity+availableInventory)+ " items left in inventory!");
-        InventoryPojo inventoryPojo = get(productId);
+        InventoryPojo inventoryPojo = getCheck(productId);
         if(inventoryPojo.getQuantity()< 0){
             throw new ApiException("Value exceeded " + Integer.MAX_VALUE);
         }
@@ -73,7 +81,7 @@ public class InventoryService {
             throw new ApiException(availableInventory + " items are left for " + barcode);
         }
         int updatedInventory = availableInventory - inputQuantity;
-        InventoryPojo inventoryPojo = get(productId);
+        InventoryPojo inventoryPojo = getCheck(productId);
         inventoryPojo.setQuantity(updatedInventory);
     }
 

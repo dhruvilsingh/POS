@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
   <title>Coverage Report > ProductDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
@@ -56,10 +57,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 </tr>
   <tr>
-    <td class="name">ProductDao$$EnhancerBySpringCGLIB$$a118c9ba</td>
+    <td class="name">ProductDao$$EnhancerBySpringCGLIB$$6727950b</td>
   </tr>
   <tr>
-    <td class="name">ProductDao$$EnhancerBySpringCGLIB$$a118c9ba$$FastClassBySpringCGLIB$$f02cf0a2</td>
+    <td class="name">ProductDao$$EnhancerBySpringCGLIB$$6727950b$$FastClassBySpringCGLIB$$bc535f2a</td>
   </tr>
   <tr>
     <td class="name">ProductDao$$FastClassBySpringCGLIB$$6a80f183</td>
@@ -102,9 +103,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;@Repository
 <b class="fc">&nbsp;public class ProductDao extends AbstractDao{</b>
-<b class="fc">&nbsp;    private static String SELECT_ID = &quot;select productPojo from ProductPojo productPojo where productId=:id&quot;;</b>
-<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select productPojo from ProductPojo productPojo order by productPojo.productId desc&quot;;</b>
-<b class="fc">&nbsp;    private static String SELECT_BARCODE = &quot;select productPojo from ProductPojo productPojo where productBarcode=:productBarcode&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_ID = &quot;select productPojo from ProductPojo productPojo where id=:id&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select productPojo from ProductPojo productPojo order by productPojo.id desc&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_BARCODE = &quot;select productPojo from ProductPojo productPojo where barcode=:productBarcode&quot;;</b>
 &nbsp;
 &nbsp;    @PersistenceContext
 &nbsp;    private EntityManager entityManager;
@@ -115,7 +116,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public ProductPojo select(int productId) {
-<b class="fc">&nbsp;        TypedQuery&lt;ProductPojo&gt; query = getQuery(SELECT_ID, ProductPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;ProductPojo&gt; query = getQuery(SELECT_BY_ID, ProductPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;id&quot;, productId);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
 &nbsp;    }
@@ -126,7 +127,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public ProductPojo select(String productBarcode) {
-<b class="fc">&nbsp;        TypedQuery&lt;ProductPojo&gt; query = getQuery(SELECT_BARCODE, ProductPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;ProductPojo&gt; query = getQuery(SELECT_BY_BARCODE, ProductPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;productBarcode&quot;, productBarcode);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
 &nbsp;    }
@@ -155,7 +156,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

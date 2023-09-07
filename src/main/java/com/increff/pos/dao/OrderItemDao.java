@@ -1,7 +1,5 @@
 package com.increff.pos.dao;
 
-import com.increff.pos.pojo.BrandPojo;
-import com.increff.pos.pojo.CartPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.model.enums.OrderStatus;
 import org.springframework.stereotype.Repository;
@@ -10,34 +8,30 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Repository
+@Transactional
 public class OrderItemDao extends AbstractDao{
 
     private static String SELECT_ALL = "select orderItemPojo from OrderItemPojo orderItemPojo where orderId=:id order by orderItemPojo.id desc";
 
     private static String SELECT_BY_ID = "select orderItemPojo from OrderItemPojo orderItemPojo where id = :id";
 
-    private static String SELECT_ITEM_BY_ORDER_ID = "select orderItemPojo from OrderItemPojo orderItemPojo where orderID = :orderId and" +
+    private static String SELECT_ITEM_BY_ORDER_ID = "select orderItemPojo from OrderItemPojo orderItemPojo where orderID = :orderId and " +
                                 "productId = :productId";
 
     private static String DELETE_BY_ID = "delete from OrderItemPojo orderItemPojo where id=:id";
 
-
-    private static String SELECT_ITEM_COUNT = "SELECT COUNT(ip.id) " +
+    private static String SELECT_ITEM_COUNT = "SELECT COALESCE(COUNT(ip.id),0) " +
                                                     "FROM OrdersPojo op " +
                                                     "INNER JOIN OrderItemPojo ip on " +
                                                     "op.id = ip.orderId "+
                                                     "WHERE op.time >= :dateTimeStartOfDay AND op.time < :dateTimeStartOfNextDay " +
                                                     "and op.status = :orderStatus";
 
-    private static String SELECT_REVENUE = "SELECT SUM(ip.sellingPrice * ip.quantity) " +
+    private static String SELECT_REVENUE = "SELECT COALESCE(SUM(ip.sellingPrice * ip.quantity),0) " +
                                                 "FROM OrdersPojo op " +
                                                 "INNER JOIN OrderItemPojo ip on " +
                                                 "op.id = ip.orderId "+
@@ -47,9 +41,8 @@ public class OrderItemDao extends AbstractDao{
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Transactional
     public void insert(OrderItemPojo orderItemPojo) {
-        entityManager.persist(orderItemPojo);
+        entityManager.merge(orderItemPojo);
     }
 
     public OrderItemPojo selectId(int itemId){
@@ -71,7 +64,6 @@ public class OrderItemDao extends AbstractDao{
         return query.getResultList();
     }
 
-    @Transactional
     public int deleteId(int itemNo) {
         Query query = entityManager.createQuery(DELETE_BY_ID);
         query.setParameter("id", itemNo);

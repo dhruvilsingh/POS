@@ -4,7 +4,8 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
-  <title>Coverage Report > ControllerConfig</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ApiException</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -18,15 +19,18 @@
 <div class="breadCrumbs">
 Current scope:     <a href="../../index.html">all classes</a>
     <span class="separator">|</span>
-    <a href="../index.html">com.increff.pos.spring</a>
+    <a href="../index.html">com.increff.pos.service.exception</a>
 </div>
 
-<h1>Coverage Summary for Class: ControllerConfig (com.increff.pos.spring)</h1>
+<h1>Coverage Summary for Class: ApiException (com.increff.pos.service.exception)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -37,52 +41,33 @@ Current scope:     <a href="../../index.html">all classes</a>
 </th>
 </tr>
 <tr>
-  <td class="name">ControllerConfig</td>
+  <td class="name">ApiException</td>
 <td class="coverageStat">
   <span class="percent">
-    88.9%
+    100%
   </span>
   <span class="absValue">
-    (8/9)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.6%
+    100%
   </span>
   <span class="absValue">
-    (28/29)
-  </span>
-</td>
-</tr>
-  <tr>
-    <td class="name">ControllerConfig$$EnhancerBySpringCGLIB$$2edcc610</td>
-  </tr>
-  <tr>
-    <td class="name">ControllerConfig$$EnhancerBySpringCGLIB$$2edcc610$$FastClassBySpringCGLIB$$cb400b62</td>
-  </tr>
-  <tr>
-    <td class="name">ControllerConfig$$FastClassBySpringCGLIB$$3900bafb</td>
-  </tr>
-<tr>
-  <td class="name"><strong>Total</strong></td>
-<td class="coverageStat">
-  <span class="percent">
-    88.9%
-  </span>
-  <span class="absValue">
-    (8/9)
+    (3/3)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96.6%
+    100%
   </span>
   <span class="absValue">
-    (28/29)
+    (4/4)
   </span>
 </td>
 </tr>
+
 </table>
 
 <br/>
@@ -90,104 +75,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.spring;
+<code class="sourceCode" id="sourceCode">&nbsp;package com.increff.pos.service.exception;
 &nbsp;
-&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
-&nbsp;import com.fasterxml.jackson.databind.SerializationFeature;
-&nbsp;import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-&nbsp;import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
-&nbsp;import org.springframework.context.ApplicationContext;
-&nbsp;import org.springframework.context.annotation.Bean;
-&nbsp;import org.springframework.context.annotation.Configuration;
-&nbsp;import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-&nbsp;import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-&nbsp;import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-&nbsp;import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-&nbsp;import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-&nbsp;import org.thymeleaf.spring4.SpringTemplateEngine;
-&nbsp;import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
-&nbsp;import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-&nbsp;import org.thymeleaf.templatemode.TemplateMode;
-&nbsp;import org.thymeleaf.templateresolver.ITemplateResolver;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
 &nbsp;
-&nbsp;import springfox.documentation.builders.PathSelectors;
-&nbsp;import springfox.documentation.builders.RequestHandlerSelectors;
-&nbsp;import springfox.documentation.spi.DocumentationType;
-&nbsp;import springfox.documentation.spring.web.plugins.Docket;
-&nbsp;import springfox.documentation.swagger2.annotations.EnableSwagger2;
-&nbsp;
-&nbsp;import java.time.ZonedDateTime;
-&nbsp;import java.time.format.DateTimeFormatter;
-&nbsp;
-&nbsp;@Configuration
-&nbsp;@EnableWebMvc
-&nbsp;@EnableSwagger2
-<b class="fc">&nbsp;public class ControllerConfig extends WebMvcConfigurerAdapter {</b>
-&nbsp;
-&nbsp;	public static final String PACKAGE_CONTROLLER = &quot;com.increff.pos.controller&quot;;
-&nbsp;
-&nbsp;
-&nbsp;	private ApplicationContext applicationContext;
-&nbsp;
-&nbsp;	public void setApplicationContext(ApplicationContext applicationContext) {
-<b class="nc">&nbsp;		this.applicationContext = applicationContext;</b>
-&nbsp;	}
+&nbsp;public class ApiException extends Exception {
+&nbsp;	private List&lt;Map&lt;String,String&gt;&gt; errorList;
 &nbsp;	
-&nbsp;	@Bean
-&nbsp;	public Docket api() {
-<b class="fc">&nbsp;		return new Docket(DocumentationType.SWAGGER_2)//</b>
-<b class="fc">&nbsp;				.useDefaultResponseMessages(false)//</b>
-<b class="fc">&nbsp;				.select().apis(RequestHandlerSelectors.basePackage(PACKAGE_CONTROLLER))//</b>
-<b class="fc">&nbsp;				.paths(PathSelectors.regex(&quot;/api/.*&quot;))//</b>
-<b class="fc">&nbsp;				.build();</b>
+&nbsp;	public ApiException(String string) {
+<b class="fc">&nbsp;		super(string);</b>
 &nbsp;	}
 &nbsp;
-&nbsp;	// Add configuration for Swagger
-&nbsp;	@Override
-&nbsp;	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-<b class="fc">&nbsp;		registry.addResourceHandler(&quot;/swagger-ui.html&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/&quot;);</b>
-<b class="fc">&nbsp;		registry.addResourceHandler(&quot;/webjars/**&quot;).addResourceLocations(&quot;classpath:/META-INF/resources/webjars/&quot;);</b>
-<b class="fc">&nbsp;		registry.addResourceHandler(&quot;/static/**&quot;).addResourceLocations(&quot;/static/&quot;);</b>
+&nbsp;	public ApiException(String message, List&lt;Map&lt;String,String&gt;&gt; errorList) {
+<b class="fc">&nbsp;		super(message);</b>
+<b class="fc">&nbsp;		this.errorList = errorList;</b>
 &nbsp;	}
 &nbsp;
-&nbsp;	@Override
-&nbsp;	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-<b class="fc">&nbsp;		configurer.enable();</b>
+&nbsp;	public List&lt;Map&lt;String,String&gt;&gt; getErrorList() {
+<b class="fc">&nbsp;		return errorList;</b>
 &nbsp;	}
-&nbsp;
-&nbsp;	@Bean
-&nbsp;	public SpringTemplateEngine templateEngine() {
-<b class="fc">&nbsp;		SpringTemplateEngine engine = new SpringTemplateEngine();</b>
-<b class="fc">&nbsp;		engine.setEnableSpringELCompiler(true);</b>
-<b class="fc">&nbsp;		engine.setTemplateResolver(templateResolver());</b>
-<b class="fc">&nbsp;		return engine;</b>
-&nbsp;	}
-&nbsp;
-&nbsp;	@Bean
-&nbsp;	public ThymeleafViewResolver viewResolver() {
-<b class="fc">&nbsp;		ThymeleafViewResolver resolver = new ThymeleafViewResolver();</b>
-<b class="fc">&nbsp;		resolver.setTemplateEngine(templateEngine());</b>
-<b class="fc">&nbsp;		resolver.setCharacterEncoding(&quot;UTF-8&quot;);</b>
-<b class="fc">&nbsp;		return resolver;</b>
-&nbsp;	}
-&nbsp;	
-&nbsp;	@Bean
-&nbsp;	public ITemplateResolver templateResolver() {
-<b class="fc">&nbsp;		SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();</b>
-<b class="fc">&nbsp;		resolver.setApplicationContext(applicationContext);</b>
-<b class="fc">&nbsp;		resolver.setPrefix(&quot;/html/&quot;);</b>
-<b class="fc">&nbsp;		resolver.setTemplateMode(TemplateMode.HTML);</b>
-<b class="fc">&nbsp;		return resolver;</b>
-&nbsp;	}
-&nbsp;	
-&nbsp;	@Bean
-&nbsp;	public ObjectMapper objectMapper() {
-<b class="fc">&nbsp;        	JavaTimeModule javaTimeModule = new JavaTimeModule();</b>
-<b class="fc">&nbsp;        	javaTimeModule.addSerializer(ZonedDateTime.class,</b>
-<b class="fc">&nbsp;                	new ZonedDateTimeSerializer(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss.SSSXXX&quot;)));</b>
-<b class="fc">&nbsp;        	return Jackson2ObjectMapperBuilder.json().featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // ISODate</b>
-<b class="fc">&nbsp;                	.modules(javaTimeModule).build();</b>
-&nbsp;    	}
 &nbsp;}
 </code>
 </pre>
@@ -212,7 +119,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-17 11:41</div>
+    <div style="float:right;">generated on 2023-09-05 14:08</div>
 </div>
 </body>
 </html>

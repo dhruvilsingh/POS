@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
   <title>Coverage Report > InventoryDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
@@ -56,10 +57,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 </tr>
   <tr>
-    <td class="name">InventoryDao$$EnhancerBySpringCGLIB$$2b91e2f3</td>
+    <td class="name">InventoryDao$$EnhancerBySpringCGLIB$$f1a0ae44</td>
   </tr>
   <tr>
-    <td class="name">InventoryDao$$EnhancerBySpringCGLIB$$2b91e2f3$$FastClassBySpringCGLIB$$cd402c45</td>
+    <td class="name">InventoryDao$$EnhancerBySpringCGLIB$$f1a0ae44$$FastClassBySpringCGLIB$$b1e9b61</td>
   </tr>
   <tr>
     <td class="name">InventoryDao$$FastClassBySpringCGLIB$$2d0ed9f6</td>
@@ -102,7 +103,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;@Repository
 <b class="fc">&nbsp;public class InventoryDao extends AbstractDao{</b>
-<b class="fc">&nbsp;    private static String SELECT_ID = &quot;select inventoryPojo from InventoryPojo inventoryPojo where productId=:id&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_ID = &quot;select inventoryPojo from InventoryPojo inventoryPojo where productId=:id&quot;;</b>
 <b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select inventoryPojo from InventoryPojo inventoryPojo order by inventoryPojo.productId desc&quot;;</b>
 &nbsp;
 &nbsp;    @PersistenceContext
@@ -114,7 +115,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public InventoryPojo select(int productId) {
-<b class="fc">&nbsp;        TypedQuery&lt;InventoryPojo&gt; query = getQuery(SELECT_ID, InventoryPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;InventoryPojo&gt; query = getQuery(SELECT_BY_ID, InventoryPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;id&quot;, productId);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
 &nbsp;    }
@@ -148,7 +149,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

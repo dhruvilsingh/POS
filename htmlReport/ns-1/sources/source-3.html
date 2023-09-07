@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html id="htmlId">
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
   <title>Coverage Report > CartDao</title>
   <style type="text/css">
     @import "../../css/coverage.css";
@@ -56,10 +57,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 </tr>
   <tr>
-    <td class="name">CartDao$$EnhancerBySpringCGLIB$$56b3d367</td>
+    <td class="name">CartDao$$EnhancerBySpringCGLIB$$1cc29eb8</td>
   </tr>
   <tr>
-    <td class="name">CartDao$$EnhancerBySpringCGLIB$$56b3d367$$FastClassBySpringCGLIB$$80012c49</td>
+    <td class="name">CartDao$$EnhancerBySpringCGLIB$$1cc29eb8$$FastClassBySpringCGLIB$$2e88d96a</td>
   </tr>
   <tr>
     <td class="name">CartDao$$FastClassBySpringCGLIB$$e330aaf2</td>
@@ -103,11 +104,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;@Repository
 <b class="fc">&nbsp;public class CartDao extends  AbstractDao{</b>
-<b class="fc">&nbsp;    private static String SELECT_ID = &quot;select cartPojo from CartPojo cartPojo where itemNo=:id&quot;;</b>
-<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select cartPojo from CartPojo cartPojo where userEmail=:email order by cartPojo.itemNo desc&quot;;</b>
-<b class="fc">&nbsp;    private static String DELETE_ID = &quot;delete from CartPojo cartPojo where itemNo=:id&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_ID = &quot;select cartPojo from CartPojo cartPojo where id=:id&quot;;</b>
+<b class="fc">&nbsp;    private static String SELECT_ALL = &quot;select cartPojo from CartPojo cartPojo where userEmail=:email order by cartPojo.id desc&quot;;</b>
+<b class="fc">&nbsp;    private static String DELETE_BY_ID = &quot;delete from CartPojo cartPojo where id=:id&quot;;</b>
 <b class="fc">&nbsp;    private static String DELETE_ALL = &quot;delete from CartPojo cartPojo where userEmail=:email&quot;;</b>
-<b class="fc">&nbsp;    private static String SELECT_PRODUCT = &quot;select cartPojo from CartPojo cartPojo where productId=:productId &quot; +</b>
+<b class="fc">&nbsp;    private static String SELECT_BY_PRODUCT_ID = &quot;select cartPojo from CartPojo cartPojo where productId=:productId &quot; +</b>
 &nbsp;                                            &quot;and userEmail=:email&quot;;
 &nbsp;
 &nbsp;    @PersistenceContext
@@ -119,13 +120,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    public CartPojo selectId(int itemNo) {
-<b class="fc">&nbsp;        TypedQuery&lt;CartPojo&gt; query = getQuery(SELECT_ID, CartPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;CartPojo&gt; query = getQuery(SELECT_BY_ID, CartPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;id&quot;, itemNo);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    public CartPojo selectProduct(int productId, String userEmail) {
-<b class="fc">&nbsp;        TypedQuery&lt;CartPojo&gt; query = getQuery(SELECT_PRODUCT, CartPojo.class);</b>
+<b class="fc">&nbsp;        TypedQuery&lt;CartPojo&gt; query = getQuery(SELECT_BY_PRODUCT_ID, CartPojo.class);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;productId&quot;, productId);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;email&quot;,userEmail);</b>
 <b class="fc">&nbsp;        return getSingle(query);</b>
@@ -138,7 +139,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;    @Transactional
 &nbsp;    public void deleteId(int itemNo) {
-<b class="fc">&nbsp;        Query query = entityManager.createQuery(DELETE_ID);</b>
+<b class="fc">&nbsp;        Query query = entityManager.createQuery(DELETE_BY_ID);</b>
 <b class="fc">&nbsp;        query.setParameter(&quot;id&quot;, itemNo);</b>
 <b class="fc">&nbsp;        query.executeUpdate();</b>
 &nbsp;    }
@@ -175,7 +176,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2023-07-19 16:25</div>
+    <div style="float:right;">generated on 2023-09-07 00:23</div>
 </div>
 </body>
 </html>

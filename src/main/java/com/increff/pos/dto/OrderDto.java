@@ -1,14 +1,13 @@
 package com.increff.pos.dto;
 
 import com.increff.pos.model.data.OrderData;
-import com.increff.pos.model.forms.OrderItemForm;
 import com.increff.pos.pojo.CartPojo;
 import com.increff.pos.pojo.OrderItemPojo;
 import com.increff.pos.pojo.OrdersPojo;
 import com.increff.pos.service.*;
+import com.increff.pos.service.exception.ApiException;
+import com.increff.pos.util.ConversionUtil;
 import com.increff.pos.util.SecurityUtil;
-import com.increff.pos.util.StringUtil;
-import com.increff.pos.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,31 +35,33 @@ public class OrderDto {
 
     @Transactional(rollbackOn = ApiException.class)
     public void createOrder() throws ApiException {
-        List<CartPojo> list = cartService.getAll(SecurityUtil.getUser());
+        List<CartPojo> list = cartService.getAll(SecurityUtil.getUserEmail());
         if(list.isEmpty()){
             throw new ApiException("Order empty!");
         }
         int orderId = orderService.add();
         for(CartPojo cartPojo : list){
             int productId = cartPojo.getProductId();
-            Double productMrp = productService.get(productId).getMrp();
-            checkSellingPrice(cartPojo.getSellingPrice(), productMrp, productService.get(productId).getBarcode());
-            inventoryService.checkInputQuantity(productId, cartPojo.getQuantity(), productService.get(productId).getBarcode());
-            orderItemService.add(convert(cartPojo, orderId));
+            Double productMrp = productService.getCheck(productId).getMrp();
+            checkSellingPrice(cartPojo.getSellingPrice(), productMrp, productService.getCheck(productId).getBarcode());
+            inventoryService.checkInputQuantity(productId, cartPojo.getQuantity(), productService.getCheck(productId).getBarcode());
+            OrderItemPojo orderItemPojo = ConversionUtil.convert(cartPojo, OrderItemPojo.class);
+            orderItemPojo.setOrderId(orderId);
+            orderItemService.add(orderItemPojo);
         }
-        cartService.deleteAll(SecurityUtil.getUser());
+        cartService.deleteAll(SecurityUtil.getUserEmail());
     }
 
     public OrderData get(int id) throws ApiException {
         OrdersPojo ordersPojo = orderService.getCheck(id);
-        return convert(ordersPojo);
+        return ConversionUtil.convert(ordersPojo, OrderData.class);
     }
 
-    public List<OrderData> getAll() {
+    public List<OrderData> getAll() throws ApiException {
         List<OrdersPojo> list = orderService.getAll();
         List<OrderData> list2 = new ArrayList<OrderData>();
         for (OrdersPojo ordersPojo : list) {
-            list2.add(convert(ordersPojo));
+            list2.add(ConversionUtil.convert(ordersPojo, OrderData.class));
         }
         return list2;
     }
@@ -80,29 +81,5 @@ public class OrderDto {
         }
     }
 
-    //convert functions
-    private static OrderData convert(OrdersPojo ordersPojo) {
-        OrderData orderData = new OrderData();
-        orderData.setId(ordersPojo.getId());
-        orderData.setStatus(ordersPojo.getStatus().toString());
-        orderData.setTime(ordersPojo.getTime());
-        return orderData;
-    }
-
-    private OrderItemPojo convert(CartPojo cartPojo, int orderId){
-        OrderItemPojo orderItemPojo = new OrderItemPojo();
-        orderItemPojo.setOrderId(orderId);
-        orderItemPojo.setQuantity(cartPojo.getQuantity());
-        orderItemPojo.setSellingPrice(cartPojo.getSellingPrice());
-        orderItemPojo.setProductId(cartPojo.getProductId());
-        return  orderItemPojo;
-    }
-
-    private OrderItemPojo convert(OrderItemForm orderItemForm){
-        OrderItemPojo orderItemPojo = new OrderItemPojo();
-        orderItemPojo.setQuantity((int) orderItemForm.getQuantity());
-        orderItemPojo.setSellingPrice(orderItemForm.getSellingPrice());
-        return  orderItemPojo;
-    }
 
 }

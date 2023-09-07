@@ -9,8 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -18,7 +16,7 @@ import java.util.List;
 public class OrderDao extends AbstractDao{
     private static String SELECT_BY_ID = "select ordersPojo from OrdersPojo ordersPojo where id=:id";
     private static String SELECT_ALL = "select ordersPojo from OrdersPojo ordersPojo order by ordersPojo.id desc";
-    private static String SELECT_ORDER_COUNT = "select count(op.id) from OrdersPojo op " +
+    private static String SELECT_ORDER_COUNT = "select coalesce(count(op.id),0) from OrdersPojo op " +
             "WHERE op.time >= :dateTimeStartOfDay AND op.time < :dateTimeStartOfNextDay " +
             "and op.status = :orderStatus";
 

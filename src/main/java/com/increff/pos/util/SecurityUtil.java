@@ -29,7 +29,7 @@ public class SecurityUtil {
 		return token == null ? null : (UserPrincipal) getAuthentication().getPrincipal();
 	}
 
-	public static String getUser(){
+	public static String getUserEmail(){
 		UserPrincipal principal = getPrincipal();
 		return principal.getEmail();
 	}
